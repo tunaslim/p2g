@@ -232,9 +232,9 @@ export default function Home() {
                           </>
                         )}
                         <br />
-                        MaxHeight: {service.MaxHeight} {' && '}
-                        MaxWidth: {service.MaxWidth} {' && '}
-                        MaxLength: {service.MaxLength} {' && '}
+                        MaxHeight: {service.MaxHeight}
+                        MaxWidth: {service.MaxWidth}
+                        MaxLength: {service.MaxLength}
                         MaxWeight: {service.MaxWeight}
                       </td>
                       <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
