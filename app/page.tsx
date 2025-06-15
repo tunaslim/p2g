@@ -61,21 +61,21 @@ export default function Home() {
       const response = await axios.post(`${apiBase}/create-label`, { labelData });
       setLabel(response.data);
       setLoading(false);
+    } catch (err) {
+      console.error('Error fetching label:', err);
 
-      catch (err) {
-      console.error('Error fetching quotes:', err);
-  
       if (axios.isAxiosError(err)) {
-      setError(err.response?.data?.message || err.message || 'Failed to get quotes.');
-    } else if (err instanceof Error) {
-      setError(err.message);
-    } else {
-      setError('Failed to get quotes.');
-    }
+        setError(err.response?.data?.message || err.message || 'Failed to create label.');
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Failed to create label.');
+      }
 
-  setQuotes([]);
-  setLoading(false);
-}
+      setQuotes([]);
+      setLoading(false);
+    }
+  };
 
   return (
     <main className={styles.main}>
