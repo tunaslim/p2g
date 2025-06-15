@@ -15,7 +15,7 @@ interface Service {
   ShortDescriptions?: string;
   MaxHeight: number;
   MaxWidth: number;
-  MaxLength: number;
+  MaxLength: number; // corrected spelling
   MaxWeight: number;
   Links: ServiceLinks;
 }
@@ -40,9 +40,9 @@ export default function Home() {
     CollectionAddress: { Country: '', Property: '', Postcode: '', Town: '', VatStatus: 'Individual' },
     DeliveryAddress: { Country: '', Property: '', Postcode: '', Town: '', VatStatus: 'Individual' },
     Parcels: [{ Value: '', Weight: '', Length: '', Width: '', Height: '' }],
-    Extras: [],
+    Extras: [] as any[],
     IncludedDropShopDistances: false,
-    ServiceFilter: { IncludeServiceTags: [], ExcludeServiceTags: [] },
+    ServiceFilter: { IncludeServiceTags: [] as string[], ExcludeServiceTags: [] as string[] },
   });
 
   const [quotes, setQuotes] = useState<Quote[]>([]);
@@ -59,6 +59,7 @@ export default function Home() {
       setLoading(true);
       setError('');
 
+      // Parse numeric parcel fields safely
       const parsedOrder = {
         ...order,
         Parcels: order.Parcels.map(parcel => ({
@@ -90,6 +91,11 @@ export default function Home() {
   };
 
   const createLabel = async () => {
+    if (!selectedService) {
+      setError('No service selected');
+      return;
+    }
+
     try {
       setLoading(true);
       setError('');
@@ -165,7 +171,7 @@ export default function Home() {
             <input
               key={field}
               className={styles.input}
-              placeholder={`Parcel ${field}${field === 'Weight' ? ' (kg)' : field === 'Length' || field === 'Width' || field === 'Height' ? ' (cm)' : ''}`}
+              placeholder={`Parcel ${field}${field === 'Weight' ? ' (kg)' : ['Length', 'Width', 'Height'].includes(field) ? ' (cm)' : ''}`}
               type="number"
               value={order.Parcels[0][field as keyof typeof order.Parcels[0]]}
               onChange={(e) => setOrder({
@@ -208,7 +214,7 @@ export default function Home() {
                       <td><img src={service.Links.ImageSmall} alt={service.Name} className={styles.logo} /></td>
                       <td>{service.CourierName}</td>
                       <td>
-                        {service.Name}&nbsp;
+                        {service.Name}{' '}
                         {service.ShortDescriptions && (
                           <>
                             <button
@@ -225,9 +231,10 @@ export default function Home() {
                             {isExpanded && <p className={styles.description}>{service.ShortDescriptions}</p>}
                           </>
                         )}
-                        MaxHeight: {service.MaxHeight}&nbsp; &&
-                        MaxWidth: {service.MaxWidth}&nbsp; &&
-                        MaxLenght: {service.MaxLenght}&nbsp; &&
+                        <br />
+                        MaxHeight: {service.MaxHeight} {' && '}
+                        MaxWidth: {service.MaxWidth} {' && '}
+                        MaxLength: {service.MaxLength} {' && '}
                         MaxWeight: {service.MaxWeight}
                       </td>
                       <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
