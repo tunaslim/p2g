@@ -4,6 +4,33 @@ import { useState } from 'react';
 import axios from 'axios';
 import styles from './page.module.css';
 
+// Type Definitions
+interface ServiceLinks {
+  ImageSmall: string;
+}
+
+interface Service {
+  CourierName: string;
+  Name: string;
+  Description?: string;
+  Links: ServiceLinks;
+}
+
+interface Quote {
+  Service: Service;
+  TotalPrice: number;
+  TotalPriceExVat: number;
+  EstimatedDeliveryDate: string;
+}
+
+interface QuotesResponse {
+  Quotes: Quote[];
+}
+
+interface LabelResponse {
+  ShipmentLabels: { LabelUrl: string }[];
+}
+
 export default function Home() {
   const [order, setOrder] = useState({
     CollectionAddress: { Country: '', Property: '', Postcode: '', Town: '', VatStatus: 'Individual' },
@@ -14,10 +41,10 @@ export default function Home() {
     ServiceFilter: { IncludeServiceTags: [], ExcludeServiceTags: [] },
   });
 
-  const [quotes, setQuotes] = useState([]);
+  const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedService, setSelectedService] = useState(null);
-  const [label, setLabel] = useState(null);
+  const [selectedService, setSelectedService] = useState<Quote | null>(null);
+  const [label, setLabel] = useState<LabelResponse | null>(null);
   const [error, setError] = useState('');
   const [expandedDescriptions, setExpandedDescriptions] = useState<{ [key: number]: boolean }>({});
 
@@ -39,11 +66,20 @@ export default function Home() {
         })),
       };
 
-      const response = await axios.post(`${apiBase}/get-quote`, { order: parsedOrder });
+      const response = await axios.post<QuotesResponse>(`${apiBase}/get-quote`, { order: parsedOrder });
       setQuotes(response.data.Quotes);
       setLoading(false);
     } catch (err) {
-      setError('Failed to get quotes.');
+      console.error('Error fetching quotes:', err);
+
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || err.message || 'Failed to get quotes.');
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Failed to get quotes.');
+      }
+
       setQuotes([]);
       setLoading(false);
     }
@@ -59,7 +95,7 @@ export default function Home() {
         SelectedService: selectedService,
       };
 
-      const response = await axios.post(`${apiBase}/create-label`, { labelData });
+      const response = await axios.post<LabelResponse>(`${apiBase}/create-label`, { labelData });
       setLabel(response.data);
       setLoading(false);
     } catch (err) {
@@ -73,16 +109,8 @@ export default function Home() {
         setError('Failed to create label.');
       }
 
-      setQuotes([]);
       setLoading(false);
     }
-  };
-
-  const toggleDescription = (index: number) => {
-    setExpandedDescriptions(prev => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
   };
 
   return (
@@ -129,13 +157,13 @@ export default function Home() {
 
           {/* Parcel Details */}
           <h3 className={styles.subTitle}>Parcel Details</h3>
-          {(['Value', 'Weight', 'Length', 'Width', 'Height'] as const).map((field) => (
+          {['Value', 'Weight', 'Length', 'Width', 'Height'].map((field) => (
             <input
               key={field}
               className={styles.input}
               placeholder={`Parcel ${field}${field === 'Weight' ? ' (kg)' : field === 'Length' || field === 'Width' || field === 'Height' ? ' (cm)' : ''}`}
               type="number"
-              value={order.Parcels[0][field]}
+              value={order.Parcels[0][field as keyof typeof order.Parcels[0]]}
               onChange={(e) => setOrder({
                 ...order,
                 Parcels: [{ ...order.Parcels[0], [field]: e.target.value }],
@@ -176,22 +204,23 @@ export default function Home() {
                       <td><img src={service.Links.ImageSmall} alt={service.Name} className={styles.logo} /></td>
                       <td>{service.CourierName}</td>
                       <td>
-                        <div>
-                          {service.Name}
-                          <div className={styles.descriptionContainer}>
-                            <p className={isExpanded ? styles.expanded : styles.collapsed}>
-                              {service.Description || 'No description available.'}
-                            </p>
-                            {service.Description && (
-                              <button
-                                onClick={() => toggleDescription(index)}
-                                className={styles.toggleButton}
-                              >
-                                {isExpanded ? 'Show Less' : 'Show More'}
-                              </button>
-                            )}
-                          </div>
-                        </div>
+                        {service.Name}
+                        {service.Description && (
+                          <>
+                            <button
+                              className={styles.descriptionToggle}
+                              onClick={() =>
+                                setExpandedDescriptions({
+                                  ...expandedDescriptions,
+                                  [index]: !isExpanded,
+                                })
+                              }
+                            >
+                              {isExpanded ? 'Hide Details' : 'Show Details'}
+                            </button>
+                            {isExpanded && <p className={styles.description}>{service.Description}</p>}
+                          </>
+                        )}
                       </td>
                       <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
                       <td>£{quote.TotalPrice.toFixed(2)}</td>
