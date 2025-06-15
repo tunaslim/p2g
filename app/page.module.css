@@ -1,56 +1,51 @@
 .main {
-  padding: 2rem;
+  padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
 .title {
   font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
+  margin-bottom: 20px;
 }
 
 .loading {
-  margin-bottom: 1rem;
+  color: orange;
 }
 
 .error {
-  margin-bottom: 1rem;
   color: red;
 }
 
 .formSection {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 40px;
 }
 
 .sectionTitle {
   font-size: 1.5rem;
-  font-weight: 600;
+  margin-bottom: 10px;
 }
 
 .subTitle {
-  font-weight: 500;
-  margin-top: 1rem;
+  font-size: 1.2rem;
+  margin-top: 20px;
 }
 
 .input {
-  border: 1px solid #ccc;
-  padding: 0.5rem;
+  display: block;
+  margin-bottom: 10px;
+  padding: 8px;
   width: 100%;
-  border-radius: 4px;
+  max-width: 400px;
 }
 
 .primaryButton {
   background-color: #0070f3;
   color: white;
-  padding: 0.6rem 1rem;
+  padding: 10px 20px;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
-  max-width: 200px;
+  border-radius: 4px;
 }
 
 .primaryButton:hover {
@@ -68,50 +63,66 @@
 
 .table th,
 .table td {
-  border: 1px solid #ccc;
-  padding: 0.5rem;
-  text-align: left;
-}
-
-.table th {
-  background-color: #f3f3f3;
-}
-
-.table tr:hover {
-  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 8px;
 }
 
 .logo {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
+  width: 50px;
 }
 
 .selectButton {
-  background-color: #22c55e;
+  background-color: green;
   color: white;
-  padding: 0.4rem 0.8rem;
+  padding: 6px 12px;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
+  border-radius: 4px;
 }
 
 .selectButton:hover {
-  background-color: #16a34a;
+  background-color: darkgreen;
 }
 
 .labelSection {
-  margin-top: 2rem;
+  margin-top: 30px;
 }
 
 .downloadButton {
-  background-color: #8b5cf6;
+  background-color: #0070f3;
   color: white;
-  padding: 0.6rem 1rem;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
   border-radius: 4px;
   text-decoration: none;
 }
 
 .downloadButton:hover {
-  background-color: #7c3aed;
+  background-color: #005bb5;
+}
+
+.descriptionContainer {
+  margin-top: 8px;
+}
+
+.collapsed {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+}
+
+.expanded {
+  white-space: normal;
+}
+
+.toggleButton {
+  background: none;
+  color: blue;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 4px;
+  font-size: 0.9rem;
 }
