@@ -14,13 +14,16 @@ export default function Home() {
     ServiceFilter: { IncludeServiceTags: [], ExcludeServiceTags: [] },
   });
 
-  const [quotes, setQuotes] = useState([]);
+  const [quotes, setQuotes] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedService, setSelectedService] = useState(null);
-  const [label, setLabel] = useState(null);
+  const [selectedService, setSelectedService] = useState<any>(null);
+  const [label, setLabel] = useState<any>(null);
   const [error, setError] = useState('');
 
   const apiBase = 'https://p2g-api.up.railway.app';
+
+  const addressFields = ['Country', 'Property', 'Postcode', 'Town'] as const;
+  type AddressField = typeof addressFields[number];
 
   const getQuotes = async () => {
     try {
@@ -62,7 +65,7 @@ export default function Home() {
       setLabel(response.data);
       setLoading(false);
     } catch (err) {
-      console.error('Error fetching label:', err);
+      console.error('Error creating label:', err);
 
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || err.message || 'Failed to create label.');
@@ -91,7 +94,7 @@ export default function Home() {
 
           {/* Collection Address */}
           <h3 className={styles.subTitle}>Sender Address</h3>
-          {['Country', 'Property', 'Postcode', 'Town'].map((field) => (
+          {addressFields.map((field) => (
             <input
               key={field}
               className={styles.input}
@@ -106,7 +109,7 @@ export default function Home() {
 
           {/* Delivery Address */}
           <h3 className={styles.subTitle}>Delivery Address</h3>
-          {['Country', 'Property', 'Postcode', 'Town'].map((field) => (
+          {addressFields.map((field) => (
             <input
               key={field}
               className={styles.input}
@@ -127,7 +130,7 @@ export default function Home() {
               className={styles.input}
               placeholder={`Parcel ${field}${field === 'Weight' ? ' (kg)' : field === 'Length' || field === 'Width' || field === 'Height' ? ' (cm)' : ''}`}
               type="number"
-              value={order.Parcels[0][field]}
+              value={order.Parcels[0][field as keyof typeof order.Parcels[0]]}
               onChange={(e) => setOrder({
                 ...order,
                 Parcels: [{ ...order.Parcels[0], [field]: e.target.value }],
