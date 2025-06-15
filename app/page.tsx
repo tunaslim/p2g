@@ -14,16 +14,14 @@ export default function Home() {
     ServiceFilter: { IncludeServiceTags: [], ExcludeServiceTags: [] },
   });
 
-  const [quotes, setQuotes] = useState<any[]>([]);
+  const [quotes, setQuotes] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedService, setSelectedService] = useState<any>(null);
-  const [label, setLabel] = useState<any>(null);
+  const [selectedService, setSelectedService] = useState(null);
+  const [label, setLabel] = useState(null);
   const [error, setError] = useState('');
+  const [expandedDescriptions, setExpandedDescriptions] = useState<{ [key: number]: boolean }>({});
 
   const apiBase = 'https://p2g-api.up.railway.app';
-
-  const addressFields = ['Country', 'Property', 'Postcode', 'Town'] as const;
-  type AddressField = typeof addressFields[number];
 
   const getQuotes = async () => {
     try {
@@ -80,6 +78,13 @@ export default function Home() {
     }
   };
 
+  const toggleDescription = (index: number) => {
+    setExpandedDescriptions(prev => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
   return (
     <main className={styles.main}>
       <h1 className={styles.title}>Parcel2Go Quote & Label Generator</h1>
@@ -94,7 +99,7 @@ export default function Home() {
 
           {/* Collection Address */}
           <h3 className={styles.subTitle}>Sender Address</h3>
-          {addressFields.map((field) => (
+          {(['Country', 'Property', 'Postcode', 'Town'] as const).map((field) => (
             <input
               key={field}
               className={styles.input}
@@ -109,7 +114,7 @@ export default function Home() {
 
           {/* Delivery Address */}
           <h3 className={styles.subTitle}>Delivery Address</h3>
-          {addressFields.map((field) => (
+          {(['Country', 'Property', 'Postcode', 'Town'] as const).map((field) => (
             <input
               key={field}
               className={styles.input}
@@ -124,13 +129,13 @@ export default function Home() {
 
           {/* Parcel Details */}
           <h3 className={styles.subTitle}>Parcel Details</h3>
-          {['Value', 'Weight', 'Length', 'Width', 'Height'].map((field) => (
+          {(['Value', 'Weight', 'Length', 'Width', 'Height'] as const).map((field) => (
             <input
               key={field}
               className={styles.input}
               placeholder={`Parcel ${field}${field === 'Weight' ? ' (kg)' : field === 'Length' || field === 'Width' || field === 'Height' ? ' (cm)' : ''}`}
               type="number"
-              value={order.Parcels[0][field as keyof typeof order.Parcels[0]]}
+              value={order.Parcels[0][field]}
               onChange={(e) => setOrder({
                 ...order,
                 Parcels: [{ ...order.Parcels[0], [field]: e.target.value }],
@@ -164,11 +169,30 @@ export default function Home() {
                 .sort((a, b) => a.TotalPrice - b.TotalPrice)
                 .map((quote, index) => {
                   const service = quote.Service;
+                  const isExpanded = expandedDescriptions[index] || false;
+
                   return (
                     <tr key={index}>
                       <td><img src={service.Links.ImageSmall} alt={service.Name} className={styles.logo} /></td>
                       <td>{service.CourierName}</td>
-                      <td>{service.Name}</td>
+                      <td>
+                        <div>
+                          {service.Name}
+                          <div className={styles.descriptionContainer}>
+                            <p className={isExpanded ? styles.expanded : styles.collapsed}>
+                              {service.Description || 'No description available.'}
+                            </p>
+                            {service.Description && (
+                              <button
+                                onClick={() => toggleDescription(index)}
+                                className={styles.toggleButton}
+                              >
+                                {isExpanded ? 'Show Less' : 'Show More'}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </td>
                       <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
                       <td>£{quote.TotalPrice.toFixed(2)}</td>
                       <td>{new Date(quote.EstimatedDeliveryDate).toLocaleDateString()}</td>
