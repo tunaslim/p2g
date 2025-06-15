@@ -20,7 +20,7 @@ export default function Home() {
   const [label, setLabel] = useState(null);
   const [error, setError] = useState('');
 
-  const apiBase = 'https://parcel2go-api.up.railway.app';
+  const apiBase = 'https://p2g-api.up.railway.app';
 
   const getQuotes = async () => {
     try {
