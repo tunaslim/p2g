@@ -12,7 +12,7 @@ interface ServiceLinks {
 interface Service {
   CourierName: string;
   Name: string;
-  Description?: string;
+  ShortDescriptions?: string;
   Links: ServiceLinks;
 }
 
