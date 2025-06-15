@@ -58,13 +58,17 @@
 
 .table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 10px;
 }
 
 .table th,
 .table td {
-  border: 1px solid #ddd;
-  padding: 8px;
+  border: none; /* Remove borders */
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 8px; /* Rounded corners */
+  text-align: left;
 }
 
 .logo {
