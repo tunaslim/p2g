@@ -232,7 +232,7 @@ export default function Home() {
                           </>
                         )}
                         <br />
-                        MaxWeight: {service.MaxWeight * 100}kg{' '}
+                        MaxWeight: {service.MaxWeight}kg{' '}
                         MaxHeight: {service.MaxHeight * 100}cm{' '}
                         MaxWidth: {service.MaxWidth * 100}cm{' '}
                         MaxLength: {service.MaxLength * 100}cm
