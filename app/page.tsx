@@ -13,6 +13,10 @@ interface Service {
   CourierName: string;
   Name: string;
   ShortDescriptions?: string;
+  MaxHeight: number;
+  MaxWidth: number;
+  MaxLength: number;
+  MaxWeight: number;
   Links: ServiceLinks;
 }
 
@@ -204,7 +208,7 @@ export default function Home() {
                       <td><img src={service.Links.ImageSmall} alt={service.Name} className={styles.logo} /></td>
                       <td>{service.CourierName}</td>
                       <td>
-                        {service.Name}
+                        {service.Name}&nbsp;
                         {service.ShortDescriptions && (
                           <>
                             <button
@@ -221,6 +225,10 @@ export default function Home() {
                             {isExpanded && <p className={styles.description}>{service.ShortDescriptions}</p>}
                           </>
                         )}
+                        MaxHeight: {service.MaxHeight}&nbsp; &&
+                        MaxWidth: {service.MaxWidth}&nbsp; &&
+                        MaxLenght: {service.MaxLenght}&nbsp; &&
+                        MaxWeight: {service.MaxWeight}
                       </td>
                       <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
                       <td>£{quote.TotalPrice.toFixed(2)}</td>
