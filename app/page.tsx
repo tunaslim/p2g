@@ -205,7 +205,7 @@ export default function Home() {
                       <td>{service.CourierName}</td>
                       <td>
                         {service.Name}
-                        {service.Description && (
+                        {service.ShortDescriptions && (
                           <>
                             <button
                               className={styles.descriptionToggle}
@@ -218,7 +218,7 @@ export default function Home() {
                             >
                               {isExpanded ? 'Hide Details' : 'Show Details'}
                             </button>
-                            {isExpanded && <p className={styles.description}>{service.Description}</p>}
+                            {isExpanded && <p className={styles.description}>{service.ShortDescriptions}</p>}
                           </>
                         )}
                       </td>
