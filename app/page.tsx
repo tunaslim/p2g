@@ -125,7 +125,7 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <h1 className={styles.title}>Parcel2Go Quote & Label Generator</h1>
+      <h1 className={styles.title}>Parcel2Go Quotes</h1>
 
       {loading && <p className={styles.loading}>Loading...</p>}
 
