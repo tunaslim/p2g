@@ -62,13 +62,25 @@
   border-spacing: 0 10px;
 }
 
-.table th,
+.table tr,
 .table td {
   border: none;
-  padding: 12px;
+  padding: 15px 20px;
   background-color: #b8b4b4;
   border-radius: 0px;
   text-align: left;
+}
+
+.table tr,
+.table td:first-of-type {
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
+}
+
+.table tr,
+.table td:last-of-type {
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
 }
 
 .logo {
