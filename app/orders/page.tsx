@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 
 interface Order {
   id: string;
-  // Add your order fields here
+  reference: string;
+  customer_name: string;
+  // Add other fields as needed
 }
 
 export default function OrdersPage() {
@@ -14,20 +15,22 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('helmToken');
-    if (!token) {
-      setError('Not logged in');
-      return;
-    }
-
     async function fetchOrders() {
-      setLoading(true);
-      setError('');
+      const token = localStorage.getItem('helm_token');
+      if (!token) {
+        setError('No token found. Please login.');
+        return;
+      }
+
       try {
-        const response = await axios.get(`/api/helm/orders?token=${token}`);
-        setOrders(response.data.orders || response.data); // adjust based on response shape
+        setLoading(true);
+        const response = await fetch(`/api/helm/orders?token=${token}`);
+        if (!response.ok) throw new Error('Failed to fetch orders');
+
+        const data = await response.json();
+        setOrders(data.orders);
       } catch (err: any) {
-        setError(err.response?.data?.message || err.message || 'Failed to load orders');
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -36,18 +39,20 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
-  if (loading) return <p>Loading orders...</p>;
-  if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
-  if (orders.length === 0) return <p>No orders found.</p>;
-
   return (
     <main>
-      <h1>Your Orders</h1>
-      <ul>
-        {orders.map(order => (
-          <li key={order.id}>{/* render order info here */}Order ID: {order.id}</li>
-        ))}
-      </ul>
+      <h1>Orders</h1>
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {orders.length > 0 && (
+        <ul>
+          {orders.map((order) => (
+            <li key={order.id}>
+              {order.reference} - {order.customer_name}
+            </li>
+          ))}
+        </ul>
+      )}
     </main>
   );
 }
