@@ -69,16 +69,16 @@
   padding: 15px 20px;
   text-align: left;
   font-size: 1rem;
-  border-top-left-radius: 50px;
-  border-top-right-radius: 50px;
 }
 
 .table th:first-of-type {
-  border-top-left-radius: 50px;
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
 }
 
 .table th:last-of-type {
-  border-top-right-radius: 50px;
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
 }
 
 /* Table body rows and cells */
