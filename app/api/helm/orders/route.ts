@@ -1,24 +1,32 @@
+// ✅ app/api/helm/orders/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const page = searchParams.get('page') || '1';
-  const sort = searchParams.get('sort') || 'name_az';
-  const token = searchParams.get('token');
+export async function GET(request: NextRequest) {
+  const token = request.nextUrl.searchParams.get('token') || '';
 
   if (!token) {
-    return NextResponse.json({ message: 'Missing token' }, { status: 400 });
+    return NextResponse.json({ error: 'Missing auth token' }, { status: 401 });
   }
 
   try {
-    const response = await axios.get(`https://goodlife.myhelm.app/public-api/orders?page=${page}&sort=${sort}`, {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await fetch('https://goodlife.myhelm.app/public-api/order', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+      },
     });
 
-    return NextResponse.json(response.data);
-  } catch (err) {
-    console.error('Proxy get orders error:', err);
-    return NextResponse.json({ message: 'Proxy get orders failed', error: err }, { status: 500 });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      return NextResponse.json(
+        { error: errorData.message || 'Failed to fetch orders' },
+        { status: response.status }
+      );
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
