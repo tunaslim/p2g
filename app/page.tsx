@@ -15,7 +15,7 @@ interface Service {
   ShortDescriptions?: string;
   MaxHeight: number;
   MaxWidth: number;
-  MaxLength: number; // corrected spelling
+  MaxLength: number;
   MaxWeight: number;
   Links: ServiceLinks;
 }
@@ -212,9 +212,9 @@ export default function Home() {
                   return (
                     <tr key={index}>
                       <td><img src={service.Links.ImageSmall} alt={service.Name} className={styles.logo} /></td>
-                      <td>{service.CourierName}</td>
+                      <td><span className={styles.bold}{service.CourierName}</span></td>
                       <td>
-                        {service.Name}{' '}
+                        </span>className={styles.bold}{service.Name}</span>{' '}
                         {service.ShortDescriptions && (
                           <>
                             <button
@@ -232,10 +232,12 @@ export default function Home() {
                           </>
                         )}
                         <br />
+                        <span className={styles.maxdims}
                         MaxWeight: {service.MaxWeight}kg{' '}
                         MaxHeight: {service.MaxHeight * 100}cm{' '}
                         MaxWidth: {service.MaxWidth * 100}cm{' '}
                         MaxLength: {service.MaxLength * 100}cm
+                        </span>
                       </td>
                       <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
                       <td>£{quote.TotalPrice.toFixed(2)}</td>
