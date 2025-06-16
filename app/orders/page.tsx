@@ -1,52 +1,74 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getOrders } from '../../utils/api';
-import { useRouter } from 'next/navigation';
+import axios from 'axios';
+
+interface Order {
+  order_id: string;
+  reference: string;
+  status: string;
+}
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [error, setError] = useState('');
-  const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      router.push('/login');
-      return;
-    }
-
-    async function fetchOrders() {
+    const fetchOrders = async () => {
       try {
-        const data = await getOrders(token);
-        setOrders(data);
+        const token = localStorage.getItem('helmToken');
+        if (!token) {
+          setError('No token found. Please login first.');
+          return;
+        }
+
+        const response = await axios.get('https://goodlife.myhelm.app/public-api/orders', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setOrders(response.data.orders);
       } catch (err) {
-        setError(err.message);
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unexpected error occurred.');
+        }
       }
-    }
+    };
 
     fetchOrders();
-  }, [router]);
-
-  if (error) {
-    return <p style={{ color: 'red' }}>{error}</p>;
-  }
-
-  if (!orders.length) {
-    return <p>Loading orders...</p>;
-  }
+  }, []);
 
   return (
-    <div style={{ maxWidth: 800, margin: 'auto' }}>
-      <h2>Orders</h2>
-      {orders.map(order => (
-        <div key={order.id} style={{ border: '1px solid #ccc', padding: 10, marginBottom: 10 }}>
-          <p><strong>Order ID:</strong> {order.id}</p>
-          <p><strong>Customer:</strong> {order.customer_name || order.customer?.name || 'N/A'}</p>
-          <p><strong>Status:</strong> {order.status}</p>
-          {/* Add more order details as needed */}
-        </div>
-      ))}
-    </div>
+    <main style={{ padding: '40px' }}>
+      <h1>Orders</h1>
+
+      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+
+      {orders.length === 0 && !error && <p>No orders found.</p>}
+
+      {orders.length > 0 && (
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>Order ID</th>
+              <th style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>Reference</th>
+              <th style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order.order_id}>
+                <td style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>{order.order_id}</td>
+                <td style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>{order.reference}</td>
+                <td style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>{order.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </main>
   );
 }
