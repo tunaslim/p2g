@@ -59,7 +59,6 @@ export default function Home() {
       setLoading(true);
       setError('');
 
-      // Parse numeric parcel fields safely
       const parsedOrder = {
         ...order,
         Parcels: order.Parcels.map(parcel => ({
@@ -135,7 +134,6 @@ export default function Home() {
         <div className={styles.formSection}>
           <h2 className={styles.sectionTitle}>Order Details</h2>
 
-          {/* Collection Address */}
           <h3 className={styles.subTitle}>Sender Address</h3>
           {(['Country', 'Property', 'Postcode', 'Town'] as const).map((field) => (
             <input
@@ -150,7 +148,6 @@ export default function Home() {
             />
           ))}
 
-          {/* Delivery Address */}
           <h3 className={styles.subTitle}>Delivery Address</h3>
           {(['Country', 'Property', 'Postcode', 'Town'] as const).map((field) => (
             <input
@@ -165,7 +162,6 @@ export default function Home() {
             />
           ))}
 
-          {/* Parcel Details */}
           <h3 className={styles.subTitle}>Parcel Details</h3>
           {['Value', 'Weight', 'Length', 'Width', 'Height'].map((field) => (
             <input
@@ -212,13 +208,13 @@ export default function Home() {
                   return (
                     <tr key={index}>
                       <td><img src={service.Links.ImageSmall} alt={service.Name} className={styles.logo} /></td>
-                      <td><span className={styles.bold}{service.CourierName}</span></td>
+                      <td><span className={styles.bold}>{service.CourierName}</span></td>
                       <td>
-                        </span>className={styles.bold}{service.Name}</span>{' '}
+                        <span className={styles.bold}>{service.Name}</span>{' '}
                         {service.ShortDescriptions && (
                           <>
                             <button
-                              className={styles.descriptionToggle}
+                              className={styles.toggleButton}
                               onClick={() =>
                                 setExpandedDescriptions({
                                   ...expandedDescriptions,
@@ -232,11 +228,11 @@ export default function Home() {
                           </>
                         )}
                         <br />
-                        <span className={styles.maxdims}
-                        MaxWeight: {service.MaxWeight}kg{' '}
-                        MaxHeight: {service.MaxHeight * 100}cm{' '}
-                        MaxWidth: {service.MaxWidth * 100}cm{' '}
-                        MaxLength: {service.MaxLength * 100}cm
+                        <span className={styles.maxdims}>
+                          MaxWeight: {service.MaxWeight}kg{' '}
+                          MaxHeight: {service.MaxHeight * 100}cm{' '}
+                          MaxWidth: {service.MaxWidth * 100}cm{' '}
+                          MaxLength: {service.MaxLength * 100}cm
                         </span>
                       </td>
                       <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
