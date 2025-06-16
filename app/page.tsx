@@ -224,7 +224,12 @@ export default function Home() {
                             >
                               {isExpanded ? 'Hide Details' : 'Show Details'}
                             </button>
-                            {isExpanded && <p className={styles.description}>{service.ShortDescriptions}</p>}
+                            {isExpanded && (
+                              <div
+                                className={styles.description}
+                                dangerouslySetInnerHTML={{ __html: service.ShortDescriptions }}
+                              />
+                            )}
                           </>
                         )}
                         <br />
