@@ -5,64 +5,54 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const router = useRouter();
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError('');
+
     try {
-      const response = await axios.post('https://goodlife.myhelm.app/auth/login', {
-        email,
-        password,
-        '2fa_code': null,
-      });
+      const response = await axios.post('/api/helm/login', { email, password, '2fa_code': null });
+      const token = response.data.token; // Adjust field as per your API
 
-      const token = response.data.token;
-      localStorage.setItem('helmToken', token);
-      router.push('/orders');
-    } catch (err) {
-      console.error('Full error:', err); // Logs the full error object
-
-      if (axios.isAxiosError(err)) {
-        console.error('Axios error details:', err.toJSON()); // Logs Axios error structure
-        setError(err.response?.data?.message || err.message || 'Login failed.');
-      } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Login failed.');
+      if (!token) {
+        setError('Login failed: No token returned');
+        return;
       }
+
+      localStorage.setItem('helmToken', token);
+
+      // Redirect to orders page after login
+      router.push('/orders');
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || 'Login failed');
     }
   }
 
   return (
-    <main style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
-      <h1>Login to Helm</h1>
+    <main>
+      <h1>Login</h1>
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '10px' }}>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-          />
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" style={{ padding: '10px 20px' }}>Login</button>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit">Login</button>
       </form>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </main>
   );
 }
