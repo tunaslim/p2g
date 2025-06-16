@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 
 export async function GET(
   request: Request,
-  context: { params: { orderId: string } }
+  { params }: { params: { orderId: string } }
 ) {
-  const { orderId } = context.params;
+  const { orderId } = params;
 
   const tokenFromQuery = new URL(request.url).searchParams.get('token');
   const authHeader = request.headers.get('authorization');
