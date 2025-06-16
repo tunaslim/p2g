@@ -1,17 +1,27 @@
+// ✅ app/api/helm/login/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
+  const { email, password } = await request.json();
+
   try {
-    const body = await req.json();
-
-    const response = await axios.post('https://goodlife.myhelm.app/public-api/auth/login', body, {
+    const response = await fetch('https://goodlife.myhelm.app/public-api/auth/login', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, '2fa_code': null }),
     });
 
-    return NextResponse.json(response.data);
-  } catch (err) {
-    console.error('Proxy login error:', err);
-    return NextResponse.json({ message: 'Proxy login failed', error: err }, { status: 500 });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      return NextResponse.json(
+        { error: errorData.message || 'Failed to login' },
+        { status: response.status }
+      );
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
