@@ -10,64 +10,55 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  async function login(email: string, password: string): Promise<string> {
-    try {
-      const response = await axios.post('https://goodlife.myhelm.app/public-api/auth/login', {
-        email,
-        password,
-      });
-      const token = response.data.token;
-      localStorage.setItem('helmToken', token);
-      return token;
-    } catch (err) {
-      console.error('Login error:', err);
-      throw new Error('Failed to login. Please check your credentials.');
-    }
-  }
-
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
-      const token = await login(email, password);
-      console.log('Logged in with token:', token);
-      router.push('/');
+      const response = await axios.post('https://goodlife.myhelm.app/auth/login', {
+        email,
+        password,
+        '2fa_code': null,
+      });
+
+      const token = response.data.token;
+      localStorage.setItem('helmToken', token);
+      router.push('/orders');
     } catch (err) {
-      if (err instanceof Error) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || err.message || 'Login failed.');
+      } else if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('An unexpected error occurred.');
+        setError('Login failed.');
       }
     }
   }
 
   return (
-    <main style={{ padding: '40px', maxWidth: '400px', margin: '0 auto' }}>
-      <h1 style={{ marginBottom: '20px' }}>Helm Login</h1>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <main style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
+      <h1>Login to Helm</h1>
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
+        <div style={{ marginBottom: '10px' }}>
+          <label>Email:</label>
           <input
             type="email"
-            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            style={{ width: '100%', padding: '8px' }}
+            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
           />
         </div>
-        <div style={{ marginBottom: '15px' }}>
+        <div style={{ marginBottom: '10px' }}>
+          <label>Password:</label>
           <input
             type="password"
-            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: '8px' }}
+            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
           />
         </div>
-        <button type="submit" style={{ padding: '10px 20px' }}>
-          Login
-        </button>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <button type="submit" style={{ padding: '10px 20px' }}>Login</button>
       </form>
     </main>
   );
