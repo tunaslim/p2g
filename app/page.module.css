@@ -138,6 +138,10 @@
   color: blue;
   border: none;
   cursor: pointer;
+  padding: 0;
+  margin-top: 4px;
+  font-size: 0.9rem;
+}
 
 .description {
   margin-top: 8px;
@@ -147,8 +151,4 @@
   font-size: 0.95rem;
   color: #333;
   line-height: 1.4;
-}
-  padding: 0;
-  margin-top: 4px;
-  font-size: 0.9rem;
 }
