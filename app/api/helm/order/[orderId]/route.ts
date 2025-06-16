@@ -1,23 +1,53 @@
-import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
+import { NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest, { params }: { params: { orderId: string } }) {
+export async function GET(
+  request: Request,
+  { params }: { params: { orderId: string } }
+) {
   const { orderId } = params;
-  const { searchParams } = new URL(req.url);
-  const token = searchParams.get('token');
-
-  if (!token) {
-    return NextResponse.json({ message: 'Missing token' }, { status: 400 });
-  }
 
   try {
-    const response = await axios.get(`https://goodlife.myhelm.app/public-api/order/${orderId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const url = new URL(request.url);
+    const token = url.searchParams.get('token');
 
-    return NextResponse.json(response.data);
-  } catch (err) {
-    console.error('Proxy get order detail error:', err);
-    return NextResponse.json({ message: 'Proxy get order detail failed', error: err }, { status: 500 });
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Authorization token is required as query parameter "token"' },
+        { status: 401 }
+      );
+    }
+
+    // Call Helm API order detail endpoint
+    const helmRes = await fetch(
+      `https://goodlife.myhelm.app/public-api/order/${orderId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!helmRes.ok) {
+      const errorText = await helmRes.text();
+      return NextResponse.json(
+        { error: `Helm API error: ${helmRes.status} - ${errorText}` },
+        { status: helmRes.status }
+      );
+    }
+
+    const data = await helmRes.json();
+
+    return NextResponse.json(data);
+  } catch (error) {
+    // TypeScript: error is unknown, so we do type guard
+    let message = 'Unknown error';
+    if (error instanceof Error) message = error.message;
+
+    return NextResponse.json(
+      { error: `Server error: ${message}` },
+      { status: 500 }
+    );
   }
 }
