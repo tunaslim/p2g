@@ -23,7 +23,10 @@ export default function LoginPage() {
       localStorage.setItem('helmToken', token);
       router.push('/orders');
     } catch (err) {
+      console.error('Full error:', err); // Logs the full error object
+
       if (axios.isAxiosError(err)) {
+        console.error('Axios error details:', err.toJSON()); // Logs Axios error structure
         setError(err.response?.data?.message || err.message || 'Login failed.');
       } else if (err instanceof Error) {
         setError(err.message);
