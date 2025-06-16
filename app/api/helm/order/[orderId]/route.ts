@@ -2,11 +2,10 @@ import { NextResponse } from 'next/server';
 
 export async function GET(
   request: Request,
-  context: { params: { orderId: string } }
+  { params }: { params: { orderId: string } }
 ) {
-  const { orderId } = context.params;
+  const { orderId } = params;
 
-  // Get the auth token from query parameters or headers as you prefer
   const tokenFromQuery = new URL(request.url).searchParams.get('token');
   const authHeader = request.headers.get('authorization');
   const token = tokenFromQuery || (authHeader?.replace(/^Bearer\s/, '') ?? '');
