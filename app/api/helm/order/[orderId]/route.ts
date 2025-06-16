@@ -1,53 +1,30 @@
 import { NextResponse } from 'next/server';
 
-export async function GET(
-  request: Request,
-  { params }: { params: { orderId: string } }
-) {
+export async function GET(request: Request, { params }: { params: { orderId: string } }) {
   const { orderId } = params;
+  const url = `https://goodlife.myhelm.app/public-api/order/${orderId}`;
+
+  const token = new URL(request.url).searchParams.get('token');
+
+  if (!token) {
+    return NextResponse.json({ error: 'Missing auth token' }, { status: 401 });
+  }
 
   try {
-    const url = new URL(request.url);
-    const token = url.searchParams.get('token');
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Authorization token is required as query parameter "token"' },
-        { status: 401 }
-      );
+    if (!response.ok) {
+      const errorData = await response.json();
+      return NextResponse.json({ error: errorData.message || 'Failed to fetch order detail' }, { status: response.status });
     }
 
-    // Call Helm API order detail endpoint
-    const helmRes = await fetch(
-      `https://goodlife.myhelm.app/public-api/order/${orderId}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    if (!helmRes.ok) {
-      const errorText = await helmRes.text();
-      return NextResponse.json(
-        { error: `Helm API error: ${helmRes.status} - ${errorText}` },
-        { status: helmRes.status }
-      );
-    }
-
-    const data = await helmRes.json();
-
+    const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    // TypeScript: error is unknown, so we do type guard
-    let message = 'Unknown error';
-    if (error instanceof Error) message = error.message;
-
-    return NextResponse.json(
-      { error: `Server error: ${message}` },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
