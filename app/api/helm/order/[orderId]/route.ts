@@ -1,41 +1,40 @@
 // ✅ app/api/helm/order/[orderId]/route.ts
-import { NextResponse } from 'next/server';
+
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { paramName: string } }
+  request: NextRequest,
+  { params }: { params: { orderId: string } }
 ) {
-  const { orderId } = params;
-
-  const tokenFromQuery = new URL(request.url).searchParams.get('token');
-  const authHeader = request.headers.get('authorization');
-  const token = tokenFromQuery || (authHeader?.replace(/^Bearer\s/, '') ?? '');
+  const { orderId } = params; // Extract the dynamic route parameter
+  const token = new URL(request.url).searchParams.get('token');
 
   if (!token) {
-    return NextResponse.json({ error: 'Missing auth token' }, { status: 401 });
+    return NextResponse.json({ error: 'Token is required' }, { status: 401 });
   }
 
-  const url = `https://goodlife.myhelm.app/public-api/order/${orderId}`;
-
   try {
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-      },
-    });
+    const helmResponse = await fetch(
+      `https://goodlife.myhelm.app/public-api/order/${orderId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+    if (!helmResponse.ok) {
+      const errorData = await helmResponse.json().catch(() => ({}));
       return NextResponse.json(
-        { error: errorData.message || 'Failed to fetch order detail' },
-        { status: response.status }
+        { error: errorData.message || 'Failed to fetch order' },
+        { status: helmResponse.status }
       );
     }
 
-    const data = await response.json();
+    const data = await helmResponse.json();
     return NextResponse.json(data);
-  } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Internal server error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
