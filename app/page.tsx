@@ -35,6 +35,31 @@ interface LabelResponse {
   ShipmentLabels: { LabelUrl: string }[];
 }
 
+// Parcel2Go Order Types
+interface ParcelInput {
+  Value: string;
+  Weight: string;
+  Length: string;
+  Width: string;
+  Height: string;
+}
+
+interface Order {
+  CollectionAddress: {
+    Country: string;
+    Property: string;
+    Postcode: string;
+    Town: string;
+  };
+  DeliveryAddress: {
+    Country: string;
+    Property: string;
+    Postcode: string;
+    Town: string;
+  };
+  Parcels: ParcelInput[];
+}
+
 export default function Home() {
   // Helm Auth & Orders states
   const [email, setEmail] = useState('demo@despatchcloud.com');
@@ -46,17 +71,17 @@ export default function Home() {
   const [authError, setAuthError] = useState('');
   const [ordersError, setOrdersError] = useState('');
 
-  // Parcel2Go states (you might need to add missing states like order, quotes, etc.)
-  const [order, setOrder] = useState<any>({
+  // Parcel2Go states
+  const [order, setOrder] = useState<Order>({
     CollectionAddress: { Country: '', Property: '', Postcode: '', Town: '' },
     DeliveryAddress: { Country: '', Property: '', Postcode: '', Town: '' },
     Parcels: [{ Value: '', Weight: '', Length: '', Width: '', Height: '' }],
   });
   const [quotes, setQuotes] = useState<Quote[]>([]);
-  const [selectedService, setSelectedService] = useState<Quote | null>(null);
-  const [label, setLabel] = useState<LabelResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedService, setSelectedService] = useState<Quote | null>(null);
+  const [label, setLabel] = useState<LabelResponse | null>(null);
   const [expandedDescriptions, setExpandedDescriptions] = useState<{ [key: number]: boolean }>({});
 
   const apiBase = 'https://p2g-api.up.railway.app';
@@ -111,7 +136,7 @@ export default function Home() {
 
       const parsedOrder = {
         ...order,
-        Parcels: order.Parcels.map(parcel => ({
+        Parcels: order.Parcels.map((parcel: ParcelInput) => ({
           Value: parseFloat(parcel.Value) || 0,
           Weight: parseFloat(parcel.Weight) || 0,
           Length: parseFloat(parcel.Length) || 0,
@@ -173,6 +198,7 @@ export default function Home() {
     }
   };
 
+  // Render
   return (
     <main className={styles.main}>
       <h1 className={styles.title}>Parcel2Go & Helm Orders</h1>
@@ -282,7 +308,7 @@ export default function Home() {
                   className={styles.input}
                   placeholder={`Parcel ${field}${field === 'Weight' ? ' (kg)' : ['Length', 'Width', 'Height'].includes(field) ? ' (cm)' : ''}`}
                   type="number"
-                  value={order.Parcels[0][field as keyof typeof order.Parcels[0]]}
+                  value={order.Parcels[0][field as keyof ParcelInput]}
                   onChange={(e) => setOrder({
                     ...order,
                     Parcels: [{ ...order.Parcels[0], [field]: e.target.value }],
