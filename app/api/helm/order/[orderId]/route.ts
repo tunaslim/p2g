@@ -4,9 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string } }
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
-  const { orderId } = params; // Extract the dynamic route parameter
+  const { orderId } = await params;
   const token = new URL(request.url).searchParams.get('token');
 
   if (!token) {
