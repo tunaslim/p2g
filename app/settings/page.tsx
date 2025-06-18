@@ -61,7 +61,7 @@ export default function SettingsPage() {
           />
         </label>
 
-        <button type="submit" className={styles.primaryButton}>Login</button>
+        <button type="submit" className={styles.primaryButton}>Login to Helm</button>
       </form>
 
       {error && <p className={styles.error}>{error}</p>}
