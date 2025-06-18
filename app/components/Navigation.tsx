@@ -17,7 +17,7 @@ export default function Navigation() {
   return (
     <header className={styles.header}>
       <nav className={styles.nav}>
-        <Link href="/" className={styles.navLink}>Home</Link>
+        <Link href="/" className={styles.navLink}>Manual Quote</Link>
         {!token && <Link href="/settings" className={styles.navLink}>Settings</Link>}
         {token && (
           <>
