@@ -59,7 +59,7 @@ export default function DespatchReadyOrders() {
                 <th>Address</th>
                 <th>Postcode</th>
                 <th>Status</th>
-                <th>Shopify Link</th>
+                <th></th> {/* Empty header */}
               </tr>
             </thead>
             <tbody>
@@ -77,7 +77,7 @@ export default function DespatchReadyOrders() {
                       rel="noopener noreferrer"
                       className={styles.selectButton}
                     >
-                      View
+                      View on sales channel
                     </a>
                   </td>
                 </tr>
