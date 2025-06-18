@@ -23,8 +23,7 @@ export default function Navigation() {
             <Link href="/despatch-ready-orders" className={styles.navLink}>Despatch Ready Orders</Link>
             <button
               onClick={handleLogout}
-              className={styles.navLink}
-              style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+              className={`${styles.navLink} ${styles.linkButton}`}
             >
               Logout
             </button>
