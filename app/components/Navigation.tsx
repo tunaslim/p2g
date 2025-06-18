@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useToken } from '../context/TokenContext';
@@ -21,10 +22,7 @@ export default function Navigation() {
         {token && (
           <>
             <Link href="/despatch-ready-orders" className={styles.navLink}>Despatch Ready Orders</Link>
-            <button
-              onClick={handleLogout}
-              className={styles.navLink}}
-            >
+            <button onClick={handleLogout} className={styles.navLink}>
               Logout
             </button>
           </>
