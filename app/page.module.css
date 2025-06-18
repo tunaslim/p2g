@@ -200,6 +200,11 @@
   color: white;
   text-decoration: none;
   font-weight: bold;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
 }
 
 .navLink:hover {
