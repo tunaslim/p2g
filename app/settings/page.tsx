@@ -2,17 +2,18 @@
 import { useState } from 'react';
 import styles from '../page.module.css';
 import axios from 'axios';
+import { useToken } from '../context/TokenContext';
 
 export default function SettingsPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [token, setToken] = useState('');
   const [error, setError] = useState('');
+  const { token, setToken } = useToken(); // ✅ use context instead of local state
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setToken('');
+    setToken(''); // this updates context + cookie
 
     try {
       const response = await axios.post('/api/helm-login', {
@@ -20,7 +21,7 @@ export default function SettingsPage() {
         password,
       });
 
-      setToken(response.data.token);
+      setToken(response.data.token); // ✅ updates context + cookie
     } catch (err: any) {
       setError(err.response?.data?.error || 'Login failed');
     }
