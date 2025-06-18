@@ -6,6 +6,7 @@ import { useToken } from '../context/TokenContext';
 
 interface Order {
   id: number;
+  channel_id: number;
   channel_order_id: string;
   shipping_name: string;
   shipping_address_line_one: string;
@@ -20,6 +21,19 @@ export default function DespatchReadyOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [error, setError] = useState('');
 
+  const getChannelLogo = (channel_id: number) => {
+    switch (channel_id) {
+      case 1:
+        return '/logos/amazon.png';
+      case 2:
+        return '/logos/ebay.png';
+      case 7:
+        return '/logos/shopify.png';
+      default:
+        return '/logos/default.png';
+    }
+  };
+
   useEffect(() => {
     if (!token) return;
 
@@ -28,6 +42,7 @@ export default function DespatchReadyOrders() {
         const response = await axios.get('/api/helm-orders', {
           headers: {
             Authorization: `Bearer ${token}`,
+            'X-Helm-Filter': 'status[]=3',
           },
         });
         setOrders(response.data.data || []);
@@ -54,20 +69,30 @@ export default function DespatchReadyOrders() {
           <table className={styles.table}>
             <thead>
               <tr>
+                <th></th>
                 <th>Order ID</th>
                 <th>Customer</th>
                 <th>Address</th>
                 <th>Postcode</th>
                 <th>Status</th>
-                <th></th> {/* Empty header */}
+                <th></th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id}>
+                  <td>
+                    <img
+                      src={getChannelLogo(order.channel_id)}
+                      alt="Channel Logo"
+                      className={styles.logo}
+                    />
+                  </td>
                   <td>{order.channel_order_id}</td>
                   <td>{order.shipping_name}</td>
-                  <td>{order.shipping_address_line_one}, {order.shipping_address_city}</td>
+                  <td>
+                    {order.shipping_address_line_one}, {order.shipping_address_city}
+                  </td>
                   <td>{order.shipping_address_postcode}</td>
                   <td>{order.status}</td>
                   <td>
