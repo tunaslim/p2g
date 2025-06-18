@@ -14,6 +14,9 @@ interface Order {
   shipping_address_postcode: string;
   status: string;
   access_url: string;
+  status_description: string;
+  channel_alt_id: string;
+  sale_type: string;
 }
 
 export default function DespatchReadyOrders() {
@@ -69,24 +72,25 @@ export default function DespatchReadyOrders() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th></th>
+                <th>Order</th>
                 <th>Order ID</th>
                 <th>Customer</th>
                 <th>Address</th>
                 <th>Postcode</th>
                 <th>Status</th>
-                <th></th>
+                <th>Order</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id}>
                   <td>
-                    <img
-                      src={getChannelLogo(order.channel_id)}
-                      alt="Channel Logo"
-                      className={styles.logo}
-                    />
+                    <div className={styles.orderCell}>
+                      <div><strong>{order.channel_order_id}</strong></div>
+                      <div>{order.status_description}</div>
+                      <div>{order.channel_alt_id}</div>
+                      <div>{order.sale_type}</div>
+                    </div>
                   </td>
                   <td>{order.channel_order_id}</td>
                   <td>{order.shipping_name}</td>
