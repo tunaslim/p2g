@@ -4,9 +4,20 @@ import styles from '../page.module.css';
 import axios from 'axios';
 import { useToken } from '../context/TokenContext';
 
+interface Order {
+  id: number;
+  channel_order_id: string;
+  shipping_name: string;
+  shipping_address_line_one: string;
+  shipping_address_city: string;
+  shipping_address_postcode: string;
+  status: string;
+  access_url: string;
+}
+
 export default function DespatchReadyOrders() {
   const { token } = useToken();
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -14,17 +25,14 @@ export default function DespatchReadyOrders() {
 
     const fetchOrders = async () => {
       try {
-        const response = await axios.get(
-          'https://goodlife.myhelm.app/public-api/orders?filters[3]',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
-        setOrders(response.data.orders || []);
+        const response = await axios.get('/api/helm-orders', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setOrders(response.data.data || []);
       } catch (err: any) {
-        setError(err.response?.data?.message || 'Failed to fetch orders');
+        setError(err.response?.data?.error || 'Failed to fetch orders');
       }
     };
 
@@ -42,24 +50,41 @@ export default function DespatchReadyOrders() {
       )}
 
       {orders.length > 0 && (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.id}>
-                <td>{order.id}</td>
-                <td>{order.customer_name || 'N/A'}</td>
-                <td>{order.status}</td>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Address</th>
+                <th>Postcode</th>
+                <th>Status</th>
+                <th>Shopify Link</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id}>
+                  <td>{order.channel_order_id}</td>
+                  <td>{order.shipping_name}</td>
+                  <td>{order.shipping_address_line_one}, {order.shipping_address_city}</td>
+                  <td>{order.shipping_address_postcode}</td>
+                  <td>{order.status}</td>
+                  <td>
+                    <a
+                      href={order.access_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.selectButton}
+                    >
+                      View
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
