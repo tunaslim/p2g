@@ -224,3 +224,9 @@
 .linkButton:hover {
   text-decoration: underline;
 }
+
+.logo {
+  width: 40px;
+  height: auto;
+  margin-right: 10px;
+}
