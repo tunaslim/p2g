@@ -39,7 +39,6 @@ export default function Home() {
   // Helm Auth & Orders states
   const [email, setEmail] = useState('demo@despatchcloud.com');
   const [password, setPassword] = useState('secretpassword');
-  // Helm Orders states
   const [token, setToken] = useState<string | null>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [authLoading, setAuthLoading] = useState(false);
@@ -47,7 +46,18 @@ export default function Home() {
   const [authError, setAuthError] = useState('');
   const [ordersError, setOrdersError] = useState('');
 
-  // Parcel2Go states
+  // Parcel2Go states (you might need to add missing states like order, quotes, etc.)
+  const [order, setOrder] = useState<any>({
+    CollectionAddress: { Country: '', Property: '', Postcode: '', Town: '' },
+    DeliveryAddress: { Country: '', Property: '', Postcode: '', Town: '' },
+    Parcels: [{ Value: '', Weight: '', Length: '', Width: '', Height: '' }],
+  });
+  const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [selectedService, setSelectedService] = useState<Quote | null>(null);
+  const [label, setLabel] = useState<LabelResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [expandedDescriptions, setExpandedDescriptions] = useState<{ [key: number]: boolean }>({});
 
   const apiBase = 'https://p2g-api.up.railway.app';
 
@@ -70,7 +80,6 @@ export default function Home() {
     }
   };
 
-  // Fetch Helm orders once token is set
   // Fetch Helm orders
   const fetchOrders = async (authToken: string) => {
     setOrdersLoading(true);
@@ -164,7 +173,6 @@ export default function Home() {
     }
   };
 
-  // Render
   return (
     <main className={styles.main}>
       <h1 className={styles.title}>Parcel2Go & Helm Orders</h1>
