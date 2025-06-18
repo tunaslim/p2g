@@ -14,11 +14,14 @@ export default function DespatchReadyOrders() {
 
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('https://goodlife.myhelm.app/public-api/orders/despatch-ready', {
-          headers: {
-            Authorization: `Bearer ${token}`
+        const response = await axios.get(
+          'https://goodlife.myhelm.app/public-api/orders?filters[3]',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
           }
-        });
+        );
         setOrders(response.data.orders || []);
       } catch (err: any) {
         setError(err.response?.data?.message || 'Failed to fetch orders');
