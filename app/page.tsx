@@ -157,7 +157,7 @@ export default function Home() {
 
       {(!quotes || quotes.length === 0) && (
         <div className={styles.formSection}>
-          <h2 className={styles.sectionTitle}>Order Details</h2>
+          <h2 className={styles.sectionTitle}>Manual Quote</h2>
 
           <h3 className={styles.subTitle}>Sender Address</h3>
           {(['Country', 'Property', 'Postcode', 'Town'] as const).map((field) => (
