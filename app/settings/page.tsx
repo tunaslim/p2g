@@ -1,19 +1,27 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from '../page.module.css';
 import axios from 'axios';
 import { useToken } from '../context/TokenContext';
+import { useRouter } from 'next/navigation';
 
 export default function SettingsPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { token, setToken } = useToken(); // ✅ use context instead of local state
+  const { token, setToken } = useToken();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (token) {
+      router.push('/despatch-ready-orders');
+    }
+  }, [token, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setToken(''); // this updates context + cookie
+    setToken('');
 
     try {
       const response = await axios.post('/api/helm-login', {
@@ -21,7 +29,7 @@ export default function SettingsPage() {
         password,
       });
 
-      setToken(response.data.token); // ✅ updates context + cookie
+      setToken(response.data.token);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Login failed');
     }
@@ -55,13 +63,6 @@ export default function SettingsPage() {
 
         <button type="submit" className={styles.primaryButton}>Login</button>
       </form>
-
-      {token && (
-        <div className={styles.description}>
-          <p><strong>Token:</strong></p>
-          <code style={{ wordBreak: 'break-all' }}>{token}</code>
-        </div>
-      )}
 
       {error && <p className={styles.error}>{error}</p>}
     </div>
