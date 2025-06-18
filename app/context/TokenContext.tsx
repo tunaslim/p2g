@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 interface TokenContextType {
   token: string;
@@ -12,7 +12,23 @@ const TokenContext = createContext<TokenContextType>({
 });
 
 export const TokenProvider = ({ children }: { children: React.ReactNode }) => {
-  const [token, setToken] = useState('');
+  const [token, setTokenState] = useState('');
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem('helm_token');
+    if (savedToken) {
+      setTokenState(savedToken);
+    }
+  }, []);
+
+  const setToken = (newToken: string) => {
+    setTokenState(newToken);
+    if (newToken) {
+      localStorage.setItem('helm_token', newToken);
+    } else {
+      localStorage.removeItem('helm_token');
+    }
+  };
 
   return (
     <TokenContext.Provider value={{ token, setToken }}>
