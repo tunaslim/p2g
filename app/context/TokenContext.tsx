@@ -11,11 +11,25 @@ const TokenContext = createContext<TokenContextType>({
   setToken: () => {},
 });
 
+function getCookie(name: string): string | null {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
+function setCookie(name: string, value: string, days = 7) {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; expires=${expires}`;
+}
+
+function deleteCookie(name: string) {
+  document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+}
+
 export const TokenProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setTokenState] = useState('');
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('helm_token');
+    const savedToken = getCookie('helm_token');
     if (savedToken) {
       setTokenState(savedToken);
     }
@@ -24,9 +38,9 @@ export const TokenProvider = ({ children }: { children: React.ReactNode }) => {
   const setToken = (newToken: string) => {
     setTokenState(newToken);
     if (newToken) {
-      localStorage.setItem('helm_token', newToken);
+      setCookie('helm_token', newToken);
     } else {
-      localStorage.removeItem('helm_token');
+      deleteCookie('helm_token');
     }
   };
 
