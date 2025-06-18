@@ -15,14 +15,14 @@ export default function SettingsPage() {
     setToken('');
 
     try {
-      const response = await axios.post('https://goodlife.myhelm.app/public-api/auth/login', {
+      const response = await axios.post('/api/helm-login', {
         email,
         password,
       });
 
       setToken(response.data.token);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.error || 'Login failed');
     }
   };
 
