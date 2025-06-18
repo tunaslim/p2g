@@ -1,6 +1,6 @@
-// app/layout.tsx
 import Link from 'next/link';
 import './globals.css';
+import styles from './page.module.css';
 
 export const metadata = {
   title: 'Parcel2Go Integration',
@@ -10,15 +10,14 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gray-100 text-gray-900">
-        <header className="p-4 bg-blue-600 text-white flex justify-between">
-          <h1 className="text-xl font-bold">Parcel2Go App</h1>
-          <nav className="space-x-4">
-            <Link href="/">Home</Link>
-            <Link href="/settings">Settings</Link>
+      <body>
+        <header className={styles.header}>
+          <nav className={styles.nav}>
+            <Link href="/" className={styles.navLink}>Home</Link>
+            <Link href="/settings" className={styles.navLink}>Settings</Link>
           </nav>
         </header>
-        <main className="p-4">{children}</main>
+        <main className={styles.main}>{children}</main>
       </body>
     </html>
   );
