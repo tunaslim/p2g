@@ -1,4 +1,4 @@
-'use client';More actions
+'use client';
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -48,7 +48,6 @@ export default function Home() {
   const [ordersError, setOrdersError] = useState('');
 
   // Parcel2Go states
-@@ -65,336 +61,9 @@
 
   const apiBase = 'https://p2g-api.up.railway.app';
 
