@@ -29,6 +29,7 @@ interface Order {
   shipping_address_line_one: string;
   shipping_address_city: string;
   shipping_address_postcode: string;
+  shipping_address_iso: string;
   status: string;
   access_url: string;
   status_description: string;
