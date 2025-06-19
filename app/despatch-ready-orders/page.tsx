@@ -121,11 +121,14 @@ export default function DespatchReadyOrders() {
                 <tr key={order.id}>
                   <td>
                     <div className={styles.orderCell}>
-                      <div><strong>{order.channel_order_id}</strong></div>
-                      <div>{order.status_description}</div>
-                      <div>{order.channel_alt_id}</div>
-                      <div>{order.sale_type}</div>
-                    </div>
+                     <div>
+                      <img src={getChannelLogo(order.channel_id)} alt="Logo" className={styles.logo} />
+                     </div>
+                    <div><strong>{order.channel_order_id}</strong></div>
+                    <div>{order.status_description}</div>
+                    <div>{order.channel_alt_id}</div>
+                    <div>{order.sale_type}</div>
+                   </div>
                   </td>
                   <td>
                     <div className={styles.orderCell}>
