@@ -118,7 +118,7 @@ export default function DespatchReadyOrders() {
                 <th>Order</th>
                 <th>Customer</th>
                 <th>Item Details</th>
-                <th>Total</th>
+                <th className={styles.totalColumn}>Total</th>
                 <th>Order</th>
               </tr>
             </thead>
@@ -161,7 +161,7 @@ export default function DespatchReadyOrders() {
                       ))}
                     </div>
                   </td>
-                  <td>
+                  <td className={styles.totalColumn}>
                     <div className={styles.orderCell}>
                       <div>Total Tax: £{order.total_tax}</div>
                       <div>Shipping: £{order.shipping_paid}</div>
