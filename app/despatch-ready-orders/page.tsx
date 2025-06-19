@@ -177,8 +177,9 @@ export default function DespatchReadyOrders() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className={styles.selectButton}
+                      title="View on sales channel"
                     >
-                      View on sales channel
+                      <ExternalLink size={18} />
                     </a>
                   </td>
                 </tr>
