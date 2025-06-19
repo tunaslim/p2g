@@ -238,3 +238,8 @@
   font-size: 0.9rem;
   line-height: 1.4;
 }
+
+.totalColumn {
+  min-width: 200px;
+  width: 220px;
+}
