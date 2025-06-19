@@ -5,15 +5,15 @@ import axios from 'axios';
 import { useToken } from '../context/TokenContext';
 
 interface Order {
+  shipping_name_company: string | null;
+  phone_one: string;
+  email: string;
+  shipping_address_line_two: string | null;
   id: number;
   channel_id: number;
   channel_order_id: string;
-  shipping_name_company: string | null;
   shipping_name: string;
-  phone_one: string;
-  email: string;
   shipping_address_line_one: string;
-  shipping_address_line_two: string | null;
   shipping_address_city: string;
   shipping_address_postcode: string;
   shipping_address_iso: string;
@@ -40,6 +40,19 @@ export default function DespatchReadyOrders() {
       default:
         return '/logos/default.png';
     }
+  };
+
+  const iso2to3: Record<string, string> = {
+    GB: 'GBR',
+    US: 'USA',
+    DE: 'DEU',
+    FR: 'FRA',
+    IT: 'ITA',
+    TR: 'TUR',
+    ES: 'ESP',
+    CA: 'CAN',
+    NL: 'NLD',
+    // Add more as needed
   };
 
   useEffect(() => {
@@ -106,7 +119,7 @@ export default function DespatchReadyOrders() {
                       <div>{order.shipping_address_line_two}</div>
                       <div>{order.shipping_address_city}</div>
                       <div>{order.shipping_address_postcode}</div>
-                      <div>{order.shipping_address_iso}</div>
+                      <div>{iso2to3[order.shipping_address_iso] || order.shipping_address_iso}</div>
                     </div>
                   </td>
                   <td>
