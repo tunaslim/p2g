@@ -5,6 +5,19 @@ import axios from 'axios';
 import { useToken } from '../context/TokenContext';
 
 interface Order {
+  inventory: {
+    sku: string;
+    quantity: number;
+    name: string;
+    unit_price: string;
+    unit_tax: string;
+    line_total_discount: string;
+    price: string;
+    options: string;
+    hs_code: string | null;
+    country_of_origin: string | null;
+    customs_description: string | null;
+  }[];
   shipping_name_company: string | null;
   phone_one: string;
   email: string;
@@ -16,7 +29,6 @@ interface Order {
   shipping_address_line_one: string;
   shipping_address_city: string;
   shipping_address_postcode: string;
-  shipping_address_iso: string;
   status: string;
   access_url: string;
   status_description: string;
@@ -52,7 +64,6 @@ export default function DespatchReadyOrders() {
     ES: 'ESP',
     CA: 'CAN',
     NL: 'NLD',
-    // Add more as needed
   };
 
   const truncateEmail = (email: string): string => {
@@ -99,8 +110,7 @@ export default function DespatchReadyOrders() {
               <tr>
                 <th>Order</th>
                 <th>Customer</th>
-                <th>Address</th>
-                <th>Postcode</th>
+                <th>Item Details</th>
                 <th>Status</th>
                 <th>Order</th>
               </tr>
@@ -130,9 +140,17 @@ export default function DespatchReadyOrders() {
                     </div>
                   </td>
                   <td>
-                    {order.shipping_address_line_one}, {order.shipping_address_city}
+                    <div className={styles.orderCell}>
+                      {order.inventory.map((item, idx) => (
+                        <div key={idx} style={{ marginBottom: '8px' }}>
+                          <div><strong>{item.name}</strong> (x{item.quantity})</div>
+                          <div>SKU: {item.sku}</div>
+                          <div>Price: £{item.price}</div>
+                          <div>Tax: £{item.unit_tax}</div>
+                        </div>
+                      ))}
+                    </div>
                   </td>
-                  <td>{order.shipping_address_postcode}</td>
                   <td>{order.status}</td>
                   <td>
                     <a
