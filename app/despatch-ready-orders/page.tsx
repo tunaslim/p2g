@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import styles from '../page.module.css';
 import axios from 'axios';
 import { useToken } from '../context/TokenContext';
+import { ExternalLink } from 'lucide-react';
 
 interface Order {
   inventory: {
