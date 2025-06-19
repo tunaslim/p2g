@@ -8,10 +8,15 @@ interface Order {
   id: number;
   channel_id: number;
   channel_order_id: string;
+  shipping_name_company: string | null;
   shipping_name: string;
+  phone_one: string;
+  email: string;
   shipping_address_line_one: string;
+  shipping_address_line_two: string | null;
   shipping_address_city: string;
   shipping_address_postcode: string;
+  shipping_address_iso: string;
   status: string;
   access_url: string;
   status_description: string;
@@ -27,7 +32,7 @@ export default function DespatchReadyOrders() {
   const getChannelLogo = (channel_id: number) => {
     switch (channel_id) {
       case 1:
-        return '/logos/amazon.png';
+        return 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1206px-Amazon_logo.svg.png?20250504041148';
       case 2:
         return '/logos/ebay.png';
       case 7:
@@ -73,7 +78,6 @@ export default function DespatchReadyOrders() {
             <thead>
               <tr>
                 <th>Order</th>
-                <th>Order ID</th>
                 <th>Customer</th>
                 <th>Address</th>
                 <th>Postcode</th>
@@ -92,8 +96,19 @@ export default function DespatchReadyOrders() {
                       <div>{order.sale_type}</div>
                     </div>
                   </td>
-                  <td>{order.channel_order_id}</td>
-                  <td>{order.shipping_name}</td>
+                  <td>
+                    <div className={styles.orderCell}>
+                      <div>{order.shipping_name_company}</div>
+                      <div>{order.shipping_name}</div>
+                      <div>{order.phone_one}</div>
+                      <div>{order.email}</div>
+                      <div>{order.shipping_address_line_one}</div>
+                      <div>{order.shipping_address_line_two}</div>
+                      <div>{order.shipping_address_city}</div>
+                      <div>{order.shipping_address_postcode}</div>
+                      <div>{order.shipping_address_iso}</div>
+                    </div>
+                  </td>
                   <td>
                     {order.shipping_address_line_one}, {order.shipping_address_city}
                   </td>
