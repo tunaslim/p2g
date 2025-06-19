@@ -55,6 +55,13 @@ export default function DespatchReadyOrders() {
     // Add more as needed
   };
 
+  const truncateEmail = (email: string): string => {
+    const [localPart, domain] = email.split('@');
+    if (!localPart || !domain) return email;
+    if (email.length <= 25) return email;
+    return `${localPart.slice(0, 5)}[...]${localPart.slice(-5)}@${domain}`;
+  };
+
   useEffect(() => {
     if (!token) return;
 
@@ -114,7 +121,7 @@ export default function DespatchReadyOrders() {
                       <div>{order.shipping_name_company}</div>
                       <div>{order.shipping_name}</div>
                       <div>{order.phone_one}</div>
-                      <div>{order.email}</div>
+                      <div>{truncateEmail(order.email)}</div>
                       <div>{order.shipping_address_line_one}</div>
                       <div>{order.shipping_address_line_two}</div>
                       <div>{order.shipping_address_city}</div>
