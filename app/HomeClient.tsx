@@ -85,7 +85,7 @@ export default function HomeClient() {
   const [error, setError] = useState('');
   const [selectedService, setSelectedService] = useState<Quote | null>(null);
   const [label, setLabel] = useState<LabelResponse | null>(null);
-  const [expandedDescriptions, setExpandedDescriptions] = useState<{ [key: number]: boolean }>({});
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Record<number, boolean>>({});
 
   const apiBase = 'https://p2g-api.up.railway.app';
 
@@ -93,8 +93,8 @@ export default function HomeClient() {
   useEffect(() => {
     const prop = searchParams.get('deliveryProperty');
     const parcelVal = searchParams.get('deliveryParcelValue');
-    setOrder((prev) => {
-      let updated = { ...prev };
+    setOrder(prev => {
+      const updated = { ...prev };
       if (prop) {
         updated.DeliveryAddress = {
           Country: searchParams.get('deliveryCountry') || prev.DeliveryAddress.Country,
@@ -117,7 +117,7 @@ export default function HomeClient() {
     try {
       const parsedOrder = {
         ...order,
-        Parcels: order.Parcels.map((parcel) => ({
+        Parcels: order.Parcels.map(parcel => ({
           Value: parseFloat(parcel.Value) || 0,
           Weight: parseFloat(parcel.Weight) || 0,
           Length: parseFloat(parcel.Length) || 0,
@@ -154,11 +154,7 @@ export default function HomeClient() {
     setLoading(true);
     setError('');
     try {
-      const labelData = {
-        ...order,
-        SelectedService: selectedService,
-      };
-
+      const labelData = { ...order, SelectedService: selectedService };
       const response = await axios.post<LabelResponse>(
         `${apiBase}/create-label`,
         { labelData }
@@ -185,18 +181,18 @@ export default function HomeClient() {
 
       {!quotes.length && !label && (
         <div className={styles.formSection}>
-          {/* Manual Quote Form */}
           <h2 className={styles.sectionTitle}>Manual Quote</h2>
 
-          {/* Sender Address */}
           <h3 className={styles.subTitle}>Sender Address</h3>
-          {(['Country', 'Property', 'Postcode', 'Town'] as const).map((field) => (
+          {(['Country', 'Property', 'Postcode', 'Town'] as const).map(field => (
             <input
               key={field}
               className={styles.input}
-              placeholder={field === 'Country' ? 'Country (e.g., GBR)' : `Collection ${field}`}
+              placeholder={
+                field === 'Country' ? 'Country (e.g., GBR)' : `Collection ${field}`
+              }
               value={order.CollectionAddress[field]}
-              onChange={(e) =>
+              onChange={e =>
                 setOrder({
                   ...order,
                   CollectionAddress: {
@@ -208,15 +204,16 @@ export default function HomeClient() {
             />
           ))}
 
-          {/* Delivery Address */}
           <h3 className={styles.subTitle}>Delivery Address</h3>
-          {(['Country', 'Property', 'Postcode', 'Town'] as const).map((field) => (
+          {(['Country', 'Property', 'Postcode', 'Town'] as const).map(field => (
             <input
               key={field}
               className={styles.input}
-              placeholder={field === 'Country' ? 'Country (e.g., GBR)' : `Delivery ${field}`}
+              placeholder={
+                field === 'Country' ? 'Country (e.g., GBR)' : `Delivery ${field}`
+              }
               value={order.DeliveryAddress[field]}
-              onChange={(e) =>
+              onChange={e =>
                 setOrder({
                   ...order,
                   DeliveryAddress: {
@@ -228,9 +225,8 @@ export default function HomeClient() {
             />
           ))}
 
-          {/* Parcel Details */}
           <h3 className={styles.subTitle}>Parcel Details</h3>
-          {(['Value', 'Weight', 'Length', 'Width', 'Height'] as const).map((field) => (
+          {(['Value', 'Weight', 'Length', 'Width', 'Height'] as const).map(field => (
             <input
               key={field}
               className={styles.input}
@@ -240,7 +236,7 @@ export default function HomeClient() {
               }
               type="number"
               value={order.Parcels[0][field as keyof ParcelInput]}
-              onChange={(e) =>
+              onChange={e =>
                 setOrder({
                   ...order,
                   Parcels: [{ ...order.Parcels[0], [field]: e.target.value }],
@@ -258,7 +254,82 @@ export default function HomeClient() {
       {quotes.length > 0 && !label && (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
-            <!-- table rows here -->
+            <thead>
+              <tr>
+                <th></th>
+                <th>Courier</th>
+                <th>Service</th>
+                <th>Price (excl. VAT)</th>
+                <th>Total Price</th>
+                <th>Est. Delivery</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {quotes
+                .slice()
+                .sort((a, b) => a.TotalPrice - b.TotalPrice)
+                .map((quote, idx) => {
+                  const svc = quote.Service;
+                  const isExpanded = !!expandedDescriptions[idx];
+                  return (
+                    <tr key={idx}>
+                      <td>
+                        <img
+                          src={svc.Links.ImageSmall}
+                          alt={svc.Name}
+                          className={styles.logo}
+                        />
+                      </td>
+                      <td>
+                        <span className={styles.bold}>{svc.CourierName}</span>
+                      </td>
+                      <td>
+                        <span className={styles.bold}>{svc.Name}</span>
+                        {svc.ShortDescriptions && (
+                          <>
+                            <button
+                              className={styles.toggleButton}
+                              onClick={() =>
+                                setExpandedDescriptions(prev => ({
+                                  ...prev,
+                                  [idx]: !prev[idx],
+                                }))
+                              }
+                            >
+                              {isExpanded ? 'Hide Details' : 'Show Details'}
+                            </button>
+                            {isExpanded && (
+                              <div
+                                className={styles.description}
+                                dangerouslySetInnerHTML={{ __html: svc.ShortDescriptions! }}
+                              />
+                            )}
+                          </>
+                        )}
+                        <br />
+                        <span className={styles.maxdims}>
+                          MaxWeight: {svc.MaxWeight}kg MaxHeight: {svc.MaxHeight * 100}cm MaxWidth: {svc.MaxWidth * 100}cm MaxLength: {svc.MaxLength * 100}cm
+                        </span>
+                      </td>
+                      <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
+                      <td>£{quote.TotalPrice.toFixed(2)}</td>
+                      <td>{new Date(quote.EstimatedDeliveryDate).toLocaleDateString()}</td>
+                      <td>
+                        <button
+                          onClick={() => {
+                            setSelectedService(quote);
+                            createLabel();
+                          }}
+                          className={styles.selectButton}
+                        >
+                          Select
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
           </table>
         </div>
       )}
