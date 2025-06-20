@@ -1,5 +1,7 @@
+// app/despatch-ready-orders/page.tsx
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from '../page.module.css';
 import axios from 'axios';
 import { useToken } from '../context/TokenContext';
@@ -42,24 +44,20 @@ interface Order {
 }
 
 export default function DespatchReadyOrders() {
+  const router = useRouter();
   const { token } = useToken();
   const [orders, setOrders] = useState<Order[]>([]);
   const [error, setError] = useState('');
 
   const getChannelLogo = (id: number): string => {
     switch (id) {
-      case 24: return '/logos/ebay.png';
-      case 15: return '/logos/ebay.png';
-      case 27: return '/logos/amazon.png';
-      case 25: return '/logos/amazon.png';
-      case 6:  return '/logos/amazon.png';
-      case 2:  return '/logos/amazon.png';
-      case 5:  return '/logos/amazon.png';
-      case 4:  return '/logos/amazon.png';
-      case 3:  return '/logos/amazon.png';
+      case 24: case 15: return '/logos/ebay.png';
+      case 27: case 25:
+      case 6: case 2:
+      case 5: case 4:
+      case 3: return '/logos/amazon.png';
       case 11: return '/logos/etsy.png';
-      case 8:  return '/logos/shopify.png';
-      case 7:  return '/logos/shopify.png';
+      case 8: case 7: return '/logos/shopify.png';
       case 26: return '/logos/woocommerce.png';
       default: return '/logos/default.png';
     }
@@ -96,8 +94,7 @@ export default function DespatchReadyOrders() {
 
   const truncateEmail = (email: string): string => {
     const [localPart, domain] = email.split('@');
-    if (!localPart || !domain) return email;
-    if (email.length <= 25) return email;
+    if (!localPart || !domain || email.length <= 25) return email;
     return `${localPart.slice(0,5)}[...]${localPart.slice(-5)}@${domain}`;
   };
 
@@ -206,6 +203,7 @@ export default function DespatchReadyOrders() {
                     </div>
                   </td>
                   <td>
+                    {/* Open the order in Helm */}
                     <a
                       href={order.access_url}
                       target="_blank"
@@ -228,6 +226,28 @@ export default function DespatchReadyOrders() {
                         <line x1="10" y1="14" x2="21" y2="3" />
                       </svg>
                     </a>
+
+                    {/* New Get Quote button */}
+                    <button
+                      className={styles.primaryButton}
+                      onClick={() => {
+                        const property = order.shipping_address_line_two
+                          ? `${order.shipping_address_line_one} ${order.shipping_address_line_two}`
+                          : order.shipping_address_line_one;
+                        const town = order.shipping_address_city;
+                        const postcode = order.shipping_address_postcode;
+                        const country = order.shipping_address_iso;
+                        const params = new URLSearchParams({
+                          deliveryProperty: property,
+                          deliveryTown: town,
+                          deliveryPostcode: postcode,
+                          deliveryCountry: country,
+                        }).toString();
+                        router.push(`/?${params}`);
+                      }}
+                    >
+                      Get Quote
+                    </button>
                   </td>
                 </tr>
               ))}
