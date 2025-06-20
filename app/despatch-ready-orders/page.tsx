@@ -84,6 +84,11 @@ export default function DespatchReadyOrders() {
     }
   };
 
+  const formatPrice = (value: string | number): string => {
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    return num.toFixed(2);
+  };
+
   const iso2to3: Record<string, string> = {
     GB: 'GBR', US: 'USA', DE: 'DEU', FR: 'FRA', IT: 'ITA', TR: 'TUR',
     ES: 'ESP', CA: 'CAN', NL: 'NLD', IL: 'ISR', BE: 'BEL',
@@ -160,19 +165,19 @@ export default function DespatchReadyOrders() {
                         <div key={idx} style={{marginBottom:'8px'}}>
                           <div><strong>{item.name}</strong> (x{item.quantity})</div>
                           <div>SKU: {item.sku}</div>
-                          <div>Price: £{item.price}</div>
-                          <div>Tax: £{item.unit_tax}</div>
+                          <div>Price: £{formatPrice(item.price)}</div>
+                          <div>Tax: £{formatPrice(item.unit_tax)}</div>
                         </div>
                       ))}
                     </div>
                   </td>
                   <td className={styles.totalColumn}>
                     <div className={styles.orderCell}>
-                      <div>Total Tax: £{order.total_tax}</div>
-                      <div>Shipping: £{order.shipping_paid}</div>
-                      <div>Total Discount: £{order.total_discount}</div>
-                      <div>Order Discount: £{order.order_discount}</div>
-                      <div>Total Paid: £{order.total_paid}</div>
+                      <div>Total Tax: £{formatPrice(order.total_tax)}</div>
+                      <div>Shipping: £{formatPrice(order.shipping_paid)}</div>
+                      <div>Total Discount: £{formatPrice(order.total_discount)}</div>
+                      <div>Order Discount: £{formatPrice(order.order_discount)}</div>
+                      <div>Total Paid: £{formatPrice(order.total_paid)}</div>
                     </div>
                   </td>
                   <td>
