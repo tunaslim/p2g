@@ -1,4 +1,3 @@
-
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -147,7 +146,7 @@ export default function DespatchReadyOrders() {
                   <tr key={order.id}>
                     <td>
                       <div className={styles.orderCell}>
-                        <div style={{ textAlign: 'center', marginBottom: 8 }}>
+                        <div className={styles.logoWrapper}>
                           <img
                             src={getChannelLogo(order.channel_id)}
                             alt={getChannelName(order.channel_id)}
@@ -179,7 +178,7 @@ export default function DespatchReadyOrders() {
                     <td>
                       <div className={styles.orderCell}>
                         {order.inventory.map((item, idx) => (
-                          <div key={idx} style={{ marginBottom: '8px' }}>
+                          <div key={idx} className={styles.itemRow}>
                             <div><strong>{item.name}</strong> (x{item.quantity})</div>
                             {parseFloat(item.price) > 0 && (
                               <div>Price: £{formatPrice(item.price)}</div>
@@ -208,7 +207,7 @@ export default function DespatchReadyOrders() {
                         {totalPaid > 0 && (
                           <div>Total Paid: £{formatPrice(order.total_paid)}</div>
                         )}
-                        {/* New Parcel Value */}
+                        {/* Parcel Value */}
                         <div>Parcel Value: £{parcelValue.toFixed(2)}</div>
                       </div>
                     </td>
@@ -233,12 +232,13 @@ export default function DespatchReadyOrders() {
                             : order.shipping_address_line_one;
                           const town = order.shipping_address_city;
                           const postcode = order.shipping_address_postcode;
-                          const countryParam = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
+                          const countryParam = country3;
                           const params = new URLSearchParams({
                             deliveryProperty: property,
                             deliveryTown: town,
                             deliveryPostcode: postcode,
                             deliveryCountry: countryParam,
+                            deliveryParcelValue: parcelValue.toFixed(2),
                           }).toString();
                           router.push(`/?${params}`);
                         }}
