@@ -1,7 +1,9 @@
+// app/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useSearchParams } from 'next/navigation';
 import styles from './page.module.css';
 
 // Type Definitions for Parcel2Go
@@ -61,7 +63,8 @@ interface Order {
 }
 
 export default function Home() {
-  // Parcel2Go states
+  const searchParams = useSearchParams();
+
   const [order, setOrder] = useState<Order>({
     CollectionAddress: {
       Country: 'GBR',
@@ -69,9 +72,15 @@ export default function Home() {
       Postcode: 'BN9 9BA',
       Town: 'Newhaven',
     },
-    DeliveryAddress: { Country: '', Property: '', Postcode: '', Town: '' },
+    DeliveryAddress: {
+      Country: '',
+      Property: '',
+      Postcode: '',
+      Town: '',
+    },
     Parcels: [{ Value: '', Weight: '', Length: '', Width: '', Height: '' }],
   });
+
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -81,6 +90,22 @@ export default function Home() {
 
   const apiBase = 'https://p2g-api.up.railway.app';
 
+  // Prefill delivery address when navigated from Despatch‐Ready page
+  useEffect(() => {
+    const prop = searchParams.get('deliveryProperty');
+    if (prop) {
+      setOrder((prev) => ({
+        ...prev,
+        DeliveryAddress: {
+          Country: searchParams.get('deliveryCountry') || prev.DeliveryAddress.Country,
+          Property: prop,
+          Postcode: searchParams.get('deliveryPostcode') || prev.DeliveryAddress.Postcode,
+          Town: searchParams.get('deliveryTown') || prev.DeliveryAddress.Town,
+        },
+      }));
+    }
+  }, [searchParams]);
+
   // Parcel2Go get quotes
   const getQuotes = async () => {
     try {
@@ -89,7 +114,7 @@ export default function Home() {
 
       const parsedOrder = {
         ...order,
-        Parcels: order.Parcels.map((parcel: ParcelInput) => ({
+        Parcels: order.Parcels.map((parcel) => ({
           Value: parseFloat(parcel.Value) || 0,
           Weight: parseFloat(parcel.Weight) || 0,
           Length: parseFloat(parcel.Length) || 0,
@@ -103,21 +128,15 @@ export default function Home() {
         { order: parsedOrder }
       );
       setQuotes(response.data.Quotes);
-      setLoading(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching quotes:', err);
-
       if (axios.isAxiosError(err)) {
-        setError(
-          err.response?.data?.message || err.message || 'Failed to get quotes.'
-        );
-      } else if (err instanceof Error) {
-        setError(err.message);
+        setError(err.response?.data?.message || err.message || 'Failed to get quotes.');
       } else {
-        setError('Failed to get quotes.');
+        setError(err.message || 'Failed to get quotes.');
       }
-
       setQuotes([]);
+    } finally {
       setLoading(false);
     }
   };
@@ -143,20 +162,14 @@ export default function Home() {
         { labelData }
       );
       setLabel(response.data);
-      setLoading(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error creating label:', err);
-
       if (axios.isAxiosError(err)) {
-        setError(
-          err.response?.data?.message || err.message || 'Failed to create label.'
-        );
-      } else if (err instanceof Error) {
-        setError(err.message);
+        setError(err.response?.data?.message || err.message || 'Failed to create label.');
       } else {
-        setError('Failed to create label.');
+        setError(err.message || 'Failed to create label.');
       }
-
+    } finally {
       setLoading(false);
     }
   };
@@ -167,10 +180,9 @@ export default function Home() {
       <h1 className={styles.title}>Parcel2Go Integration</h1>
 
       {loading && <p className={styles.loading}>Loading...</p>}
-
       {error && <p className={styles.error}>Error: {error}</p>}
 
-      {(!quotes || quotes.length === 0) && (
+      {quotes.length === 0 && !label && (
         <div className={styles.formSection}>
           <h2 className={styles.sectionTitle}>Manual Quote</h2>
 
@@ -188,7 +200,10 @@ export default function Home() {
               onChange={(e) =>
                 setOrder({
                   ...order,
-                  CollectionAddress: { ...order.CollectionAddress, [field]: e.target.value },
+                  CollectionAddress: {
+                    ...order.CollectionAddress,
+                    [field]: e.target.value,
+                  },
                 })
               }
             />
@@ -208,14 +223,17 @@ export default function Home() {
               onChange={(e) =>
                 setOrder({
                   ...order,
-                  DeliveryAddress: { ...order.DeliveryAddress, [field]: e.target.value },
+                  DeliveryAddress: {
+                    ...order.DeliveryAddress,
+                    [field]: e.target.value,
+                  },
                 })
               }
             />
           ))}
 
           <h3 className={styles.subTitle}>Parcel Details</h3>
-          {['Value', 'Weight', 'Length', 'Width', 'Height'].map((field) => (
+          {(['Value', 'Weight', 'Length', 'Width', 'Height'] as const).map((field) => (
             <input
               key={field}
               className={styles.input}
@@ -232,7 +250,12 @@ export default function Home() {
               onChange={(e) =>
                 setOrder({
                   ...order,
-                  Parcels: [{ ...order.Parcels[0], [field]: e.target.value }],
+                  Parcels: [
+                    {
+                      ...order.Parcels[0],
+                      [field]: e.target.value,
+                    },
+                  ],
                 })
               }
             />
@@ -244,7 +267,7 @@ export default function Home() {
         </div>
       )}
 
-      {quotes?.length > 0 && !label && (
+      {quotes.length > 0 && !label && (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
@@ -262,35 +285,33 @@ export default function Home() {
               {quotes
                 .slice()
                 .sort((a, b) => a.TotalPrice - b.TotalPrice)
-                .map((quote, index) => {
-                  const service = quote.Service;
-                  const isExpanded = expandedDescriptions[index] || false;
+                .map((quote, idx) => {
+                  const svc = quote.Service;
+                  const isExpanded = !!expandedDescriptions[idx];
 
                   return (
-                    <tr key={index}>
+                    <tr key={idx}>
                       <td>
                         <img
-                          src={service.Links.ImageSmall}
-                          alt={service.Name}
+                          src={svc.Links.ImageSmall}
+                          alt={svc.Name}
                           className={styles.logo}
                         />
                       </td>
                       <td>
-                        <span className={styles.bold}>
-                          {service.CourierName}
-                        </span>
+                        <span className={styles.bold}>{svc.CourierName}</span>
                       </td>
                       <td>
-                        <span className={styles.bold}>{service.Name}</span>{' '}
-                        {service.ShortDescriptions && (
+                        <span className={styles.bold}>{svc.Name}</span>{' '}
+                        {svc.ShortDescriptions && (
                           <>
                             <button
                               className={styles.toggleButton}
                               onClick={() =>
-                                setExpandedDescriptions({
-                                  ...expandedDescriptions,
-                                  [index]: !isExpanded,
-                                })
+                                setExpandedDescriptions((prev) => ({
+                                  ...prev,
+                                  [idx]: !prev[idx],
+                                }))
                               }
                             >
                               {isExpanded ? 'Hide Details' : 'Show Details'}
@@ -298,22 +319,26 @@ export default function Home() {
                             {isExpanded && (
                               <div
                                 className={styles.description}
-                                dangerouslySetInnerHTML={{ __html: service.ShortDescriptions }}
+                                dangerouslySetInnerHTML={{
+                                  __html: svc.ShortDescriptions!,
+                                }}
                               />
                             )}
                           </>
                         )}
                         <br />
                         <span className={styles.maxdims}>
-                          MaxWeight: {service.MaxWeight}kg{' '}
-                          MaxHeight: {service.MaxHeight * 100}cm{' '}
-                          MaxWidth: {service.MaxWidth * 100}cm{' '}
-                          MaxLength: {service.MaxLength * 100}cm
+                          MaxWeight: {svc.MaxWeight}kg{' '}
+                          MaxHeight: {svc.MaxHeight * 100}cm{' '}
+                          MaxWidth: {svc.MaxWidth * 100}cm{' '}
+                          MaxLength: {svc.MaxLength * 100}cm
                         </span>
                       </td>
                       <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
                       <td>£{quote.TotalPrice.toFixed(2)}</td>
-                      <td>{new Date(quote.EstimatedDeliveryDate).toLocaleDateString()}</td>
+                      <td>
+                        {new Date(quote.EstimatedDeliveryDate).toLocaleDateString()}
+                      </td>
                       <td>
                         <button
                           onClick={() => {
