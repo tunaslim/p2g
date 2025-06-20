@@ -49,13 +49,13 @@ export default function DespatchReadyOrders() {
   const getChannelLogo = (channel_id: number): string => {
   switch (channel_id) {
     case 1:
-      return 'public/logos/amazon.png';
+      return '/logos/amazon.png';
     case 2:
-      return 'public/logos/ebay.png';
+      return '/logos/ebay.png';
     case 7:
-      return 'public/logos/shopify.png';
+      return '/logos/shopify.png';
     default:
-      return 'public/logos/default.png';
+      return '/logos/default.png';
   }
 };
 
