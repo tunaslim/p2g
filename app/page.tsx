@@ -63,7 +63,12 @@ interface Order {
 export default function Home() {
   // Parcel2Go states
   const [order, setOrder] = useState<Order>({
-    CollectionAddress: { Country: '', Property: '', Postcode: '', Town: '' },
+    CollectionAddress: {
+      Country: 'GBR',
+      Property: 'Unit 45B Basepoint, Denton Island',
+      Postcode: 'BN9 9BA',
+      Town: 'Newhaven',
+    },
     DeliveryAddress: { Country: '', Property: '', Postcode: '', Town: '' },
     Parcels: [{ Value: '', Weight: '', Length: '', Width: '', Height: '' }],
   });
@@ -93,14 +98,19 @@ export default function Home() {
         })),
       };
 
-      const response = await axios.post<QuotesResponse>(`${apiBase}/get-quote`, { order: parsedOrder });
+      const response = await axios.post<QuotesResponse>(
+        `${apiBase}/get-quote`,
+        { order: parsedOrder }
+      );
       setQuotes(response.data.Quotes);
       setLoading(false);
     } catch (err) {
       console.error('Error fetching quotes:', err);
 
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || err.message || 'Failed to get quotes.');
+        setError(
+          err.response?.data?.message || err.message || 'Failed to get quotes.'
+        );
       } else if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -128,14 +138,19 @@ export default function Home() {
         SelectedService: selectedService,
       };
 
-      const response = await axios.post<LabelResponse>(`${apiBase}/create-label`, { labelData });
+      const response = await axios.post<LabelResponse>(
+        `${apiBase}/create-label`,
+        { labelData }
+      );
       setLabel(response.data);
       setLoading(false);
     } catch (err) {
       console.error('Error creating label:', err);
 
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || err.message || 'Failed to create label.');
+        setError(
+          err.response?.data?.message || err.message || 'Failed to create label.'
+        );
       } else if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -164,12 +179,18 @@ export default function Home() {
             <input
               key={field}
               className={styles.input}
-              placeholder={field === 'Country' ? 'Country (e.g., GBR)' : `Collection ${field}`}
+              placeholder={
+                field === 'Country'
+                  ? 'Country (e.g., GBR)'
+                  : `Collection ${field}`
+              }
               value={order.CollectionAddress[field]}
-              onChange={(e) => setOrder({
-                ...order,
-                CollectionAddress: { ...order.CollectionAddress, [field]: e.target.value },
-              })}
+              onChange={(e) =>
+                setOrder({
+                  ...order,
+                  CollectionAddress: { ...order.CollectionAddress, [field]: e.target.value },
+                })
+              }
             />
           ))}
 
@@ -178,12 +199,18 @@ export default function Home() {
             <input
               key={field}
               className={styles.input}
-              placeholder={field === 'Country' ? 'Country (e.g., GBR)' : `Delivery ${field}`}
+              placeholder={
+                field === 'Country'
+                  ? 'Country (e.g., GBR)'
+                  : `Delivery ${field}`
+              }
               value={order.DeliveryAddress[field]}
-              onChange={(e) => setOrder({
-                ...order,
-                DeliveryAddress: { ...order.DeliveryAddress, [field]: e.target.value },
-              })}
+              onChange={(e) =>
+                setOrder({
+                  ...order,
+                  DeliveryAddress: { ...order.DeliveryAddress, [field]: e.target.value },
+                })
+              }
             />
           ))}
 
@@ -192,13 +219,22 @@ export default function Home() {
             <input
               key={field}
               className={styles.input}
-              placeholder={`Parcel ${field}${field === 'Weight' ? ' (kg)' : ['Length', 'Width', 'Height'].includes(field) ? ' (cm)' : ''}`}
+              placeholder={
+                `Parcel ${field}` +
+                (field === 'Weight'
+                  ? ' (kg)'
+                  : ['Length', 'Width', 'Height'].includes(field)
+                  ? ' (cm)'
+                  : '')
+              }
               type="number"
               value={order.Parcels[0][field as keyof ParcelInput]}
-              onChange={(e) => setOrder({
-                ...order,
-                Parcels: [{ ...order.Parcels[0], [field]: e.target.value }],
-              })}
+              onChange={(e) =>
+                setOrder({
+                  ...order,
+                  Parcels: [{ ...order.Parcels[0], [field]: e.target.value }],
+                })
+              }
             />
           ))}
 
@@ -232,8 +268,18 @@ export default function Home() {
 
                   return (
                     <tr key={index}>
-                      <td><img src={service.Links.ImageSmall} alt={service.Name} className={styles.logo} /></td>
-                      <td><span className={styles.bold}>{service.CourierName}</span></td>
+                      <td>
+                        <img
+                          src={service.Links.ImageSmall}
+                          alt={service.Name}
+                          className={styles.logo}
+                        />
+                      </td>
+                      <td>
+                        <span className={styles.bold}>
+                          {service.CourierName}
+                        </span>
+                      </td>
                       <td>
                         <span className={styles.bold}>{service.Name}</span>{' '}
                         {service.ShortDescriptions && (
