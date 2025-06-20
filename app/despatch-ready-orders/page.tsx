@@ -1,4 +1,3 @@
-// app/despatch-ready-orders/page.tsx
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -49,13 +48,17 @@ export default function DespatchReadyOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [error, setError] = useState('');
 
-  const getChannelLogo = (id: number): string => {
+  // Map 2-letter ISO to 3-letter ISO
+  const iso2to3: Record<string, string> = {
+    GB: 'GBR', US: 'USA', DE: 'DEU', FR: 'FRA', IT: 'ITA', TR: 'TUR',
+    ES: 'ESP', CA: 'CAN', NL: 'NLD', IL: 'ISR', BE: 'BEL',
+  };
+
+  const getChannelLogo = (id: number) => {
     switch (id) {
       case 24: case 15: return '/logos/ebay.png';
-      case 27: case 25:
-      case 6: case 2:
-      case 5: case 4:
-      case 3: return '/logos/amazon.png';
+      case 27: case 25: case 6: case 2: case 5: case 4: case 3:
+        return '/logos/amazon.png';
       case 11: return '/logos/etsy.png';
       case 8: case 7: return '/logos/shopify.png';
       case 26: return '/logos/woocommerce.png';
@@ -63,36 +66,31 @@ export default function DespatchReadyOrders() {
     }
   };
 
-  const getChannelName = (id: number): string => {
+  const getChannelName = (id: number) => {
     switch (id) {
       case 24: return 'Unicorncolors eBay';
       case 15: return 'Colourchanging eBay';
       case 27: return 'Amazon BE';
       case 25: return 'Amazon PL';
-      case 6:  return 'Amazon UK';
-      case 2:  return 'Amazon DE';
-      case 5:  return 'Amazon Spain';
-      case 4:  return 'Amazon France';
-      case 3:  return 'Amazon Italy';
+      case 6: return 'Amazon UK';
+      case 2: return 'Amazon DE';
+      case 5: return 'Amazon Spain';
+      case 4: return 'Amazon France';
+      case 3: return 'Amazon Italy';
       case 11: return 'Etsy Acc';
-      case 8:  return 'SFXC Shopify';
-      case 7:  return 'Colour Changing Shopify';
+      case 8: return 'SFXC Shopify';
+      case 7: return 'Colour Changing Shopify';
       case 26: return 'Woo Commerce';
       default: return 'Unknown Channel';
     }
   };
 
-  const formatPrice = (value: string | number): string => {
+  const formatPrice = (value: string | number) => {
     const num = typeof value === 'string' ? parseFloat(value) : value;
     return num.toFixed(2);
   };
 
-  const iso2to3: Record<string, string> = {
-    GB: 'GBR', US: 'USA', DE: 'DEU', FR: 'FRA', IT: 'ITA', TR: 'TUR',
-    ES: 'ESP', CA: 'CAN', NL: 'NLD', IL: 'ISR', BE: 'BEL',
-  };
-
-  const truncateEmail = (email: string): string => {
+  const truncateEmail = (email: string) => {
     const [localPart, domain] = email.split('@');
     if (!localPart || !domain || email.length <= 25) return email;
     return `${localPart.slice(0,5)}[...]${localPart.slice(-5)}@${domain}`;
@@ -103,7 +101,10 @@ export default function DespatchReadyOrders() {
     const fetchOrders = async () => {
       try {
         const resp = await axios.get('/api/helm-orders', {
-          headers: { Authorization: `Bearer ${token}`, 'X-Helm-Filter': 'status[]=3' }
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'X-Helm-Filter': 'status[]=3'
+          }
         });
         setOrders(resp.data.data || []);
       } catch (e: any) {
@@ -137,7 +138,7 @@ export default function DespatchReadyOrders() {
                 <tr key={order.id}>
                   <td>
                     <div className={styles.orderCell}>
-                      <div style={{ textAlign: 'center', marginBottom: 8 }}>
+                      <div style={{ textAlign: 'center', marginBottom: 8 }}>  
                         <img
                           src={getChannelLogo(order.channel_id)}
                           alt={getChannelName(order.channel_id)}
@@ -203,31 +204,19 @@ export default function DespatchReadyOrders() {
                     </div>
                   </td>
                   <td>
-                    {/* Open the order in Helm */}
                     <a
                       href={order.access_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={styles.selectButton}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                         <polyline points="15 3 21 3 21 9" />
                         <line x1="10" y1="14" x2="21" y2="3" />
                       </svg>
                     </a>
 
-                    {/* New Get Quote button */}
                     <button
                       className={styles.primaryButton}
                       onClick={() => {
@@ -236,7 +225,7 @@ export default function DespatchReadyOrders() {
                           : order.shipping_address_line_one;
                         const town = order.shipping_address_city;
                         const postcode = order.shipping_address_postcode;
-                        const country = order.shipping_address_iso;
+                        const country = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
                         const params = new URLSearchParams({
                           deliveryProperty: property,
                           deliveryTown: town,
