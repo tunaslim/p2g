@@ -105,7 +105,9 @@ export default function DespatchReadyOrders() {
     if (!token) return;
     const fetchOrders = async () => {
       try {
-        const resp = await axios.get('/api/helm-orders', { headers: { Authorization: `Bearer ${token}`, 'X-Helm-Filter':'status[]=3' } });
+        const resp = await axios.get('/api/helm-orders', {
+          headers: { Authorization: `Bearer ${token}`, 'X-Helm-Filter': 'status[]=3' }
+        });
         setOrders(resp.data.data || []);
       } catch (e: any) {
         setError(e.response?.data?.error || 'Failed to fetch orders');
@@ -118,8 +120,10 @@ export default function DespatchReadyOrders() {
     <div className={styles.main}>
       <h1 className={styles.title}>Despatch Ready Orders</h1>
       {error && <p className={styles.error}>{error}</p>}
-      {!error && orders.length===0 && <p className={styles.subTitle}>No despatch-ready orders found.</p>}
-      {orders.length>0 && (
+      {!error && orders.length === 0 && (
+        <p className={styles.subTitle}>No despatch-ready orders found.</p>
+      )}
+      {orders.length > 0 && (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
@@ -132,13 +136,19 @@ export default function DespatchReadyOrders() {
               </tr>
             </thead>
             <tbody>
-              {orders.map(order=>(
+              {orders.map((order) => (
                 <tr key={order.id}>
                   <td>
                     <div className={styles.orderCell}>
-                      <div style={{textAlign:'center',marginBottom:8}}>
-                        <img src={getChannelLogo(order.channel_id)} alt={getChannelName(order.channel_id)} className={styles.logo} />
-                        <div className={styles.channelName}>{getChannelName(order.channel_id)}</div>
+                      <div style={{ textAlign: 'center', marginBottom: 8 }}>
+                        <img
+                          src={getChannelLogo(order.channel_id)}
+                          alt={getChannelName(order.channel_id)}
+                          className={styles.logo}
+                        />
+                        <div className={styles.channelName}>
+                          {getChannelName(order.channel_id)}
+                        </div>
                       </div>
                       <div><strong>{order.channel_order_id}</strong></div>
                       <div>{order.status_description}</div>
@@ -156,33 +166,63 @@ export default function DespatchReadyOrders() {
                       <div>{order.shipping_address_line_two}</div>
                       <div>{order.shipping_address_city}</div>
                       <div>{order.shipping_address_postcode}</div>
-                      <div>{iso2to3[order.shipping_address_iso]||order.shipping_address_iso}</div>
+                      <div>
+                        {iso2to3[order.shipping_address_iso] || order.shipping_address_iso}
+                      </div>
                     </div>
                   </td>
                   <td>
                     <div className={styles.orderCell}>
-                      {order.inventory.map((item,idx)=>(
-                        <div key={idx} style={{marginBottom:'8px'}}>
+                      {order.inventory.map((item, idx) => (
+                        <div key={idx} style={{ marginBottom: '8px' }}>
                           <div><strong>{item.name}</strong> (x{item.quantity})</div>
-                          <div>SKU: {item.sku}</div>
-                          <div>Price: £{formatPrice(item.price)}</div>
-                          <div>Tax: £{formatPrice(item.unit_tax)}</div>
+                          {parseFloat(item.price) > 0 && (
+                            <div>Price: £{formatPrice(item.price)}</div>
+                          )}
+                          {parseFloat(item.unit_tax) > 0 && (
+                            <div>Tax: £{formatPrice(item.unit_tax)}</div>
+                          )}
                         </div>
                       ))}
                     </div>
                   </td>
                   <td className={styles.totalColumn}>
                     <div className={styles.orderCell}>
-                      <div>Total Tax: £{formatPrice(order.total_tax)}</div>
-                      <div>Shipping: £{formatPrice(order.shipping_paid)}</div>
-                      <div>Total Discount: £{formatPrice(order.total_discount)}</div>
-                      <div>Order Discount: £{formatPrice(order.order_discount)}</div>
-                      <div>Total Paid: £{formatPrice(order.total_paid)}</div>
+                      {parseFloat(order.total_tax) > 0 && (
+                        <div>Total Tax: £{formatPrice(order.total_tax)}</div>
+                      )}
+                      {parseFloat(order.shipping_paid) > 0 && (
+                        <div>Shipping: £{formatPrice(order.shipping_paid)}</div>
+                      )}
+                      {parseFloat(order.total_discount) > 0 && (
+                        <div>Total Discount: £{formatPrice(order.total_discount)}</div>
+                      )}
+                      {parseFloat(order.order_discount) > 0 && (
+                        <div>Order Discount: £{formatPrice(order.order_discount)}</div>
+                      )}
+                      {parseFloat(order.total_paid) > 0 && (
+                        <div>Total Paid: £{formatPrice(order.total_paid)}</div>
+                      )}
                     </div>
                   </td>
                   <td>
-                    <a href={order.access_url} target="_blank" rel="noopener noreferrer" className={styles.selectButton}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <a
+                      href={order.access_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.selectButton}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                         <polyline points="15 3 21 3 21 9" />
                         <line x1="10" y1="14" x2="21" y2="3" />
