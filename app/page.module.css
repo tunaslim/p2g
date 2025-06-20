@@ -243,3 +243,9 @@
   min-width: 200px;
   width: 220px;
 }
+
+.channelName {
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 8px;
+}
