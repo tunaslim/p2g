@@ -46,18 +46,18 @@ export default function DespatchReadyOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [error, setError] = useState('');
 
-  const getChannelLogo = (channel_id: number) => {
-    switch (channel_id) {
-      case 1:
-        return '/logos/amazon.png';
-      case 2:
-        return '/logos/ebay.png';
-      case 7:
-        return '/logos/shopify.png';
-      default:
-        return '/logos/default.png';
-    }
-  };
+  const getChannelLogo = (channel_id: number): string => {
+  switch (channel_id) {
+    case 1:
+      return '/logos/amazon.png'; // Must be public/logos/amazon.png
+    case 2:
+      return '/logos/ebay.png';
+    case 7:
+      return '/logos/shopify.png';
+    default:
+      return '/logos/default.png';
+  }
+};
 
   const iso2to3: Record<string, string> = {
     GB: 'GBR',
