@@ -49,7 +49,7 @@ export default function DespatchReadyOrders() {
   const getChannelLogo = (channel_id: number) => {
     switch (channel_id) {
       case 1:
-        return 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1206px-Amazon_logo.svg.png?20250504041148';
+        return '/logos/amazon.png';
       case 2:
         return '/logos/ebay.png';
       case 7:
@@ -128,7 +128,12 @@ export default function DespatchReadyOrders() {
                   <td>
                     <div className={styles.orderCell}>
                       <div>
-                        <img src={getChannelLogo(order.channel_id)} alt="Logo" className={styles.logo} />
+                        <img
+        src={getChannelLogo(order.channel_id)}
+        alt="Channel Logo"
+        className={styles.logo}
+        style={{ display: 'block', margin: '0 auto 5px' }}
+      />
                       </div>
                       <div><strong>{order.channel_order_id}</strong></div>
                       <div>{order.status_description}</div>
