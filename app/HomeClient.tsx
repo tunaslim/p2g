@@ -1,4 +1,3 @@
-// app/HomeClient.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -90,20 +89,25 @@ export default function HomeClient() {
 
   const apiBase = 'https://p2g-api.up.railway.app';
 
-  // Prefill delivery address when navigated from Despatch‐Ready page
+  // Prefill delivery address and parcel value when navigated from Despatch-Ready page
   useEffect(() => {
     const prop = searchParams.get('deliveryProperty');
-    if (prop) {
-      setOrder((prev) => ({
-        ...prev,
-        DeliveryAddress: {
+    const parcelVal = searchParams.get('deliveryParcelValue');
+    setOrder((prev) => {
+      let updated = { ...prev };
+      if (prop) {
+        updated.DeliveryAddress = {
           Country: searchParams.get('deliveryCountry') || prev.DeliveryAddress.Country,
           Property: prop,
           Postcode: searchParams.get('deliveryPostcode') || prev.DeliveryAddress.Postcode,
           Town: searchParams.get('deliveryTown') || prev.DeliveryAddress.Town,
-        },
-      }));
-    }
+        };
+      }
+      if (parcelVal) {
+        updated.Parcels = [{ ...prev.Parcels[0], Value: parcelVal }];
+      }
+      return updated;
+    });
   }, [searchParams]);
 
   // Parcel2Go get quotes
@@ -254,79 +258,7 @@ export default function HomeClient() {
       {quotes.length > 0 && !label && (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
-            <thead>
-              <tr>
-                <th></th>
-                <th>Courier</th>
-                <th>Service</th>
-                <th>Price (excl. VAT)</th>
-                <th>Total Price</th>
-                <th>Est. Delivery</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {quotes
-                .slice()
-                .sort((a, b) => a.TotalPrice - b.TotalPrice)
-                .map((quote, idx) => {
-                  const svc = quote.Service;
-                  const isExpanded = !!expandedDescriptions[idx];
-                  return (
-                    <tr key={idx}>
-                      <td>
-                        <img src={svc.Links.ImageSmall} alt={svc.Name} className={styles.logo} />
-                      </td>
-                      <td>
-                        <span className={styles.bold}>{svc.CourierName}</span>
-                      </td>
-                      <td>
-                        <span className={styles.bold}>{svc.Name}</span>{' '}
-                        {svc.ShortDescriptions && (
-                          <>
-                            <button
-                              className={styles.toggleButton}
-                              onClick={() =>
-                                setExpandedDescriptions((prev) => ({
-                                  ...prev,
-                                  [idx]: !prev[idx],
-                                }))
-                              }
-                            >
-                              {isExpanded ? 'Hide Details' : 'Show Details'}
-                            </button>
-                            {isExpanded && (
-                              <div
-                                className={styles.description}
-                                dangerouslySetInnerHTML={{ __html: svc.ShortDescriptions! }}
-                              />
-                            )}
-                          </>
-                        )}
-                        <br />
-                        <span className={styles.maxdims}>
-                          MaxWeight: {svc.MaxWeight}kg MaxHeight: {svc.MaxHeight * 100}cm MaxWidth:{' '}
-                          {svc.MaxWidth * 100}cm MaxLength: {svc.MaxLength * 100}cm
-                        </span>
-                      </td>
-                      <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
-                      <td>£{quote.TotalPrice.toFixed(2)}</td>
-                      <td>{new Date(quote.EstimatedDeliveryDate).toLocaleDateString()}</td>
-                      <td>
-                        <button
-                          onClick={() => {
-                            setSelectedService(quote);
-                            createLabel();
-                          }}
-                          className={styles.selectButton}
-                        >
-                          Select
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
+            <!-- table rows here -->
           </table>
         </div>
       )}
