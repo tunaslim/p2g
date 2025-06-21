@@ -249,3 +249,9 @@
   color: #555;
   margin-bottom: 8px;
 }
+
+.extraRow {
+  background-color: #f9f9f9;
+  font-size: 0.9rem;
+  color: #555;
+}
