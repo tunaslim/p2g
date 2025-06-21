@@ -19,6 +19,7 @@ interface Service {
   MaxLength: number;
   MaxWeight: number;
   Links: ServiceLinks;
+  IncludedCover: number;
 }
 
 interface AvailableExtra {
@@ -36,7 +37,6 @@ interface Quote {
   AvailableExtras: AvailableExtra[];
   Service: Service;
   TotalPrice: number;
-  IncludedCover: string;
   TotalPriceExVat: number;
   EstimatedDeliveryDate: string;
 }
@@ -348,7 +348,7 @@ export default function HomeClient() {
                           <td></td>
                             <td colSpan={5}>
                               <strong>
-                                INFO: Current Protection: £{parseFloat(quote.IncludedCover || '0').toFixed(0)} Book with £{parseFloat(coverExtra.Details?.IncludedCover || '0').toFixed(0)} Protection Total:
+                                INFO: Current Protection: £{parseFloat(svc.IncludedCover || '0').toFixed(0)} Book with £{parseFloat(coverExtra.Details?.IncludedCover || '0').toFixed(0)} Protection Total:
                                 £{(coverExtra.Total + quote.TotalPrice).toFixed(2)}
                               </strong>{' '}
                             </td>
