@@ -102,6 +102,7 @@ export default function HomeClient() {
 
   const apiBase = 'https://p2g-api.up.railway.app';
 
+  // Prefill from search params
   useEffect(() => {
     const prop = searchParams.get('deliveryProperty');
     const parcelVal = searchParams.get('deliveryParcelValue');
@@ -122,18 +123,19 @@ export default function HomeClient() {
     });
   }, [searchParams]);
 
+  // Fetch quotes
   const getQuotes = async () => {
     setLoading(true);
     setError('');
     try {
       const parsedOrder = {
         ...order,
-        Parcels: order.Parcels.map(parcel => ({
-          Value: parseFloat(parcel.Value) || 0,
-          Weight: parseFloat(parcel.Weight) || 0,
-          Length: parseFloat(parcel.Length) || 0,
-          Width: parseFloat(parcel.Width) || 0,
-          Height: parseFloat(parcel.Height) || 0,
+        Parcels: order.Parcels.map(p => ({
+          Value: parseFloat(p.Value) || 0,
+          Weight: parseFloat(p.Weight) || 0,
+          Length: parseFloat(p.Length) || 0,
+          Width: parseFloat(p.Width) || 0,
+          Height: parseFloat(p.Height) || 0,
         })),
       };
 
@@ -143,40 +145,39 @@ export default function HomeClient() {
       );
       setQuotes(response.data.Quotes);
     } catch (err: any) {
-      console.error('Error fetching quotes:', err);
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || err.message || 'Failed to get quotes.');
-      } else {
-        setError(err.message || 'Failed to get quotes.');
-      }
+      console.error(err);
+      setError(
+        axios.isAxiosError(err)
+          ? err.response?.data?.message || err.message
+          : err.message || 'Failed to get quotes.'
+      );
       setQuotes([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // Create label
   const createLabel = async () => {
     if (!selectedService) {
       setError('No service selected');
       return;
     }
-
     setLoading(true);
     setError('');
     try {
-      const labelData = { ...order, SelectedService: selectedService };
       const response = await axios.post<LabelResponse>(
         `${apiBase}/create-label`,
-        { labelData }
+        { labelData: { ...order, SelectedService: selectedService } }
       );
       setLabel(response.data);
     } catch (err: any) {
-      console.error('Error creating label:', err);
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || err.message || 'Failed to create label.');
-      } else {
-        setError(err.message || 'Failed to create label.');
-      }
+      console.error(err);
+      setError(
+        axios.isAxiosError(err)
+          ? err.response?.data?.message || err.message
+          : err.message || 'Failed to create label.'
+      );
     } finally {
       setLoading(false);
     }
@@ -242,7 +243,11 @@ export default function HomeClient() {
               className={styles.input}
               placeholder={
                 `Parcel ${field}` +
-                (field === 'Weight' ? ' (kg)' : ['Length', 'Width', 'Height'].includes(field) ? ' (cm)' : '')
+                (field === 'Weight'
+                  ? ' (kg)'
+                  : ['Length', 'Width', 'Height'].includes(field)
+                  ? ' (cm)'
+                  : '')
               }
               type="number"
               value={order.Parcels[0][field as keyof ParcelInput]}
@@ -284,8 +289,8 @@ export default function HomeClient() {
                   const isExpanded = !!expandedDescriptions[idx];
 
                   return (
-                    <React.Fragment key={idx}>
-                      <tr>
+                    <>
+                      <tr key={`svc-${idx}`}>
                         <td>
                           <img
                             src={svc.Links.ImageSmall}
@@ -321,8 +326,9 @@ export default function HomeClient() {
                           )}
                           <br />
                           <span className={styles.maxdims}>
-                            Max: {svc.MaxWeight}kg MaxDims: {svc.MaxHeight * 100} x{' '}
-                            {svc.MaxWidth * 100} x {svc.MaxLength * 100} cm
+                            Max: {svc.MaxWeight}kg MaxDims:{' '}
+                            {svc.MaxHeight * 100} x {svc.MaxWidth * 100} x{' '}
+                            {svc.MaxLength * 100} cm
                           </span>
                         </td>
                         <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
@@ -347,9 +353,10 @@ export default function HomeClient() {
                         );
 
                         if (extCover && extCover.Details) {
-                          // show extended cover option
                           const currentProtection = quote.IncludedCover;
-                          const extendedProtection = parseFloat(extCover.Details.IncludedCover);
+                          const extendedProtection = parseFloat(
+                            extCover.Details.IncludedCover
+                          );
                           const totalWithExtended = quote.TotalPrice + extCover.Total;
 
                           return (
@@ -366,13 +373,13 @@ export default function HomeClient() {
                             </tr>
                           );
                         } else if (quote.IncludedCover > 0) {
-                          // show only the included cover amount
                           return (
                             <tr key={`included-${idx}`} className={styles.extraRow}>
                               <td />
                               <td colSpan={5}>
                                 <strong>
-                                  INFO: Current Protection: £{quote.IncludedCover.toFixed(0)} Extended Protection is not available.
+                                  INFO: Current Protection: £
+                                  {quote.IncludedCover.toFixed(0)}
                                 </strong>
                               </td>
                               <td />
@@ -382,7 +389,7 @@ export default function HomeClient() {
 
                         return null;
                       })()}
-                    </React.Fragment>
+                    </>
                   );
                 })}
             </tbody>
