@@ -312,7 +312,7 @@ export default function HomeClient() {
                                   }))
                                 }
                               >
-                                {isExpanded ? ' Hide Details' : ' Show Details'}
+                                {isExpanded ? 'Hide Details' : 'Show Details'}
                               </button>
                               {isExpanded && (
                                 <div
@@ -324,7 +324,7 @@ export default function HomeClient() {
                           )}
                           <br />
                           <span className={styles.maxdims}>
-                            MaxWeight: {svc.MaxWeight}kg MaxHeight: {svc.MaxHeight * 100}cm MaxWidth: {svc.MaxWidth * 100}cm MaxLength: {svc.MaxLength * 100}cm
+                            Max: {svc.MaxWeight}kg MaxDims: {svc.MaxHeight * 100}x {svc.MaxWidth * 100}x {svc.MaxLength * 100}cm
                           </span>
                         </td>
                         <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
