@@ -344,6 +344,7 @@ export default function HomeClient() {
 
                       {coverExtra && (
                         <tr key={`extra-${idx}`} className={styles.extraRow}>
+                          <td></td>
                             <td colSpan={5}>
                               <strong>
                                 INFO: Book with £{parseFloat(coverExtra.Details?.IncludedCover || '0').toFixed(0)} Protection. Total:
