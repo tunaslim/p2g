@@ -344,10 +344,12 @@ export default function HomeClient() {
 
                       {coverExtra && (
                         <tr key={`extra-${idx}`} className={styles.extraRow}>
-                          <td></td>
-                          <td colSpan={5}>
-                            <strong>Extended Cover:</strong> £{coverExtra.Total.toFixed(2)} (Included cover: {coverExtra.Details?.IncludedCover})
-                          </td>
+                            <td colSpan={5}>
+                              <strong>
+                                INFO: Book with £{parseFloat(coverExtra.Details?.IncludedCover || '0').toFixed(0)} Protection. Total:
+                              </strong>{' '}
+                                £{(coverExtra.Total + quote.TotalPrice).toFixed(2)}
+                            </td>
                           <td></td>
                         </tr>
                       )}
