@@ -312,7 +312,7 @@ export default function HomeClient() {
                                   }))
                                 }
                               >
-                                {isExpanded ? 'Hide Details' : 'Show Details'}
+                                {isExpanded ? ' Hide Details' : ' Show Details'}
                               </button>
                               {isExpanded && (
                                 <div
