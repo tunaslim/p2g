@@ -284,12 +284,8 @@ export default function HomeClient() {
                 .sort((a, b) => a.TotalPrice - b.TotalPrice)
                 .map((quote, idx) => {
                   const svc = quote.Service;
-                  const extCover = quote.AvailableExtras.find(e => e.Type === 'ExtendedBaseCover');
                   const isExpanded = !!expandedDescriptions[idx];
-                  if (extCover && extCover.Details) {
-                    const currentProtection = quote.IncludedCover;
-                    const extendedProtection = parseFloat(extCover.Details.IncludedCover);
-                    const totalWithExtended = quote.TotalPrice + extCover.Total;
+
                   return (
                     <>
                       <tr key={`svc-${idx}`}>
@@ -328,7 +324,8 @@ export default function HomeClient() {
                           )}
                           <br />
                           <span className={styles.maxdims}>
-                            Max: {svc.MaxWeight}kg MaxDims: {svc.MaxHeight * 100}x {svc.MaxWidth * 100}x {svc.MaxLength * 100}cm
+                            Max: {svc.MaxWeight}kg MaxDims: {svc.MaxHeight * 100} x{' '}
+                            {svc.MaxWidth * 100} x {svc.MaxLength * 100} cm
                           </span>
                         </td>
                         <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
@@ -347,17 +344,31 @@ export default function HomeClient() {
                         </td>
                       </tr>
 
-      <tr key={`extra-${idx}`} className={styles.extraRow}>
-        <td />
-        <td colSpan={5}>
-          <strong>
-            INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £
-            {extendedProtection.toFixed(0)} Protection Total: £
-            {totalWithExtended.toFixed(2)}
-          </strong>
-        </td>
-        <td />
-      </tr>
+                      {(() => {
+                        const extCover = quote.AvailableExtras.find(
+                          e => e.Type === 'ExtendedBaseCover'
+                        );
+                        if (extCover && extCover.Details) {
+                          const currentProtection = quote.IncludedCover;
+                          const extendedProtection = parseFloat(extCover.Details.IncludedCover);
+                          const totalWithExtended = quote.TotalPrice + extCover.Total;
+
+                          return (
+                            <tr key={`extra-${idx}`} className={styles.extraRow}>
+                              <td />
+                              <td colSpan={5}>
+                                <strong>
+                                  INFO: Current Protection: £{currentProtection.toFixed(0)} | Book
+                                  with £{extendedProtection.toFixed(0)} Protection Total: £
+                                  {totalWithExtended.toFixed(2)}
+                                </strong>
+                              </td>
+                              <td />
+                            </tr>
+                          );
+                        }
+                        return null;
+                      })()}
                     </>
                   );
                 })}
