@@ -21,7 +21,19 @@ interface Service {
   Links: ServiceLinks;
 }
 
+interface AvailableExtra {
+  Type: string;
+  Price: number;
+  Vat: number;
+  Total: number;
+  Details: {
+    IncludedCover: string;
+    MaxWeight: string;
+  } | null;
+}
+
 interface Quote {
+  AvailableExtras: AvailableExtra[];
   Service: Service;
   TotalPrice: number;
   TotalPriceExVat: number;
@@ -271,62 +283,75 @@ export default function HomeClient() {
                 .sort((a, b) => a.TotalPrice - b.TotalPrice)
                 .map((quote, idx) => {
                   const svc = quote.Service;
+                  const coverExtra = quote.AvailableExtras.find(e => e.Type === 'ExtendedBaseCover');
                   const isExpanded = !!expandedDescriptions[idx];
                   return (
-                    <tr key={idx}>
-                      <td>
-                        <img
-                          src={svc.Links.ImageSmall}
-                          alt={svc.Name}
-                          className={styles.logo}
-                        />
-                      </td>
-                      <td>
-                        <span className={styles.bold}>{svc.CourierName}</span>
-                      </td>
-                      <td>
-                        <span className={styles.bold}>{svc.Name}</span>
-                        {svc.ShortDescriptions && (
-                          <>
-                            <button
-                              className={styles.toggleButton}
-                              onClick={() =>
-                                setExpandedDescriptions(prev => ({
-                                  ...prev,
-                                  [idx]: !prev[idx],
-                                }))
-                              }
-                            >
-                              {isExpanded ? 'Hide Details' : 'Show Details'}
-                            </button>
-                            {isExpanded && (
-                              <div
-                                className={styles.description}
-                                dangerouslySetInnerHTML={{ __html: svc.ShortDescriptions! }}
-                              />
-                            )}
-                          </>
-                        )}
-                        <br />
-                        <span className={styles.maxdims}>
-                          MaxWeight: {svc.MaxWeight}kg MaxHeight: {svc.MaxHeight * 100}cm MaxWidth: {svc.MaxWidth * 100}cm MaxLength: {svc.MaxLength * 100}cm
-                        </span>
-                      </td>
-                      <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
-                      <td>£{quote.TotalPrice.toFixed(2)}</td>
-                      <td>{new Date(quote.EstimatedDeliveryDate).toLocaleDateString()}</td>
-                      <td>
-                        <button
-                          onClick={() => {
-                            setSelectedService(quote);
-                            createLabel();
-                          }}
-                          className={styles.selectButton}
-                        >
-                          Select
-                        </button>
-                      </td>
-                    </tr>
+                    <>
+                      <tr key={`svc-${idx}`}>
+                        <td>
+                          <img
+                            src={svc.Links.ImageSmall}
+                            alt={svc.Name}
+                            className={styles.logo}
+                          />
+                        </td>
+                        <td>
+                          <span className={styles.bold}>{svc.CourierName}</span>
+                        </td>
+                        <td>
+                          <span className={styles.bold}>{svc.Name}</span>
+                          {svc.ShortDescriptions && (
+                            <>
+                              <button
+                                className={styles.toggleButton}
+                                onClick={() =>
+                                  setExpandedDescriptions(prev => ({
+                                    ...prev,
+                                    [idx]: !prev[idx],
+                                  }))
+                                }
+                              >
+                                {isExpanded ? 'Hide Details' : 'Show Details'}
+                              </button>
+                              {isExpanded && (
+                                <div
+                                  className={styles.description}
+                                  dangerouslySetInnerHTML={{ __html: svc.ShortDescriptions! }}
+                                />
+                              )}
+                            </>
+                          )}
+                          <br />
+                          <span className={styles.maxdims}>
+                            MaxWeight: {svc.MaxWeight}kg MaxHeight: {svc.MaxHeight * 100}cm MaxWidth: {svc.MaxWidth * 100}cm MaxLength: {svc.MaxLength * 100}cm
+                          </span>
+                        </td>
+                        <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
+                        <td>£{quote.TotalPrice.toFixed(2)}</td>
+                        <td>{new Date(quote.EstimatedDeliveryDate).toLocaleDateString()}</td>
+                        <td>
+                          <button
+                            onClick={() => {
+                              setSelectedService(quote);
+                              createLabel();
+                            }}
+                            className={styles.selectButton}
+                          >
+                            Select
+                          </button>
+                        </td>
+                      </tr>
+
+                      {coverExtra && (
+                        <tr key={`extra-${idx}`} className={styles.extraRow}>
+                          <td></td>
+                          <td colSpan={5}>
+                            <strong>Extended Cover:</strong> £{coverExtra.Total.toFixed(2)} (Included cover: {coverExtra.Details?.IncludedCover})
+                          </td>
+                          <td></td>
+                        </tr>
+                      )}
+                    </>
                   );
                 })}
             </tbody>
