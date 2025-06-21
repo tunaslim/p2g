@@ -260,3 +260,50 @@
   font-size: 0.9rem;
   color: #555;
 }
+
+/* Expand/Collapse Details */
+.details {
+  width: 100%;
+}
+
+.summary {
+  cursor: pointer;
+  padding: 0.75rem;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+/* Remove default triangle marker */
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Add custom marker */
+.summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+/* Rotate marker when open */
+.details[open] > .summary::before {
+  transform: rotate(90deg);
+}
+
+.detailPanel {
+  padding: 1rem;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
