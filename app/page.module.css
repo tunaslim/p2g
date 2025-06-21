@@ -60,7 +60,7 @@
 .table {
   width: 100%;
   border-collapse: seperate;
-  border-spacing: 0 10px;
+  border-spacing: 0 5px;
 }
 
 /* Table Header - Dark Style */
@@ -250,7 +250,7 @@
   margin-bottom: 8px;
 }
 
-.extraRow {
+.extraRow td {
   background-color: #ebe8c0;
   font-size: 0.9rem;
   color: #555;
