@@ -36,6 +36,7 @@ interface Quote {
   AvailableExtras: AvailableExtra[];
   Service: Service;
   TotalPrice: number;
+  IncludedCover: number;
   TotalPriceExVat: number;
   EstimatedDeliveryDate: string;
 }
@@ -347,9 +348,9 @@ export default function HomeClient() {
                           <td></td>
                             <td colSpan={5}>
                               <strong>
-                                INFO: Book with £{parseFloat(coverExtra.Details?.IncludedCover || '0').toFixed(0)} Protection. Total:
-                              </strong>{' '}
+                                INFO: Current Protection: £{parseFloat(quote.IncludedCover || '0').toFixed(0)} Book with £{parseFloat(coverExtra.Details?.IncludedCover || '0').toFixed(0)} Protection. Total:
                                 £{(coverExtra.Total + quote.TotalPrice).toFixed(2)}
+                              </strong>{' '}
                             </td>
                           <td></td>
                         </tr>
