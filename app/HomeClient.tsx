@@ -102,7 +102,6 @@ export default function HomeClient() {
 
   const apiBase = 'https://p2g-api.up.railway.app';
 
-  // Prefill delivery address and parcel value when navigated from Despatch-Ready page
   useEffect(() => {
     const prop = searchParams.get('deliveryProperty');
     const parcelVal = searchParams.get('deliveryParcelValue');
@@ -123,7 +122,6 @@ export default function HomeClient() {
     });
   }, [searchParams]);
 
-  // Parcel2Go get quotes
   const getQuotes = async () => {
     setLoading(true);
     setError('');
@@ -157,7 +155,6 @@ export default function HomeClient() {
     }
   };
 
-  // Parcel2Go create label
   const createLabel = async () => {
     if (!selectedService) {
       setError('No service selected');
@@ -287,8 +284,8 @@ export default function HomeClient() {
                   const isExpanded = !!expandedDescriptions[idx];
 
                   return (
-                    <>
-                      <tr key={`svc-${idx}`}>
+                    <React.Fragment key={idx}>
+                      <tr>
                         <td>
                           <img
                             src={svc.Links.ImageSmall}
@@ -348,7 +345,9 @@ export default function HomeClient() {
                         const extCover = quote.AvailableExtras.find(
                           e => e.Type === 'ExtendedBaseCover'
                         );
+
                         if (extCover && extCover.Details) {
+                          // show extended cover option
                           const currentProtection = quote.IncludedCover;
                           const extendedProtection = parseFloat(extCover.Details.IncludedCover);
                           const totalWithExtended = quote.TotalPrice + extCover.Total;
@@ -366,10 +365,24 @@ export default function HomeClient() {
                               <td />
                             </tr>
                           );
+                        } else if (quote.IncludedCover > 0) {
+                          // show only the included cover amount
+                          return (
+                            <tr key={`included-${idx}`} className={styles.extraRow}>
+                              <td />
+                              <td colSpan={5}>
+                                <strong>
+                                  INFO: Current Protection: £{quote.IncludedCover.toFixed(0)} Extended Protection is not available.
+                                </strong>
+                              </td>
+                              <td />
+                            </tr>
+                          );
                         }
+
                         return null;
                       })()}
-                    </>
+                    </React.Fragment>
                   );
                 })}
             </tbody>
