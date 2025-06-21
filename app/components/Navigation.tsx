@@ -17,14 +17,12 @@ export default function Navigation() {
   return (
     <header className={styles.header}>
       <nav className={styles.nav}>
-        <Link href="/" className={styles.navLink}>&#124; Manual Quote &#124;</Link>
+        <Link href="/" className={styles.navLink}>Manual Quote &#124;</Link>
         {!token && <Link href="/settings" className={styles.navLink}>Login to Helm &#124;</Link>}
         {token && (
           <>
             <Link href="/despatch-ready-orders" className={styles.navLink}>Despatch Ready Orders &#124;</Link>
-            <button onClick={handleLogout} className={styles.navLink}>
-              &#124; Logout &#124;
-            </button>
+            <button onClick={handleLogout} className={styles.navLink}>Logout &#124;</button>
           </>
         )}
       </nav>
