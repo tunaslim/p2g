@@ -13,6 +13,7 @@ interface ServiceLinks {
 interface Service {
   CourierName: string;
   Name: string;
+  Slug: string;
   ShortDescriptions?: string;
   MaxHeight: number;
   MaxWidth: number;
@@ -300,6 +301,7 @@ export default function HomeClient() {
                         </td>
                         <td>
                           <span className={styles.bold}>{svc.CourierName}</span>
+                          <span className={styles.maxdims}>{svc.Slug}</span>
                         </td>
                         <td>
                           <span className={styles.bold}>{svc.Name}</span>
