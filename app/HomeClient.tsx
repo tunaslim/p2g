@@ -300,7 +300,7 @@ export default function HomeClient() {
                           />
                         </td>
                         <td>
-                          <span className={styles.bold}>{svc.CourierName}</span>
+                          <span className={styles.bold}>{svc.CourierName}</span><br/>
                           <span className={styles.maxdims}>{svc.Slug}</span>
                         </td>
                         <td>
