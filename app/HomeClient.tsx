@@ -284,8 +284,12 @@ export default function HomeClient() {
                 .sort((a, b) => a.TotalPrice - b.TotalPrice)
                 .map((quote, idx) => {
                   const svc = quote.Service;
-                  const coverExtra = quote.AvailableExtras.find(e => e.Type === 'ExtendedBaseCover');
+                  const extCover = quote.AvailableExtras.find(e => e.Type === 'ExtendedBaseCover');
                   const isExpanded = !!expandedDescriptions[idx];
+                  if (extCover && extCover.Details) {
+                    const currentProtection = quote.IncludedCover;
+                    const extendedProtection = parseFloat(extCover.Details.IncludedCover);
+                    const totalWithExtended = quote.TotalPrice + extCover.Total;
                   return (
                     <>
                       <tr key={`svc-${idx}`}>
@@ -343,18 +347,17 @@ export default function HomeClient() {
                         </td>
                       </tr>
 
-                      {coverExtra && (
-                        <tr key={`extra-${idx}`} className={styles.extraRow}>
-                          <td></td>
-                            <td colSpan={5}>
-                              <strong>
-                                INFO: Current Protection: £{quote.IncludedCover.toFixed(0)} | Book with £{parseFloat(coverExtra.Details?.IncludedCover || '0').toFixed(0)} Protection Total:
-                                £{(coverExtra.Total + quote.TotalPrice).toFixed(2)}
-                              </strong>{' '}
-                            </td>
-                          <td></td>
-                        </tr>
-                      )}
+      <tr key={`extra-${idx}`} className={styles.extraRow}>
+        <td />
+        <td colSpan={5}>
+          <strong>
+            INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £
+            {extendedProtection.toFixed(0)} Protection Total: £
+            {totalWithExtended.toFixed(2)}
+          </strong>
+        </td>
+        <td />
+      </tr>
                     </>
                   );
                 })}
