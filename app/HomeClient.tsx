@@ -351,6 +351,7 @@ export default function HomeClient() {
                                 INFO: Current Protection: £{parseFloat(quote.IncludedCover || '0').toFixed(0)} Book with £{parseFloat(coverExtra.Details?.IncludedCover || '0').toFixed(0)} Protection Total:
                                 £{(coverExtra.Total + quote.TotalPrice).toFixed(2)}
                               </strong>{' '}
+                            </td>
                           <td></td>
                         </tr>
                       )}
