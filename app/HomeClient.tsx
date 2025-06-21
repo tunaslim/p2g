@@ -348,7 +348,7 @@ export default function HomeClient() {
                           <td></td>
                             <td colSpan={5}>
                               <strong>
-                                INFO: Current Protection: £{IncludedCover.toFixed(0)} | Book with £{parseFloat(coverExtra.Details?.IncludedCover || '0').toFixed(0)} Protection Total:
+                                INFO: Current Protection: £{quote.IncludedCover.toFixed(0)} | Book with £{parseFloat(coverExtra.Details?.IncludedCover || '0').toFixed(0)} Protection Total:
                                 £{(coverExtra.Total + quote.TotalPrice).toFixed(2)}
                               </strong>{' '}
                             </td>
