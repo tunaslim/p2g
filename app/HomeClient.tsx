@@ -36,7 +36,7 @@ interface Quote {
   AvailableExtras: AvailableExtra[];
   Service: Service;
   TotalPrice: number;
-  IncludedCover: number;
+  IncludedCover: string;
   TotalPriceExVat: number;
   EstimatedDeliveryDate: string;
 }
