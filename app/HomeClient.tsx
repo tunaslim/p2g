@@ -379,7 +379,7 @@ export default function HomeClient() {
                               <td colSpan={5}>
                                 <strong>
                                   INFO: Current Protection: £
-                                  {quote.IncludedCover.toFixed(0)}
+                                  {quote.IncludedCover.toFixed(0)} | Extended protection not available.
                                 </strong>
                               </td>
                               <td />
