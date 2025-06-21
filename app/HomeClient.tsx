@@ -19,7 +19,7 @@ interface Service {
   MaxLength: number;
   MaxWeight: number;
   Links: ServiceLinks;
-  IncludedCover: number;
+  IncludedCover: string;
 }
 
 interface AvailableExtra {
