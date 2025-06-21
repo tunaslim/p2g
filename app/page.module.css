@@ -240,13 +240,13 @@
 }
 
 .totalColumn {
-  min-width: 150px;
-  width: 150px;
+  min-width: 200px;
+  width: 220px;
 }
 
 .actionColumn {
-  min-width: 200px;
-  width: 220px;
+  min-width: 100px;
+  width: 150px;
 }
 
 .channelName {
