@@ -163,7 +163,16 @@ export default function DespatchReadyOrders() {
                       <td className={styles.expandCell} onClick={() => toggle(order.id)}>
                         {expanded.has(order.id) ? '▼' : '►'}
                       </td>
-                      <td><strong>{order.channel_order_id}</strong></td>
+                      <td>
+                        <div className={styles.orderCell}>
+                          <img
+                            src={getChannelLogo(order.channel_id)}
+                            alt={getChannelName(order.channel_id)}
+                            className={styles.logoSmall}
+                          />
+                          <strong>{order.channel_order_id}</strong>
+                        </div>
+                      </td>
                       <td>{order.shipping_name_company || order.shipping_name}</td>
                       <td>{order.inventory.length} item{order.inventory.length > 1 ? 's' : ''}</td>
                       <td className={styles.totalColumn}>£{formatPrice(order.total_paid)}</td>
@@ -222,7 +231,7 @@ export default function DespatchReadyOrders() {
                             {order.inventory.map((item, idx) => (
                               <div key={idx} className={styles.itemRow}>
                                 <div><strong>SKU:</strong> {item.sku}</div>
-                                <div>({item.quantity}x) {item.name}</div>
+                                <div>({item.quantity}) {item.name}</div>
                                 {item.options && <div><strong>Options:</strong> {item.options}</div>}
                                 <div><strong>Price:</strong> £{formatPrice(item.price)}</div>
                               </div>
