@@ -222,7 +222,7 @@ export default function DespatchReadyOrders() {
                             {order.inventory.map((item, idx) => (
                               <div key={idx} className={styles.itemRow}>
                                 <div><strong>SKU:</strong> {item.sku}</div>
-                                <div>({item.quantity}) {item.name}</div>
+                                <div>({item.quantity}x) {item.name}</div>
                                 {item.options && <div><strong>Options:</strong> {item.options}</div>}
                                 <div><strong>Price:</strong> £{formatPrice(item.price)}</div>
                               </div>
