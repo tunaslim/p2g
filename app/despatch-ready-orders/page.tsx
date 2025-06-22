@@ -46,6 +46,7 @@ export default function DespatchReadyOrders() {
   const router = useRouter();
   const { token } = useToken();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [total, setTotal] = useState<number>(0);
   const [error, setError] = useState('');
 
   // Map 2-letter ISO to 3-letter ISO
@@ -100,13 +101,14 @@ export default function DespatchReadyOrders() {
     if (!token) return;
     const fetchOrders = async () => {
       try {
-        const resp = await axios.get('/api/helm-orders', {
+        const resp = await axios.get<{ total: number; data: Order[] }>('/api/helm-orders', {
           headers: {
             Authorization: `Bearer ${token}`,
             'X-Helm-Filter': 'status[]=3'
           }
         });
         setOrders(resp.data.data || []);
+        setTotal(resp.data.total || 0);
       } catch (e: any) {
         setError(e.response?.data?.error || 'Failed to fetch orders');
       }
@@ -116,7 +118,9 @@ export default function DespatchReadyOrders() {
 
   return (
     <div className={styles.main}>
-      <h1 className={styles.title}>Despatch Ready Orders</h1>
+      <h1 className={styles.title}>
+        Despatch Ready Orders ({total})
+      </h1>
       {error && <p className={styles.error}>{error}</p>}
       {!error && orders.length === 0 && (
         <p className={styles.subTitle}>No despatch-ready orders found.</p>
@@ -135,7 +139,6 @@ export default function DespatchReadyOrders() {
             </thead>
             <tbody>
               {orders.map((order) => {
-                // Calculate parcel value
                 const totalPaid = parseFloat(order.total_paid) || 0;
                 const shippingCost = parseFloat(order.shipping_paid) || 0;
                 const country3 = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
@@ -207,7 +210,6 @@ export default function DespatchReadyOrders() {
                         {totalPaid > 0 && (
                           <div>Total Paid: £{formatPrice(order.total_paid)}</div>
                         )}
-                        {/* Parcel Value */}
                         <div>Parcel Value: £{parcelValue.toFixed(2)}</div>
                       </div>
                     </td>
