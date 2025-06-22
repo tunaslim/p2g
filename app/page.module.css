@@ -240,8 +240,8 @@
 }
 
 .totalColumn {
-  min-width: 200px;
-  width: 220px;
+  min-width: 100px;
+  width: 150px;
 }
 
 .actionColumn {
