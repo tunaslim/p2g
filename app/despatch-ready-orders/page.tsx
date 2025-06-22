@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Fragment } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../page.module.css';
 import axios from 'axios';
@@ -48,6 +48,16 @@ export default function DespatchReadyOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [error, setError] = useState('');
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
+
+  const toggle = (id: number) => {
+    setExpanded(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   // Map 2-letter ISO to 3-letter ISO
   const iso2to3: Record<string, string> = {
@@ -130,6 +140,7 @@ export default function DespatchReadyOrders() {
           <table className={styles.table}>
             <thead>
               <tr>
+                <th />
                 <th>Order</th>
                 <th>Customer</th>
                 <th>Item Details</th>
@@ -138,7 +149,7 @@ export default function DespatchReadyOrders() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => {
+              {orders.map(order => {
                 const totalPaid = parseFloat(order.total_paid) || 0;
                 const shippingCost = parseFloat(order.shipping_paid) || 0;
                 const country3 = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
@@ -146,109 +157,84 @@ export default function DespatchReadyOrders() {
                 const parcelValue = country3 === 'GBR' ? baseValue / 1.20 : baseValue;
 
                 return (
-                  <tr key={order.id}>
-                    <td>
-                      <div className={styles.orderCell}>
-                        <div className={styles.logoWrapper}>
-                          <img
-                            src={getChannelLogo(order.channel_id)}
-                            alt={getChannelName(order.channel_id)}
-                            className={styles.logo}
-                          />
-                          <div className={styles.channelName}>
-                            {getChannelName(order.channel_id)}
-                          </div>
-                        </div>
-                        <div><strong>{order.channel_order_id}</strong></div>
-                        <div>{order.status_description}</div>
-                        <div>{order.channel_alt_id}</div>
-                        <div>{order.sale_type}</div>
-                      </div>
-                    </td>
-                    <td>
-                      <div className={styles.orderCell}>
-                        <div>{order.shipping_name_company}</div>
-                        <div>{order.shipping_name}</div>
-                        <div>{order.phone_one}</div>
-                        <div>{truncateEmail(order.email)}</div>
-                        <div>{order.shipping_address_line_one}</div>
-                        <div>{order.shipping_address_line_two}</div>
-                        <div>{order.shipping_address_city}</div>
-                        <div>{order.shipping_address_postcode}</div>
-                        <div>{country3}</div>
-                      </div>
-                    </td>
-                    <td>
-                      <div className={styles.orderCell}>
-                        {order.inventory.map((item, idx) => (
-                          <div key={idx} className={styles.itemRow}>
-                            <div><strong>{item.name}</strong> (x{item.quantity})</div>
-                            {parseFloat(item.price) > 0 && (
-                              <div>Price: £{formatPrice(item.price)}</div>
-                            )}
-                            {parseFloat(item.unit_tax) > 0 && (
-                              <div>Tax: £{formatPrice(item.unit_tax)}</div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </td>
-                    <td className={styles.totalColumn}>
-                      <div className={styles.orderCell}>
-                        {parseFloat(order.total_tax) > 0 && (
-                          <div>Total Tax: £{formatPrice(order.total_tax)}</div>
-                        )}
-                        {shippingCost > 0 && (
-                          <div>Shipping: £{formatPrice(order.shipping_paid)}</div>
-                        )}
-                        {parseFloat(order.total_discount) > 0 && (
-                          <div>Total Discount: £{formatPrice(order.total_discount)}</div>
-                        )}
-                        {parseFloat(order.order_discount) > 0 && (
-                          <div>Order Discount: £{formatPrice(order.order_discount)}</div>
-                        )}
-                        {totalPaid > 0 && (
-                          <div>Total Paid: £{formatPrice(order.total_paid)}</div>
-                        )}
-                        <div>Parcel Value: £{parcelValue.toFixed(2)}</div>
-                      </div>
-                    </td>
-                    <td>
-                      <a
-                        href={order.access_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.selectButton}
+                  <Fragment key={order.id}>
+                    {/* summary row */}
+                    <tr className={styles.summaryRow}>
+                      <td
+                        className={styles.expandCell}
+                        onClick={() => toggle(order.id)}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                          <polyline points="15 3 21 3 21 9" />
-                          <line x1="10" y1="14" x2="21" y2="3" />
-                        </svg>
-                      </a>
-                      <button
-                        className={styles.primaryButton}
-                        onClick={() => {
-                          const property = order.shipping_address_line_two
-                            ? `${order.shipping_address_line_one} ${order.shipping_address_line_two}`
-                            : order.shipping_address_line_one;
-                          const town = order.shipping_address_city;
-                          const postcode = order.shipping_address_postcode;
-                          const countryParam = country3;
-                          const params = new URLSearchParams({
-                            deliveryProperty: property,
-                            deliveryTown: town,
-                            deliveryPostcode: postcode,
-                            deliveryCountry: countryParam,
-                            deliveryParcelValue: parcelValue.toFixed(2),
-                          }).toString();
-                          router.push(`/?${params}`);
-                        }}
-                      >
-                        Get Quote
-                      </button>
-                    </td>
-                  </tr>
+                        {expanded.has(order.id) ? '▼' : '►'}
+                      </td>
+                      <td><strong>{order.channel_order_id}</strong></td>
+                      <td>{order.shipping_name_company || order.shipping_name}</td>
+                      <td>{order.inventory.length} item{order.inventory.length > 1 ? 's' : ''}</td>
+                      <td className={styles.totalColumn}>£{formatPrice(order.total_paid)}</td>
+                      <td className={styles.actionColumn}>
+                        <a
+                          href={order.access_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.selectButton}
+                        >
+                          ↗
+                        </a>
+                        <button
+                          className={styles.primaryButton}
+                          onClick={() => {
+                            const property = order.shipping_address_line_two
+                              ? `${order.shipping_address_line_one} ${order.shipping_address_line_two}`
+                              : order.shipping_address_line_one;
+                            const town = order.shipping_address_city;
+                            const postcode = order.shipping_address_postcode;
+                            const countryParam = country3;
+                            const params = new URLSearchParams({
+                              deliveryProperty: property,
+                              deliveryTown: town,
+                              deliveryPostcode: postcode,
+                              deliveryCountry: countryParam,
+                              deliveryParcelValue: parcelValue.toFixed(2),
+                            }).toString();
+                            router.push(`/?${params}`);
+                          }}
+                        >
+                          Get Quote
+                        </button>
+                      </td>
+                    </tr>
+
+                    {/* detail row */}
+                    {expanded.has(order.id) && (
+                      <tr className={styles.detailRow}>
+                        <td colSpan={6}>
+                          <div className={styles.orderCell}>
+                            <div><strong>Status:</strong> {order.status_description}</div>
+                            <div><strong>Alt ID:</strong> {order.channel_alt_id}</div>
+                            <div><strong>Sale Type:</strong> {order.sale_type}</div>
+                            <div><strong>Shipping:</strong> £{formatPrice(order.shipping_paid)}</div>
+                            <div className={styles.itemList}>
+                              {order.inventory.map((item, i) => (
+                                <div key={i}>
+                                  {item.name} ×{item.quantity} @ £{formatPrice(item.price)}
+                                </div>
+                              ))}
+                            </div>
+                            {parseFloat(order.total_tax) > 0 && (
+                              <div><strong>Total Tax:</strong> £{formatPrice(order.total_tax)}</div>
+                            )}
+                            {parseFloat(order.total_discount) > 0 && (
+                              <div><strong>Total Discount:</strong> £{formatPrice(order.total_discount)}</div>
+                            )}
+                            {parseFloat(order.order_discount) > 0 && (
+                              <div><strong>Order Discount:</strong> £{formatPrice(order.order_discount)}</div>
+                            )}
+                            <div><strong>Total Paid:</strong> £{formatPrice(order.total_paid)}</div>
+                            <div><strong>Parcel Value:</strong> £{parcelValue.toFixed(2)}</div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 );
               })}
             </tbody>
