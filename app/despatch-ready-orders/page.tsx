@@ -203,11 +203,17 @@ export default function DespatchReadyOrders() {
                       </td>
                     </tr>
 
-                    {/* detail row with values under Total column */}
+                    {/* detail row: ChannelName, Alt ID, Sale Type under Order column and totals under Total column */}
                     {expanded.has(order.id) && (
                       <tr className={styles.detailRow}>
                         <td />
-                        <td />
+                        <td>
+                          <div className={styles.orderCell}>
+                            <div><strong>Channel:</strong> {getChannelName(order.channel_id)}</div>
+                            <div><strong>Alt ID:</strong> {order.channel_alt_id}</div>
+                            <div><strong>Sale Type:</strong> {order.sale_type}</div>
+                          </div>
+                        </td>
                         <td />
                         <td />
                         <td className={styles.totalColumn}>
