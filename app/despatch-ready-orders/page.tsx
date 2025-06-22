@@ -203,35 +203,31 @@ export default function DespatchReadyOrders() {
                       </td>
                     </tr>
 
-                    {/* detail row */}
+                    {/* detail row with values under Total column */}
                     {expanded.has(order.id) && (
                       <tr className={styles.detailRow}>
-                        <td colSpan={6}>
+                        <td />
+                        <td />
+                        <td />
+                        <td />
+                        <td className={styles.totalColumn}>
                           <div className={styles.orderCell}>
-                            <div><strong>Status:</strong> {order.status_description}</div>
-                            <div><strong>Alt ID:</strong> {order.channel_alt_id}</div>
-                            <div><strong>Sale Type:</strong> {order.sale_type}</div>
-                            <div><strong>Shipping:</strong> £{formatPrice(order.shipping_paid)}</div>
-                            <div className={styles.itemList}>
-                              {order.inventory.map((item, i) => (
-                                <div key={i}>
-                                  {item.name} ×{item.quantity} @ £{formatPrice(item.price)}
-                                </div>
-                              ))}
-                            </div>
                             {parseFloat(order.total_tax) > 0 && (
                               <div><strong>Total Tax:</strong> £{formatPrice(order.total_tax)}</div>
+                            )}
+                            {shippingCost > 0 && (
+                              <div><strong>Shipping:</strong> £{formatPrice(order.shipping_paid)}</div>
                             )}
                             {parseFloat(order.total_discount) > 0 && (
                               <div><strong>Total Discount:</strong> £{formatPrice(order.total_discount)}</div>
                             )}
-                            {parseFloat(order.order_discount) > 0 && (
-                              <div><strong>Order Discount:</strong> £{formatPrice(order.order_discount)}</div>
+                            {totalPaid > 0 && (
+                              <div><strong>Total Paid:</strong> £{formatPrice(order.total_paid)}</div>
                             )}
-                            <div><strong>Total Paid:</strong> £{formatPrice(order.total_paid)}</div>
                             <div><strong>Parcel Value:</strong> £{parcelValue.toFixed(2)}</div>
                           </div>
                         </td>
+                        <td />
                       </tr>
                     )}
                   </Fragment>
