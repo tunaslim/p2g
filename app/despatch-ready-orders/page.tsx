@@ -190,7 +190,7 @@ export default function DespatchReadyOrders() {
                       </td>
                     </tr>
 
-                    {/* detail row: Order details, Customer details, totals */}
+                    {/* detail row: Order, Customer, Item Details, Totals */}
                     {expanded.has(order.id) && (
                       <tr className={styles.detailRow}>
                         <td />
@@ -216,7 +216,19 @@ export default function DespatchReadyOrders() {
                             </div>
                           </div>
                         </td>
-                        <td />
+                        {/* Item details column */}
+                        <td>
+                          <div className={styles.orderCell}>
+                            {order.inventory.map((item, idx) => (
+                              <div key={idx} className={styles.itemRow}>
+                                <div><strong>SKU:</strong> {item.sku}</div>
+                                <div>({item.quantity}) {item.name}</div>
+                                {item.options && <div><strong>Options:</strong> {item.options}</div>}
+                                <div><strong>Price:</strong> £{formatPrice(item.price)}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </td>
                         {/* Totals column */}
                         <td className={styles.totalColumn}>
                           <div className={styles.orderCell}>
