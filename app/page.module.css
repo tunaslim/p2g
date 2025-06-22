@@ -314,25 +314,34 @@
   text-align: center;
   cursor: pointer;
   user-select: none;
+  vertical-align: top;
 }
 
 /* Summary row styling: subtle hover to indicate clickability */
 .summaryRow {
   background-color: #fafafa;
   transition: background-color 0.2s ease;
+  vertical-align: top;
 }
 .summaryRow:hover {
   background-color: #f0f0f0;
+  vertical-align: top;
 }
 
 /* Detail row styling: slightly inset and lighter background */
 .detailRow td {
   padding: 0.5rem 1rem;
+  vertical-align: top;
 }
 .detailRow {
   background-color: #ffffff;
+  vertical-align: top;
 }
 .detailRow .orderCell {
   border-top: 1px solid #e0e0e0;
+  vertical-align: top;
 }
 
+.detailRow > td {
+  vertical-align: top;
+}
