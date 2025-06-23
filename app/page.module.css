@@ -73,12 +73,12 @@
   font-size: 1rem;
 }
 .table th:first-of-type {
-  border-top-left-radius: 25px;
-  border-bottom-left-radius: 25px;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
 }
 .table th:last-of-type {
-  border-top-right-radius: 25px;
-  border-bottom-right-radius: 25px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
 /* Table Body Rows */
