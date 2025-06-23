@@ -66,32 +66,59 @@ export default function DespatchReadyOrders() {
 
   const getChannelLogo = (id: number) => {
     switch (id) {
-      case 24: case 15: return '/logos/ebay.png';
-      case 27: case 25: case 6: case 2: case 5: case 4: case 3:
+      case 24:
+      case 15:
+        return '/logos/ebay.png';
+      case 27:
+      case 25:
+      case 6:
+      case 2:
+      case 5:
+      case 4:
+      case 3:
         return '/logos/amazon.png';
-      case 11: return '/logos/etsy.png';
-      case 8: case 7: return '/logos/shopify.png';
-      case 26: return '/logos/woocommerce.png';
-      default: return '/logos/default.png';
+      case 11:
+        return '/logos/etsy.png';
+      case 8:
+      case 7:
+        return '/logos/shopify.png';
+      case 26:
+        return '/logos/woocommerce.png';
+      default:
+        return '/logos/default.png';
     }
   };
 
   const getChannelName = (id: number) => {
     switch (id) {
-      case 24: return 'Unicorncolors eBay';
-      case 15: return 'Colourchanging eBay';
-      case 27: return 'Amazon BE';
-      case 25: return 'Amazon PL';
-      case 6: return 'Amazon UK';
-      case 2: return 'Amazon DE';
-      case 5: return 'Amazon Spain';
-      case 4: return 'Amazon France';
-      case 3: return 'Amazon Italy';
-      case 11: return 'Etsy Acc';
-      case 8: return 'SFXC Shopify';
-      case 7: return 'Colour Changing Shopify';
-      case 26: return 'Woo Commerce';
-      default: return 'Unknown Channel';
+      case 24:
+        return 'Unicorncolors eBay';
+      case 15:
+        return 'Colourchanging eBay';
+      case 27:
+        return 'Amazon BE';
+      case 25:
+        return 'Amazon PL';
+      case 6:
+        return 'Amazon UK';
+      case 2:
+        return 'Amazon DE';
+      case 5:
+        return 'Amazon Spain';
+      case 4:
+        return 'Amazon France';
+      case 3:
+        return 'Amazon Italy';
+      case 11:
+        return 'Etsy Acc';
+      case 8:
+        return 'SFXC Shopify';
+      case 7:
+        return 'Colour Changing Shopify';
+      case 26:
+        return 'Woo Commerce';
+      default:
+        return 'Unknown Channel';
     }
   };
 
@@ -108,21 +135,20 @@ export default function DespatchReadyOrders() {
 
   useEffect(() => {
     if (!token) return;
-    const fetchOrders = async () => {
+    (async () => {
       try {
         const resp = await axios.get<{ total: number; data: Order[] }>('/api/helm-orders', {
           headers: {
             Authorization: `Bearer ${token}`,
-            'X-Helm-Filter': 'status[]=3'
-          }
+            'X-Helm-Filter': 'status[]=3',
+          },
         });
         setOrders(resp.data.data || []);
         setTotal(resp.data.total || 0);
       } catch (e: any) {
         setError(e.response?.data?.error || 'Failed to fetch orders');
       }
-    };
-    fetchOrders();
+    })();
   }, [token]);
 
   return (
@@ -151,10 +177,11 @@ export default function DespatchReadyOrders() {
                 const shippingCost = parseFloat(order.shipping_paid) || 0;
                 const country3 = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
                 const baseValue = totalPaid - shippingCost;
-                const parcelValue = country3 === 'GBR' ? baseValue / 1.20 : baseValue;
+                const parcelValue = country3 === 'GBR' ? baseValue / 1.2 : baseValue;
 
                 return (
                   <Fragment key={order.id}>
+                    {/* Summary Row */}
                     <tr className={styles.summaryRow}>
                       <td className={styles.expandCell} onClick={() => toggle(order.id)}>
                         {expanded.has(order.id) ? '▼' : '►'}
@@ -183,6 +210,7 @@ export default function DespatchReadyOrders() {
                         </a>
                       </td>
                     </tr>
+                    {/* Detail Row */}
                     {expanded.has(order.id) && (
                       <tr className={styles.detailRow}>
                         <td />
@@ -198,9 +226,7 @@ export default function DespatchReadyOrders() {
                             <div><strong>Phone:</strong> {order.phone_one}</div>
                             <div><strong>Email:</strong> {truncateEmail(order.email)}</div>
                             <div><strong>Address:</strong> {order.shipping_address_line_one}</div>
-                            {order.shipping_address_line_two && (
-                              <div>{order.shipping_address_line_two}</div>
-                            )}
+                            {order.shipping_address_line_two && <div>{order.shipping_address_line_two}</div>}
                             <div>{order.shipping_address_city}, {order.shipping_address_postcode}, {country3}</div>
                           </div>
                         </td>
@@ -210,17 +236,18 @@ export default function DespatchReadyOrders() {
                               <div key={idx} className={styles.itemRow}>
                                 <div><strong>SKU:</strong> {item.sku}</div>
                                 <div>({item.quantity}) {item.name}</div>
-                                {item.options && (<div><strong>Options:</strong> {item.options}</div>)}
+                                {item.options && <div><strong>Options:</strong> {item.options}</div>}
                                 <div><strong>Price:</strong> £{formatPrice(item.price)}</div>
-                              ))}  
+                              </div>
+                            ))}
                           </div>
                         </td>
                         <td className={styles.totalColumn}>
                           <div className={styles.orderCell}>
-                            {parseFloat(order.total_tax) > 0 && (<div><strong>Total Tax:</strong> £{formatPrice(order.total_tax)}</div>)}
-                            {shippingCost > 0 && (<div><strong>Shipping:</strong> £{formatPrice(order.shipping_paid)}</div>)}
-                            {parseFloat(order.total_discount) > 0 && (<div><strong>Total Discount:</strong> £{formatPrice(order.total_discount)}</div>)}
-                            {totalPaid > 0 && (<div><strong>Total Paid:</strong> £{formatPrice(order.total_paid)}</div>)}
+                            {parseFloat(order.total_tax) > 0 && <div><strong>Total Tax:</strong> £{formatPrice(order.total_tax)}</div>}
+                            {shippingCost > 0 && <div><strong>Shipping:</strong> £{formatPrice(order.shipping_paid)}</div>}
+                            {parseFloat(order.total_discount) > 0 && <div><strong>Total Discount:</strong> £{formatPrice(order.total_discount)}</div>}
+                            {totalPaid > 0 && <div><strong>Total Paid:</strong> £{formatPrice(order.total_paid)}</div>}
                             <div><strong>Parcel Value:</strong> £{parcelValue.toFixed(2)}</div>
                             <div className={styles.orderCell}>
                               <div><strong>Package Info</strong></div>
