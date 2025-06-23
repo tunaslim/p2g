@@ -277,7 +277,7 @@
 }
 /* Small channel logo in summary row */
 .logoSmall {
-  width: 1.5rem;
-  margin-right: 0.5rem;
+  width: 3rem;
+  margin-right: 1rem;
   vertical-align: middle;
 }
