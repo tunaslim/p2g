@@ -59,7 +59,6 @@ export default function DespatchReadyOrders() {
     });
   };
 
-  // Map 2-letter ISO to 3-letter ISO
   const iso2to3: Record<string, string> = {
     GB: 'GBR', US: 'USA', DE: 'DEU', FR: 'FRA', IT: 'ITA', TR: 'TUR',
     ES: 'ESP', CA: 'CAN', NL: 'NLD', IL: 'ISR', BE: 'BEL', JP: 'JPN',
@@ -131,10 +130,12 @@ export default function DespatchReadyOrders() {
       <h1 className={styles.title}>
         Despatch Ready Orders ({total})
       </h1>
+
       {error && <p className={styles.error}>{error}</p>}
       {!error && orders.length === 0 && (
         <p className={styles.subTitle}>No despatch-ready orders found.</p>
       )}
+
       {orders.length > 0 && (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
@@ -160,7 +161,10 @@ export default function DespatchReadyOrders() {
                   <Fragment key={order.id}>
                     {/* summary row */}
                     <tr className={styles.summaryRow}>
-                      <td className={styles.expandCell} onClick={() => toggle(order.id)}>
+                      <td
+                        className={styles.expandCell}
+                        onClick={() => toggle(order.id)}
+                      >
                         {expanded.has(order.id) ? '▼' : '►'}
                       </td>
                       <td>
@@ -177,33 +181,21 @@ export default function DespatchReadyOrders() {
                       <td>{order.inventory.length} item{order.inventory.length > 1 ? 's' : ''}</td>
                       <td className={styles.totalColumn}>£{formatPrice(order.total_paid)}</td>
                       <td className={styles.actionColumn}>
-                        <a href={order.access_url} target="_blank" rel="noopener noreferrer" className={styles.selectButton}>
+                        <a
+                          href={order.access_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.selectButton}
+                        >
                           ↗
                         </a>
-                        <button className={styles.primaryButton} onClick={() => {
-                          const property = order.shipping_address_line_two
-                            ? `${order.shipping_address_line_one} ${order.shipping_address_line_two}`
-                            : order.shipping_address_line_one;
-                          const town = order.shipping_address_city;
-                          const postcode = order.shipping_address_postcode;
-                          const countryParam = country3;
-                          const params = new URLSearchParams({
-                            deliveryProperty: property,
-                            deliveryTown: town,
-                            deliveryPostcode: postcode,
-                            deliveryCountry: countryParam,
-                            deliveryParcelValue: parcelValue.toFixed(2),
-                          }).toString();
-                          router.push(`/?${params}`);
-                        }}>Get Quote</button>
                       </td>
                     </tr>
 
-                    {/* detail row: Order, Customer, Item Details, Totals */}
+                    {/* detail row with Get Quote button */}
                     {expanded.has(order.id) && (
                       <tr className={styles.detailRow}>
                         <td />
-                        {/* Order details column */}
                         <td>
                           <div className={styles.orderCell}>
                             <div><strong>Channel:</strong> {getChannelName(order.channel_id)}</div>
@@ -211,7 +203,6 @@ export default function DespatchReadyOrders() {
                             <div><strong>Sale Type:</strong> {order.sale_type}</div>
                           </div>
                         </td>
-                        {/* Customer details column */}
                         <td>
                           <div className={styles.orderCell}>
                             <div><strong>Phone:</strong> {order.phone_one}</div>
@@ -225,20 +216,20 @@ export default function DespatchReadyOrders() {
                             </div>
                           </div>
                         </td>
-                        {/* Item details column */}
                         <td>
                           <div className={styles.orderCell}>
                             {order.inventory.map((item, idx) => (
                               <div key={idx} className={styles.itemRow}>
                                 <div><strong>SKU:</strong> {item.sku}</div>
                                 <div>({item.quantity}) {item.name}</div>
-                                {item.options && <div><strong>Options:</strong> {item.options}</div>}
+                                {item.options && (
+                                  <div><strong>Options:</strong> {item.options}</div>
+                                )}
                                 <div><strong>Price:</strong> £{formatPrice(item.price)}</div>
                               </div>
                             ))}
                           </div>
                         </td>
-                        {/* Totals column */}
                         <td className={styles.totalColumn}>
                           <div className={styles.orderCell}>
                             {parseFloat(order.total_tax) > 0 && (
@@ -256,7 +247,25 @@ export default function DespatchReadyOrders() {
                             <div><strong>Parcel Value:</strong> £{parcelValue.toFixed(2)}</div>
                           </div>
                         </td>
-                        <td />
+                        <td className={styles.actionColumn}>
+                          <button
+                            className={styles.primaryButton}
+                            onClick={() => {
+                              const params = new URLSearchParams({
+                                deliveryProperty: order.shipping_address_line_two
+                                  ? `${order.shipping_address_line_one} ${order.shipping_address_line_two}`
+                                  : order.shipping_address_line_one,
+                                deliveryTown: order.shipping_address_city,
+                                deliveryPostcode: order.shipping_address_postcode,
+                                deliveryCountry: country3,
+                                deliveryParcelValue: parcelValue.toFixed(2),
+                              }).toString();
+                              router.push(`/?${params}`);
+                            }}
+                          >
+                            Get Quote
+                          </button>
+                        </td>
                       </tr>
                     )}
                   </Fragment>
