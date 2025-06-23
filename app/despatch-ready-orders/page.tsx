@@ -142,7 +142,16 @@ export default function DespatchReadyOrders() {
       {orders.length > 0 && (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
-            <thead><tr><th/><th>Order</th><th>Customer</th><th>Items</th><th className={styles.totalColumn}>Total</th><th className={styles.actionColumn}>Action</th></tr></thead>
+            <thead>
+              <tr>
+                <th/>
+                <th>Order</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th className={styles.totalColumn}>Total</th>
+                <th className={styles.actionColumn}>Action</th>
+              </tr>
+            </thead>
             <tbody>
               {orders.map(order => {
                 const totalPaid = parseFloat(order.total_paid)||0;
@@ -175,7 +184,17 @@ export default function DespatchReadyOrders() {
                           <td className={styles.actionColumn}><div className={styles.orderCell}><div><strong>Package Info</strong></div><label>Weight (kg): <input type="number" value={info.weight} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,weight:e.target.value}}))}/></label><label>Length (cm): <input type="number" value={info.length} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,length:e.target.value}}))}/></label><label>Width (cm): <input type="number" value={info.width} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,width:e.target.value}}))}/></label><label>Height (cm): <input type="number" value={info.height} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,height:e.target.value}}))}/></label><button onClick={()=>fetchQuotesForOrder(order)} className={styles.primaryButton}>Get Quotes</button></div></td>
                         </tr>
                         {loadingMap[order.id]&&<tr className={styles.quotesRow}><td/><td colSpan={5}>Getting cheapest 5 quotes...</td></tr>}
-                        {quotesMap[order.id]?.map((q,idx)=>(<tr key={idx} className={styles.quotesRow}><td/><td>{q.Service.CourierName}</td><td>{q.Service.Name} ({q.Service.Slug})</td><td>Max: {q.Service.MaxWeight}kg - {q.Service.MaxHeight*100}x{q.Service.MaxWidth*100}x{q.Service.MaxLength*100}cm</td><td>£{q.TotalPriceExVat.toFixed(2)}</td><td>£{q.TotalPrice.toFixed(2)}</td><td>{new Date(q.EstimatedDeliveryDate).toLocaleDateString()}</td></tr>))}
+                        {quotesMap[order.id]?.map((q,idx)=>(
+                          <tr key={idx} className={styles.quotesRow}>
+                            <td/>
+                            <td>{q.Service.CourierName}</td>
+                            <td>{q.Service.Name} ({q.Service.Slug})</td>
+                            <td>Max: {q.Service.MaxWeight}kg - {q.Service.MaxHeight*100}x{q.Service.MaxWidth*100}x{q.Service.MaxLength*100}cm</td>
+                            <td>£{q.TotalPriceExVat.toFixed(2)}</td>
+                            <td>£{q.TotalPrice.toFixed(2)}</td>
+                            <td>{new Date(q.EstimatedDeliveryDate).toLocaleDateString()}</td>
+                          </tr>
+                        ))}
                       </>
                     )}
                   </Fragment>
