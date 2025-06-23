@@ -127,15 +127,11 @@ export default function DespatchReadyOrders() {
 
   return (
     <div className={styles.main}>
-      <h1 className={styles.title}>
-        Despatch Ready Orders ({total})
-      </h1>
-
+      <h1 className={styles.title}>Despatch Ready Orders ({total})</h1>
       {error && <p className={styles.error}>{error}</p>}
       {!error && orders.length === 0 && (
         <p className={styles.subTitle}>No despatch-ready orders found.</p>
       )}
-
       {orders.length > 0 && (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
@@ -161,10 +157,7 @@ export default function DespatchReadyOrders() {
                   <Fragment key={order.id}>
                     {/* summary row */}
                     <tr className={styles.summaryRow}>
-                      <td
-                        className={styles.expandCell}
-                        onClick={() => toggle(order.id)}
-                      >
+                      <td className={styles.expandCell} onClick={() => toggle(order.id)}>
                         {expanded.has(order.id) ? '▼' : '►'}
                       </td>
                       <td>
@@ -178,7 +171,7 @@ export default function DespatchReadyOrders() {
                         </div>
                       </td>
                       <td>{order.shipping_name_company || order.shipping_name}</td>
-                      <td>{order.inventory.length} item{order.inventory.length > 1 ? 's' : ''}</td>
+                      <td>{order.inventory.length} item{order.inventory.length > 1 ? 's' : ''}</div></td>
                       <td className={styles.totalColumn}>£{formatPrice(order.total_paid)}</td>
                       <td className={styles.actionColumn}>
                         <a
@@ -191,8 +184,7 @@ export default function DespatchReadyOrders() {
                         </a>
                       </td>
                     </tr>
-
-                    {/* detail row with Get Quote button */}
+                    {/* detail row */}
                     {expanded.has(order.id) && (
                       <tr className={styles.detailRow}>
                         <td />
@@ -211,9 +203,7 @@ export default function DespatchReadyOrders() {
                             {order.shipping_address_line_two && (
                               <div>{order.shipping_address_line_two}</div>
                             )}
-                            <div>
-                              {order.shipping_address_city}, {order.shipping_address_postcode}, {country3}
-                            </div>
+                            <div>{order.shipping_address_city}, {order.shipping_address_postcode}, {country3}</div>
                           </div>
                         </td>
                         <td>
@@ -222,9 +212,7 @@ export default function DespatchReadyOrders() {
                               <div key={idx} className={styles.itemRow}>
                                 <div><strong>SKU:</strong> {item.sku}</div>
                                 <div>({item.quantity}) {item.name}</div>
-                                {item.options && (
-                                  <div><strong>Options:</strong> {item.options}</div>
-                                )}
+                                {item.options && (<div><strong>Options:</strong> {item.options}</div>)}
                                 <div><strong>Price:</strong> £{formatPrice(item.price)}</div>
                               </div>
                             ))}
@@ -245,6 +233,14 @@ export default function DespatchReadyOrders() {
                               <div><strong>Total Paid:</strong> £{formatPrice(order.total_paid)}</div>
                             )}
                             <div><strong>Parcel Value:</strong> £{parcelValue.toFixed(2)}</div>
+                            {/* Package Info Inputs */}
+                            <div className={styles.orderCell}>
+                              <div><strong>Package Info</strong></div>
+                              <label>Weight (kg): <input type="number" step="0.01" /></label>
+                              <label>Length (cm): <input type="number" step="0.01" /></label>
+                              <label>Width (cm): <input type="number" step="0.01" /></label>
+                              <label>Height (cm): <input type="number" step="0.01" /></label>
+                            </div>
                           </div>
                         </td>
                         <td className={styles.actionColumn}>
