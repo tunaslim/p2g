@@ -188,8 +188,8 @@ export default function DespatchReadyOrders() {
                           <tr key={idx} className={styles.quotesRow}>
                             <td/>
                             <td>{q.Service.CourierName}</td>
-                            <td>{q.Service.Name}</br>({q.Service.Slug})</td>
-                            <td>Max: {q.Service.MaxWeight}kg</br>{q.Service.MaxHeight*100}x{q.Service.MaxWidth*100}x{q.Service.MaxLength*100}cm</td>
+                            <td>{q.Service.Name}<br/>({q.Service.Slug})</td>
+                            <td>Max: {q.Service.MaxWeight}kg<br/>{q.Service.MaxHeight*100}x{q.Service.MaxWidth*100}x{q.Service.MaxLength*100}cm</td>
                             <td>£{q.TotalPriceExVat.toFixed(2)}</td>
                             <td>£{q.TotalPrice.toFixed(2)}</td>
                             <td>{new Date(q.EstimatedDeliveryDate).toLocaleDateString()}</td>
