@@ -1,3 +1,4 @@
+/* Basic Layout */
 .main {
   padding: 20px;
   max-width: 1200px;
@@ -48,18 +49,18 @@
   cursor: pointer;
   border-radius: 4px;
 }
-
 .primaryButton:hover {
   background-color: #005bb5;
 }
 
+/* Table Wrapper */
 .tableWrapper {
   overflow-x: auto;
 }
 
 .table {
   width: 100%;
-  border-collapse: seperate;
+  border-collapse: separate;
   border-spacing: 0 5px;
 }
 
@@ -71,17 +72,16 @@
   text-align: left;
   font-size: 1rem;
 }
-
 .table th:first-of-type {
   border-top-left-radius: 25px;
   border-bottom-left-radius: 25px;
 }
-
 .table th:last-of-type {
   border-top-right-radius: 25px;
   border-bottom-right-radius: 25px;
 }
 
+/* Table Body Rows */
 .table tr,
 .table td {
   border: none;
@@ -90,25 +90,24 @@
   text-align: left;
   transition: background-color 0.3s ease;
 }
-
 .table tr td:first-of-type {
   border-top-left-radius: 50px;
   border-bottom-left-radius: 50px;
 }
-
 .table tr td:last-of-type {
   border-top-right-radius: 50px;
   border-bottom-right-radius: 50px;
 }
-
 .table tbody tr:hover {
   background-color: #d3d0d0;
 }
 
+/* Logos and Buttons */
 .logo {
-  width: 50px;
+  width: 80px;
+  height: auto;
+  margin-right: 5px;
 }
-
 .selectButton {
   background-color: green;
   color: white;
@@ -117,13 +116,8 @@
   cursor: pointer;
   border-radius: 4px;
 }
-
 .selectButton:hover {
   background-color: darkgreen;
-}
-
-.labelSection {
-  margin-top: 30px;
 }
 
 .downloadButton {
@@ -135,11 +129,14 @@
   border-radius: 4px;
   text-decoration: none;
 }
-
 .downloadButton:hover {
   background-color: #005bb5;
 }
 
+/* Miscellaneous */
+.labelSection {
+  margin-top: 30px;
+}
 .descriptionContainer {
   margin-top: 8px;
 }
@@ -150,7 +147,6 @@
   text-overflow: ellipsis;
   max-width: 250px;
 }
-
 .expanded {
   white-space: normal;
 }
@@ -179,23 +175,21 @@
   font-weight: bold;
   color: #222;
 }
-
 .maxdims {
   font-size: 0.9rem;
   color: #555;
   margin-top: 4px;
 }
 
+/* Navigation */
 .header {
   background-color: #1e40af;
   padding: 16px;
 }
-
 .nav {
   display: flex;
   gap: 16px;
 }
-
 .navLink {
   color: white;
   text-decoration: none;
@@ -206,11 +200,9 @@
   cursor: pointer;
   padding: 0;
 }
-
 .navLink:hover {
   text-decoration: underline;
 }
-
 .linkButton {
   background: none;
   border: none;
@@ -220,17 +212,11 @@
   cursor: pointer;
   text-decoration: none;
 }
-
 .linkButton:hover {
   text-decoration: underline;
 }
 
-.logo {
-  width: 80px;
-  height: auto;
-  margin-right: 5px;
-}
-
+/* Order Details Layout */
 .orderCell {
   display: flex;
   flex-direction: column;
@@ -243,72 +229,23 @@
   min-width: 100px;
   width: 150px;
 }
-
 .actionColumn {
   min-width: 100px;
   width: 150px;
 }
-
 .channelName {
   font-size: 0.8rem;
   color: #555;
   margin-bottom: 8px;
 }
-
 .extraRow td {
   background-color: #ebe8c0;
   font-size: 0.9rem;
   color: #555;
 }
 
-/* Expand/Collapse Details */
-.details {
-  width: 100%;
-}
-
-.summary {
-  cursor: pointer;
-  padding: 0.75rem;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-}
-
-/* Remove default triangle marker */
-.summary::-webkit-details-marker {
-  display: none;
-}
-
-/* Add custom marker */
-.summary::before {
-  content: '▸';
-  display: inline-block;
-  margin-right: 0.5rem;
-  transition: transform 0.2s ease;
-}
-
-/* Rotate marker when open */
-.details[open] > .summary::before {
-  transform: rotate(90deg);
-}
-
-.detailPanel {
-  padding: 1rem;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* Make the arrow cell a fixed narrow width, center-aligned and pointer cursor */
+/* Expand/Collapse Accordion Styles */
+/* Arrow cell */
 .expandCell {
   width: 2rem;
   text-align: center;
@@ -316,8 +253,7 @@
   user-select: none;
   vertical-align: top;
 }
-
-/* Summary row styling: subtle hover to indicate clickability */
+/* Summary row styling */
 .summaryRow {
   background-color: #fafafa;
   transition: background-color 0.2s ease;
@@ -325,30 +261,23 @@
 }
 .summaryRow:hover {
   background-color: #f0f0f0;
-  vertical-align: top;
 }
-
-/* Detail row styling: slightly inset and lighter background */
+/* Detail row styling */
+.detailRow {
+  background-color: #ffffff;
+  transition: background-color 0.2s ease;
+}
 .detailRow td {
   padding: 0.5rem 1rem;
   vertical-align: top;
-}
-.detailRow {
-  background-color: #ffffff;
-  vertical-align: top;
-}
-.detailRow .orderCell {
   border-top: 1px solid #e0e0e0;
-  vertical-align: top;
 }
-
-.detailRow > td {
-  vertical-align: top;
+.detailRow:hover {
+  background-color: #f9f9f9;
 }
-
 /* Small channel logo in summary row */
 .logoSmall {
-  width: 80px;
+  width: 1.5rem;
   margin-right: 0.5rem;
   vertical-align: middle;
 }
