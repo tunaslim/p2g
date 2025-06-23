@@ -62,7 +62,7 @@ export default function DespatchReadyOrders() {
   // Map 2-letter ISO to 3-letter ISO
   const iso2to3: Record<string, string> = {
     GB: 'GBR', US: 'USA', DE: 'DEU', FR: 'FRA', IT: 'ITA', TR: 'TUR',
-    ES: 'ESP', CA: 'CAN', NL: 'NLD', IL: 'ISR', BE: 'BEL',
+    ES: 'ESP', CA: 'CAN', NL: 'NLD', IL: 'ISR', BE: 'BEL', JP: 'JPN',
   };
 
   const getChannelLogo = (id: number) => {
