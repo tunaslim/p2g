@@ -91,12 +91,12 @@
   transition: background-color 0.3s ease;
 }
 .table tr td:first-of-type {
-  border-top-left-radius: 50px;
-  border-bottom-left-radius: 50px;
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
 }
 .table tr td:last-of-type {
-  border-top-right-radius: 50px;
-  border-bottom-right-radius: 50px;
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
 }
 .table tbody tr:hover {
   background-color: #d3d0d0;
