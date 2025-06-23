@@ -155,7 +155,6 @@ export default function DespatchReadyOrders() {
 
                 return (
                   <Fragment key={order.id}>
-                    {/* summary row */}
                     <tr className={styles.summaryRow}>
                       <td className={styles.expandCell} onClick={() => toggle(order.id)}>
                         {expanded.has(order.id) ? '▼' : '►'}
@@ -171,7 +170,7 @@ export default function DespatchReadyOrders() {
                         </div>
                       </td>
                       <td>{order.shipping_name_company || order.shipping_name}</td>
-                      <td>{order.inventory.length} item{order.inventory.length > 1 ? 's' : ''}</div></td>
+                      <td>{order.inventory.length} item{order.inventory.length > 1 ? 's' : ''}</td>
                       <td className={styles.totalColumn}>£{formatPrice(order.total_paid)}</td>
                       <td className={styles.actionColumn}>
                         <a
@@ -184,7 +183,6 @@ export default function DespatchReadyOrders() {
                         </a>
                       </td>
                     </tr>
-                    {/* detail row */}
                     {expanded.has(order.id) && (
                       <tr className={styles.detailRow}>
                         <td />
@@ -214,32 +212,22 @@ export default function DespatchReadyOrders() {
                                 <div>({item.quantity}) {item.name}</div>
                                 {item.options && (<div><strong>Options:</strong> {item.options}</div>)}
                                 <div><strong>Price:</strong> £{formatPrice(item.price)}</div>
-                              </div>
-                            ))}
+                              ))}  
                           </div>
                         </td>
                         <td className={styles.totalColumn}>
                           <div className={styles.orderCell}>
-                            {parseFloat(order.total_tax) > 0 && (
-                              <div><strong>Total Tax:</strong> £{formatPrice(order.total_tax)}</div>
-                            )}
-                            {shippingCost > 0 && (
-                              <div><strong>Shipping:</strong> £{formatPrice(order.shipping_paid)}</div>
-                            )}
-                            {parseFloat(order.total_discount) > 0 && (
-                              <div><strong>Total Discount:</strong> £{formatPrice(order.total_discount)}</div>
-                            )}
-                            {totalPaid > 0 && (
-                              <div><strong>Total Paid:</strong> £{formatPrice(order.total_paid)}</div>
-                            )}
+                            {parseFloat(order.total_tax) > 0 && (<div><strong>Total Tax:</strong> £{formatPrice(order.total_tax)}</div>)}
+                            {shippingCost > 0 && (<div><strong>Shipping:</strong> £{formatPrice(order.shipping_paid)}</div>)}
+                            {parseFloat(order.total_discount) > 0 && (<div><strong>Total Discount:</strong> £{formatPrice(order.total_discount)}</div>)}
+                            {totalPaid > 0 && (<div><strong>Total Paid:</strong> £{formatPrice(order.total_paid)}</div>)}
                             <div><strong>Parcel Value:</strong> £{parcelValue.toFixed(2)}</div>
-                            {/* Package Info Inputs */}
                             <div className={styles.orderCell}>
                               <div><strong>Package Info</strong></div>
                               <label>Weight (kg): <input type="number" step="0.01" /></label>
-                              <label>Length (cm): <input type="number" step="0.01" /></label>
-                              <label>Width (cm): <input type="number" step="0.01" /></label>
-                              <label>Height (cm): <input type="number" step="0.01" /></label>
+                              <label>Length (cm): <input type="number" step="0.1" /></label>
+                              <label>Width (cm): <input type="number" step="0.1" /></label>
+                              <label>Height (cm): <input type="number" step="0.1" /></label>
                             </div>
                           </div>
                         </td>
