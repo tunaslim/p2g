@@ -180,7 +180,7 @@ export default function DespatchReadyOrders() {
                     </tr>
                     {expanded.has(order.id)&&(
                       <>
-                        <tr className={styles.quotesRow}>
+                        <tr className={styles.summaryRow}>
                           <td/>
                           <td><div className={styles.orderCell}><div>{order.date_received}</div><div><strong>Alt ID:</strong> {order.channel_alt_id}</div><div><strong>Sale:</strong> {order.sale_type}</div></div></td>
                           <td><div className={styles.orderCell}><div><strong>Phone:</strong> {order.phone_one}</div><div><strong>Email:</strong> {truncateEmail(order.email)}</div><div><strong>Address:</strong> {order.shipping_address_line_one}{order.shipping_address_line_two?` ${order.shipping_address_line_two}`:''}, {order.shipping_address_city}, {order.shipping_address_postcode}, {country3}</div></div></td>
