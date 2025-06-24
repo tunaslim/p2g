@@ -1,3 +1,114 @@
+/* Typography Helpers */
+.bold {
+  font-weight: bold;
+  color: #222;
+}
+
+.maxdims {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* Navigation */
+.header {
+  background-color: #1e40af;
+  padding: 16px;
+}
+
+.nav {
+  display: flex;
+  gap: 16px;
+}
+
+.navLink {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.navLink:hover {
+  text-decoration: underline;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.linkButton:hover {
+  text-decoration: underline;
+}
+
+/* Order Details Layout */
+.orderCell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.totalColumn {
+  min-width: 100px;
+  width: 150px;
+}
+
+.actionColumn {
+  min-width: 100px;
+  width: 150px;
+}
+
+.channelName {
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.extraRow td {
+  background-color: #ebe8c0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Expand/Collapse Accordion Styles */
+.expandCell {
+  width: 2rem;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: top;
+}
+
+/* Summary Row */
+.summaryRow {
+  background-color: #fafafa;
+  transition: background-color 0.2s ease;
+  vertical-align: top;
+}
+
+/* Detail Row */
+.detailRow {
+  background-color: #ffffff;
+  transition: background-color 0.2s ease;
+}
+
+.detailRow td {
+  padding: 0.5rem 1rem;
+  vertical-align: top;
+  border-top: 1px solid #e0e0e0;
+}
+
 /* Basic Layout */
 .main {
   padding: 20px;
@@ -49,6 +160,7 @@
   cursor: pointer;
   border-radius: 4px;
 }
+
 .primaryButton:hover {
   background-color: #005bb5;
 }
@@ -58,6 +170,7 @@
   overflow-x: auto;
 }
 
+/* Table Styles */
 .table {
   width: 100%;
   border-collapse: separate;
@@ -72,10 +185,12 @@
   text-align: left;
   font-size: 1rem;
 }
+
 .table th:first-of-type {
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
 }
+
 .table th:last-of-type {
   border-top-right-radius: 20px;
   border-bottom-right-radius: 20px;
@@ -90,16 +205,29 @@
   text-align: left;
   transition: background-color 0.3s ease;
 }
+
 .table tr td:first-of-type {
   border-top-left-radius: 25px;
   border-bottom-left-radius: 25px;
 }
+
 .table tr td:last-of-type {
   border-top-right-radius: 25px;
   border-bottom-right-radius: 25px;
 }
-.table tbody tr:hover {
+
+/* Generic hover for non-summary/detail rows */
+.table tbody tr:not(.summaryRow):not(.detailRow):hover {
   background-color: #d3d0d0;
+}
+
+/* Custom hover overrides */
+.table .summaryRow:hover {
+  background-color: #f0f0f0;
+}
+
+.table .detailRow:hover {
+  background-color: #f9f9f9;
 }
 
 /* Logos and Buttons */
@@ -108,6 +236,7 @@
   height: auto;
   margin-right: 5px;
 }
+
 .selectButton {
   background-color: green;
   color: white;
@@ -116,6 +245,7 @@
   cursor: pointer;
   border-radius: 4px;
 }
+
 .selectButton:hover {
   background-color: darkgreen;
 }
@@ -129,6 +259,7 @@
   border-radius: 4px;
   text-decoration: none;
 }
+
 .downloadButton:hover {
   background-color: #005bb5;
 }
@@ -137,6 +268,7 @@
 .labelSection {
   margin-top: 30px;
 }
+
 .descriptionContainer {
   margin-top: 8px;
 }
@@ -147,6 +279,7 @@
   text-overflow: ellipsis;
   max-width: 250px;
 }
+
 .expanded {
   white-space: normal;
 }
@@ -169,115 +302,4 @@
   font-size: 0.95rem;
   color: #333;
   line-height: 1.4;
-}
-
-.bold {
-  font-weight: bold;
-  color: #222;
-}
-.maxdims {
-  font-size: 0.9rem;
-  color: #555;
-  margin-top: 4px;
-}
-
-/* Navigation */
-.header {
-  background-color: #1e40af;
-  padding: 16px;
-}
-.nav {
-  display: flex;
-  gap: 16px;
-}
-.navLink {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  background: none;
-  border: none;
-  font: inherit;
-  cursor: pointer;
-  padding: 0;
-}
-.navLink:hover {
-  text-decoration: underline;
-}
-.linkButton {
-  background: none;
-  border: none;
-  padding: 0;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  text-decoration: none;
-}
-.linkButton:hover {
-  text-decoration: underline;
-}
-
-/* Order Details Layout */
-.orderCell {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.totalColumn {
-  min-width: 100px;
-  width: 150px;
-}
-.actionColumn {
-  min-width: 100px;
-  width: 150px;
-}
-.channelName {
-  font-size: 0.8rem;
-  color: #555;
-  margin-bottom: 8px;
-}
-.extraRow td {
-  background-color: #ebe8c0;
-  font-size: 0.9rem;
-  color: #555;
-}
-
-/* Expand/Collapse Accordion Styles */
-/* Arrow cell */
-.expandCell {
-  width: 2rem;
-  text-align: center;
-  cursor: pointer;
-  user-select: none;
-  vertical-align: top;
-}
-/* Summary row styling */
-.summaryRow {
-  background-color: #fafafa;
-  transition: background-color 0.2s ease;
-  vertical-align: top;
-}
-.summaryRow:hover {
-  background-color: #f0f0f0;
-}
-/* Detail row styling */
-.detailRow {
-  background-color: #ffffff;
-  transition: background-color 0.2s ease;
-}
-.detailRow td {
-  padding: 0.5rem 1rem;
-  vertical-align: top;
-  border-top: 1px solid #e0e0e0;
-}
-.detailRow:hover {
-  background-color: #f9f9f9;
-}
-/* Small channel logo in summary row */
-.logoSmall {
-  width: 5rem;
-  margin-right: 1.5rem;
-  vertical-align: middle;
 }
