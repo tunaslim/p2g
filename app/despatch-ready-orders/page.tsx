@@ -65,7 +65,8 @@ export default function DespatchReadyOrders() {
 
   const iso2to3: Record<string, string> = {
     GB: 'GBR', US: 'USA', DE: 'DEU', FR: 'FRA', IT: 'ITA', TR: 'TUR',
-    ES: 'ESP', CA: 'CAN', NL: 'NLD', IL: 'ISR', BE: 'BEL', JP: 'JPN', CH: 'CHE',
+    ES: 'ESP', CA: 'CAN', NL: 'NLD', IL: 'ISR', BE: 'BEL', JP: 'JPN',
+    CH: 'CHE', CL: 'CHL',
   };
 
   const getChannelLogo = (id: number) => {
