@@ -135,6 +135,12 @@ export default function DespatchReadyOrders() {
         <button className={filter===82 ? styles.activeFilter : ''} onClick={() => setFilter(82)}>Printed</button>
       </div>
       <h1 className={styles.title}>{titleMap[filter]} ({total})</h1>
+      {/* Debug: show raw orders for Printed filter */}
+      {filter === 82 && !error && (
+        <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', background: '#f0f0f0', padding: '10px', margin: '10px 0' }}>
+          {JSON.stringify(orders, null, 2)}
+        </pre>
+      )}
       {error && <p className={styles.error}>{error}</p>}
       {!error && !orders.length && <p className={styles.subTitle}>No orders found for this filter.</p>}
       {orders.length > 0 && (
