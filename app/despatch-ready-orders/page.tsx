@@ -172,7 +172,7 @@ export default function DespatchReadyOrders() {
                       <td className={styles.expandCell} onClick={()=>setExpanded(p=>{const n=new Set(p);n.has(order.id)?n.delete(order.id):n.add(order.id);return n;})}>
                         {expanded.has(order.id)?'▼':'►'}
                       </td>
-                      <td><div className={styles.orderCell}><img src={getChannelLogo(order.channel_id)} className={styles.logoSmall} alt=""/><strong>{order.channel_order_id}</strong></div></td>
+                      <td><div className={styles.orderCell}><img src={getChannelLogo(order.channel_id)} className={styles.logo} alt=""/><strong>{order.channel_order_id}</strong></div></td>
                       <td>{order.shipping_name_company||order.shipping_name}</td>
                       <td>{order.inventory.length} item{order.inventory.length>1?'s':''}</td>
                       <td className={styles.totalColumn}>£{totalPaid.toFixed(2)}</td>
@@ -196,7 +196,7 @@ export default function DespatchReadyOrders() {
                               <img
                                 src={q.Service.Links.ImageSvg}
                                 alt={`${q.Service.CourierName} logo`}
-                                className={styles.logoSmall}
+                                className={styles.logo}
                                 />{' '}
                                 {q.Service.CourierName}
                             </td>
