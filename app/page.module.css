@@ -305,6 +305,7 @@
 }
 
 .actionColumn input[type="number"] {
+  margin-top: 0.25rem;
   width: 3rem;        /* make the input narrower */
   padding: 0.2em;     /* reduce padding */
   font-size: 0.9rem;  /* slightly smaller text */
@@ -312,8 +313,10 @@
 }
 
 .actionColumn label {
-  display: inline-block;
+  display: flex;
   margin-right: 1rem; /* space out each field */
   white-space: nowrap;
   font-size: 0.9rem;
+  flex-direction: column;
+  margin-bottom: 0.5rem; /* space between fields *
 }
