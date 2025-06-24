@@ -16,6 +16,7 @@ interface Service {
   MaxWeight: number;
   Links: {
     ImageSvg: string;
+  };
 }
 interface Quote {
   Service: Service;
