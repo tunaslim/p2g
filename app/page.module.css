@@ -303,3 +303,17 @@
   color: #333;
   line-height: 1.4;
 }
+
+.actionColumn input[type="number"] {
+  width: 3rem;        /* make the input narrower */
+  padding: 0.2em;     /* reduce padding */
+  font-size: 0.9rem;  /* slightly smaller text */
+  vertical-align: middle;
+}
+
+.actionColumn label {
+  display: inline-block;
+  margin-right: 1rem; /* space out each field */
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
