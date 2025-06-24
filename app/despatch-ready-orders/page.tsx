@@ -14,9 +14,7 @@ interface Service {
   MaxWidth: number;
   MaxLength: number;
   MaxWeight: number;
-  Links: {
-    ImageSvg: string;
-  };
+  Links: { ImageSvg: string };
 }
 interface Quote {
   Service: Service;
@@ -25,6 +23,7 @@ interface Quote {
   EstimatedDeliveryDate: string;
 }
 
+// Types for Helm orders
 interface Order {
   inventory: { sku: string; quantity: number; name: string; options: string; price: string; unit_tax: string }[];
   shipping_name_company: string | null;
@@ -54,9 +53,11 @@ interface Order {
 export default function DespatchReadyOrders() {
   const router = useRouter();
   const { token } = useToken();
+  // 3 = Despatch Ready, 82 = Printed
+  const [filter, setFilter] = useState<number>(3);
   const [orders, setOrders] = useState<Order[]>([]);
   const [total, setTotal] = useState<number>(0);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string>('');
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   // Package input state per order
@@ -74,12 +75,26 @@ export default function DespatchReadyOrders() {
 
   const getChannelLogo = (id: number) => {
     switch (id) {
-      case 24: case 15: return '/logos/ebay.png';
-      case 27: case 25: case 6: case 2: case 5: case 4: case 3: return '/logos/amazon.png';
-      case 11: return '/logos/etsy.png';
-      case 8: case 7: return '/logos/shopify.png';
-      case 26: return '/logos/woocommerce.png';
-      default: return '/logos/default.png';
+      case 24:
+      case 15:
+        return '/logos/ebay.png';
+      case 27:
+      case 25:
+      case 6:
+      case 2:
+      case 5:
+      case 4:
+      case 3:
+        return '/logos/amazon.png';
+      case 11:
+        return '/logos/etsy.png';
+      case 8:
+      case 7:
+        return '/logos/shopify.png';
+      case 26:
+        return '/logos/woocommerce.png';
+      default:
+        return '/logos/default.png';
     }
   };
 
@@ -97,14 +112,19 @@ export default function DespatchReadyOrders() {
     setLoadingMap(prev => ({ ...prev, [order.id]: true }));
     try {
       const payload = {
-        CollectionAddress: { Country: 'GBR', Property: 'Unit 45B Basepoint, Denton Island', Postcode: 'BN9 9BA', Town: 'Newhaven' },
+        CollectionAddress: {
+          Country: 'GBR',
+          Property: 'Unit 45B Basepoint, Denton Island',
+          Postcode: 'BN9 9BA',
+          Town: 'Newhaven'
+        },
         DeliveryAddress: {
           Country: country3,
           Property: order.shipping_address_line_two
             ? `${order.shipping_address_line_one} ${order.shipping_address_line_two}`
             : order.shipping_address_line_one,
           Postcode: order.shipping_address_postcode,
-          Town: order.shipping_address_city,
+          Town: order.shipping_address_city
         },
         Parcels: [{
           Value: parseFloat(order.total_paid) || 0,
@@ -114,42 +134,71 @@ export default function DespatchReadyOrders() {
           Height: parseFloat(info.height) || 0,
         }]
       };
-      const resp = await axios.post<{ Quotes: Quote[] }>(`${apiBase}/get-quote`, { order: payload });
+      const resp = await axios.post<{ Quotes: Quote[] }>(
+        `${apiBase}/get-quote`,
+        { order: payload }
+      );
       setQuotesMap(prev => ({
         ...prev,
-        [order.id]: resp.data.Quotes.sort((a,b)=>a.TotalPrice-b.TotalPrice).slice(0,5)
+        [order.id]: resp.data.Quotes
+          .sort((a, b) => a.TotalPrice - b.TotalPrice)
+          .slice(0, 5)
       }));
-    } catch (e) { console.error(e); } finally {
+    } catch (e) {
+      console.error(e);
+    } finally {
       setLoadingMap(prev => ({ ...prev, [order.id]: false }));
     }
   };
 
   useEffect(() => {
     if (!token) return;
+    setError('');
     (async () => {
       try {
-        const resp = await axios.get<{ total: number; data: Order[] }>('/api/helm-orders', {
-          headers: { Authorization: `Bearer ${token}`, 'X-Helm-Filter': 'status[]=3' }
-        });
+        const resp = await axios.get<{ total: number; data: Order[] }>(
+          '/api/helm-orders',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'X-Helm-Filter': `status[]=${filter}`
+            }
+          }
+        );
         setOrders(resp.data.data || []);
         setTotal(resp.data.total || 0);
       } catch {
         setError('Failed to fetch orders');
       }
     })();
-  }, [token]);
+  }, [token, filter]);
+
+  const titleMap: Record<number, string> = {
+    3: 'Despatch Ready Orders',
+    82: 'Printed Orders'
+  };
 
   return (
     <div className={styles.main}>
-      <h1 className={styles.title}>Despatch Ready Orders ({total})</h1>
+      <div className={styles.filterBar}>
+        <button
+          className={filter === 3 ? styles.activeFilter : ''}
+          onClick={() => setFilter(3)}
+        >Despatch Ready</button>
+        <button
+          className={filter === 82 ? styles.activeFilter : ''}
+          onClick={() => setFilter(82)}
+        >Printed</button>
+      </div>
+      <h1 className={styles.title}>{titleMap[filter]} ({total})</h1>
       {error && <p className={styles.error}>{error}</p>}
-      {!error && !orders.length && <p className={styles.subTitle}>No despatch-ready orders found.</p>}
+      {!error && !orders.length && <p className={styles.subTitle}>No orders found.</p>}
       {orders.length > 0 && (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th/>
+                <th />
                 <th>Order</th>
                 <th>Customer</th>
                 <th>Items</th>
@@ -159,49 +208,61 @@ export default function DespatchReadyOrders() {
             </thead>
             <tbody>
               {orders.map(order => {
-                const totalPaid = parseFloat(order.total_paid)||0;
-                const shippingCost = parseFloat(order.shipping_paid)||0;
-                const country3 = iso2to3[order.shipping_address_iso]||order.shipping_address_iso;
+                const totalPaid = parseFloat(order.total_paid) || 0;
+                const shippingCost = parseFloat(order.shipping_paid) || 0;
+                const country3 = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
                 const baseValue = totalPaid - shippingCost;
-                const parcelValue = country3==='GBR'?baseValue/1.2:baseValue;
-                const info = packageInfo[order.id]||{weight:'',length:'',width:'',height:''};
+                const parcelValue = country3 === 'GBR' ? baseValue / 1.2 : baseValue;
+                const info = packageInfo[order.id] || { weight: '', length: '', width: '', height: '' };
 
                 return (
                   <Fragment key={order.id}>
-                    <tr className={styles.quotesRow}>
-                      <td className={styles.expandCell} onClick={()=>setExpanded(p=>{const n=new Set(p);n.has(order.id)?n.delete(order.id):n.add(order.id);return n;})}>
-                        {expanded.has(order.id)?'▼':'►'}
-                      </td>
-                      <td><div className={styles.orderCell}><img src={getChannelLogo(order.channel_id)} className={styles.logo} alt=""/><strong>{order.channel_order_id}</strong></div></td>
-                      <td>{order.shipping_name_company||order.shipping_name}</td>
+                    <tr className={styles.quotesRow} onClick={() => setExpanded(p => { const n = new Set(p); n.has(order.id) ? n.delete(order.id) : n.add(order.id); return n; })}>
+                      <td className={styles.expandCell}>{expanded.has(order.id) ? '▼' : '►'}</td>
+                      <td><div className={styles.orderCell}><img src={getChannelLogo(order.channel_id)} className={styles.logo} alt="" /><strong>{order.channel_order_id}</strong></div></td>
+                      <td>{order.shipping_name_company || order.shipping_name}</td>
                       <td>{order.inventory.length} item{order.inventory.length>1?'s':''}</td>
                       <td className={styles.totalColumn}>£{totalPaid.toFixed(2)}</td>
                       <td className={styles.actionColumn}><a href={order.access_url} target="_blank" rel="noopener noreferrer" className={styles.selectButton}>↗</a></td>
                     </tr>
-                    {expanded.has(order.id)&&(
+                    {expanded.has(order.id) && (
                       <>
                         <tr className={styles.summaryRow}>
-                          <td/>
-                          <td><div className={styles.orderCell}><div>{order.date_received}</div><div><strong>Alt ID:</strong> {order.channel_alt_id}</div><div><strong>Sale:</strong> {order.sale_type}</div></div></td>
-                          <td><div className={styles.orderCell}><div><strong>Phone:</strong> {order.phone_one}</div><div><strong>Email:</strong> {truncateEmail(order.email)}</div><div><strong>Address:</strong> {order.shipping_address_line_one}{order.shipping_address_line_two?` ${order.shipping_address_line_two}`:''}, {order.shipping_address_city}, {order.shipping_address_postcode}, {country3}</div></div></td>
-                          <td><div className={styles.orderCell}>{order.inventory.map((i,idx)=><div key={idx}><strong>{i.name}</strong> (x{i.quantity})</div>)}</div></td>
-                          <td className={styles.totalColumn}><div className={styles.orderCell}><div><strong>Total Tax:</strong> £{parseFloat(order.total_tax).toFixed(2)}</div><div><strong>Shipping:</strong> £{shippingCost.toFixed(2)}</div><div><strong>Parcel Value:</strong> £{parcelValue.toFixed(2)}</div></div></td>
-                          <td className={styles.actionColumn}><div className={styles.orderCell}><div><strong>Package Info</strong></div><label>Weight (kg): <input type="number" value={info.weight} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,weight:e.target.value}}))}/></label><label>Length (cm): <input type="number" value={info.length} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,length:e.target.value}}))}/></label><label>Width (cm): <input type="number" value={info.width} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,width:e.target.value}}))}/></label><label>Height (cm): <input type="number" value={info.height} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,height:e.target.value}}))}/></label><button onClick={()=>fetchQuotesForOrder(order)} className={styles.primaryButton}>Get Quotes</button></div></td>
+                          <td />
+                          <td colSpan={5}><div className={styles.orderCell}><div>{order.date_received}</div><div><strong>Alt ID:</strong> {order.channel_alt_id}</div><div><strong>Sale:</strong> {order.sale_type}</div></div></td>
                         </tr>
-                        {loadingMap[order.id]&&<tr className={styles.quotesRow}><td/><td colSpan={5}>Getting cheapest 5 quotes...</td></tr>}
-                        {quotesMap[order.id]?.map((q,idx)=>(
+                        <tr className={styles.summaryRow}>
+                          <td />
+                          <td colSpan={5}><div className={styles.orderCell}><div><strong>Phone:</strong> {order.phone_one}</div><div><strong>Email:</strong> {truncateEmail(order.email)}</div><div><strong>Address:</strong> {order.shipping_address_line_one}{order.shipping_address_line_two?` ${order.shipping_address_line_two}`:''}, {order.shipping_address_city}, {order.shipping_address_postcode}, {country3}</div></div></td>
+                        </tr>
+                        <tr className={styles.summaryRow}>
+                          <td />
+                          <td colSpan={5}><div className={styles.orderCell}>{order.inventory.map((i, idx) => <div key={idx}><strong>{i.name}</strong> (x{i.quantity})</div>)}</div></td>
+                        </tr>
+                        <tr className={styles.summaryRow}>
+                          <td />
+                          <td colSpan={5}><div className={styles.orderCell}><div><strong>Total Tax:</strong> £{parseFloat(order.total_tax).toFixed(2)}</div><div><strong>Shipping:</strong> £{shippingCost.toFixed(2)}</div><div><strong>Parcel Value:</strong> £{parcelValue.toFixed(2)}</div></div></td>
+                        </tr>
+                        <tr className={styles.summaryRow}>
+                          <td />
+                          <td className={styles.actionColumn} colSpan={5}>
+                            <div className={styles.orderCell}>
+                              <div><strong>Package Info</strong></div>
+                              <label>Weight (kg): <input type="number" value={info.weight} onChange={e => setPackageInfo(p => ({ ...p, [order.id]: { ...info, weight: e.target.value } }))} /></label>
+                              <label>Length (cm): <input type="number" value={info.length} onChange={e => setPackageInfo(p => ({ ...p, [order.id]: { ...info, length: e.target.value } }))} /></label>
+                              <label>Width (cm): <input type="number" value={info.width} onChange={e => setPackageInfo(p => ({ ...p, [order.id]: { ...info, width: e.target.value } }))} /></label>
+                              <label>Height (cm): <input type="number" value={info.height} onChange={e => setPackageInfo(p => ({ ...p, [order.id]: { ...info, height: e.target.value } }))} /></label>
+                              <button onClick={() => fetchQuotesForOrder(order)} className={styles.primaryButton}>Get Quotes</button>
+                            </div>
+                          </td>
+                        </tr>
+                        {loadingMap[order.id] && <tr className={styles.quotesRow}><td /><td colSpan={5}>Getting cheapest 5 quotes...</td></tr>}
+                        {quotesMap[order.id]?.map((q, idx) => (
                           <tr key={idx} className={styles.quotesRow}>
-                            <td/>
-                            <td className={styles.orderCell}>
-                              <img
-                                src={q.Service.Links.ImageSvg}
-                                alt={`${q.Service.CourierName} logo`}
-                                className={styles.logo}
-                                />{' '}
-                                {q.Service.CourierName}
-                            </td>
+                            <td />
+                            <td className={styles.orderCell}><img src={q.Service.Links.ImageSvg} alt={`${q.Service.CourierName} logo`} className={styles.logo} /> {q.Service.CourierName}</td>
                             <td><strong>{q.Service.Name}</strong><br/>({q.Service.Slug})</td>
-                            <td><strong>Max: </strong>{q.Service.MaxWeight}kg<br/>{q.Service.MaxHeight*100}x{q.Service.MaxWidth*100}x{q.Service.MaxLength*100}cm</td>
+                            <td><strong>Max:</strong> {q.Service.MaxWeight}kg<br/>{q.Service.MaxHeight*100}x{q.Service.MaxWidth*100}x{q.Service.MaxLength*100}cm</td>
                             <td><strong>£{q.TotalPrice.toFixed(2)}</strong><br/>Exc.VAT (£{q.TotalPriceExVat.toFixed(2)})</td>
                             <td>{new Date(q.EstimatedDeliveryDate).toLocaleDateString()}</td>
                           </tr>
