@@ -175,9 +175,10 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 5px;
+  table-layout: fixed; /* ensure all rows span full width */
 }
 
-/* Table Header - Dark Style */
+/* Table Header – Dark Style */
 .table th {
   background-color: #333333;
   color: #ffffff;
