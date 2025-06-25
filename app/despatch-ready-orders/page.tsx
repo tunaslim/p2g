@@ -458,7 +458,7 @@ export default function DespatchReadyOrders() {
                                     </strong>
                                   </td>
                                 </tr>
-                              ) : currentProtection > 0 ? (
+                              ) : currentProtection >= 0 ? (
                                 <tr className={styles.extraRow}>
                                   <td/>
                                   <td colSpan={5}>
