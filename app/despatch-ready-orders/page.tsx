@@ -14,20 +14,17 @@ interface Service {
   MaxWidth: number;
   MaxLength: number;
   MaxWeight: number;
-  Links: {
-    ImageSvg: string;
-  };
+  Links: { ImageSvg: string };
 }
+
 interface AvailableExtra {
   Type: string;
   Price: number;
   Vat: number;
   Total: number;
-  Details: {
-    IncludedCover: string;
-    MaxWeight: string;
-  } | null;
+  Details: { IncludedCover: string; MaxWeight: string } | null;
 }
+
 interface Quote {
   Service: Service;
   TotalPriceExVat: number;
@@ -71,12 +68,10 @@ export default function DespatchReadyOrders() {
   const [error, setError] = useState('');
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
-  // Package input state per order
   const [packageInfo, setPackageInfo] = useState<
     Record<number, { weight: string; length: string; width: string; height: string }>
   >({});
 
-  // Quotes and loading state per order
   const [quotesMap, setQuotesMap] = useState<Record<number, Quote[]>>({});
   const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({});
 
@@ -117,7 +112,7 @@ export default function DespatchReadyOrders() {
           Country: 'GBR',
           Property: 'Unit 45B Basepoint, Denton Island',
           Postcode: 'BN9 9BA',
-          Town: 'Newhaven'
+          Town: 'Newhaven',
         },
         DeliveryAddress: {
           Country: country3,
@@ -133,7 +128,7 @@ export default function DespatchReadyOrders() {
           Length: parseFloat(info.length) || 0,
           Width: parseFloat(info.width) || 0,
           Height: parseFloat(info.height) || 0,
-        }]
+        }],
       };
       const resp = await axios.post<{ Quotes: Quote[] }>(
         `${apiBase}/get-quote`,
@@ -143,7 +138,7 @@ export default function DespatchReadyOrders() {
         ...prev,
         [order.id]: resp.data.Quotes
           .sort((a, b) => a.TotalPrice - b.TotalPrice)
-          .slice(0, 10)
+          .slice(0, 10),
       }));
     } catch (e) {
       console.error(e);
@@ -161,8 +156,8 @@ export default function DespatchReadyOrders() {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-              'X-Helm-Filter': 'status[]=3'
-            }
+              'X-Helm-Filter': 'status[]=3',
+            },
           }
         );
         setOrders(resp.data.data || []);
@@ -254,32 +249,19 @@ export default function DespatchReadyOrders() {
                           <td>
                             <div className={styles.orderCell}>
                               <div>{order.date_received}</div>
-                              <div>
-                                <strong>Alt ID:</strong> {order.channel_alt_id}
-                              </div>
-                              <div>
-                                <strong>Sale:</strong> {order.sale_type}
-                              </div>
+                              <div><strong>Alt ID:</strong> {order.channel_alt_id}</div>
+                              <div><strong>Sale:</strong> {order.sale_type}</div>
                               <div>{order.status_description}</div>
                             </div>
                           </td>
                           <td>
                             <div className={styles.orderCell}>
+                              <div><strong>Phone:</strong> {order.phone_one}</div>
+                              <div><strong>Email:</strong> {truncateEmail(order.email)}</div>
                               <div>
-                                <strong>Phone:</strong> {order.phone_one}
-                              </div>
-                              <div>
-                                <strong>Email:</strong> {truncateEmail(order.email)}
-                              </div>
-                              <div>
-                                <strong>Address:</strong>{' '}
-                                {order.shipping_address_line_one}
-                                {order.shipping_address_line_two
-                                  ? ` ${order.shipping_address_line_two}`
-                                  : ''}
-                                , {order.shipping_address_city},{' '}
-                                {order.shipping_address_postcode},{' '}
-                                {country3}
+                                <strong>Address:</strong> {order.shipping_address_line_one}
+                                {order.shipping_address_line_two ? ` ${order.shipping_address_line_two}` : ''}
+                                , {order.shipping_address_city}, {order.shipping_address_postcode}, {country3}
                               </div>
                             </div>
                           </td>
@@ -294,25 +276,14 @@ export default function DespatchReadyOrders() {
                           </td>
                           <td className={styles.totalColumn}>
                             <div className={styles.orderCell}>
-                              <div>
-                                <strong>Total Tax:</strong> £
-                                {parseFloat(order.total_tax).toFixed(2)}
-                              </div>
-                              <div>
-                                <strong>Shipping:</strong> £
-                                {shippingCost.toFixed(2)}
-                              </div>
-                              <div>
-                                <strong>Parcel Val.:</strong> £
-                                {parcelValue.toFixed(2)}
-                              </div>
+                              <div><strong>Total Tax:</strong> £{parseFloat(order.total_tax).toFixed(2)}</div>
+                              <div><strong>Shipping:</strong> £{shippingCost.toFixed(2)}</div>
+                              <div><strong>Parcel Val.:</strong> £{parcelValue.toFixed(2)}</div>
                             </div>
                           </td>
                           <td className={styles.actionColumn}>
                             <div className={styles.orderCell}>
-                              <div>
-                                <strong>Package Info</strong>
-                              </div>
+                              <div><strong>Package Info</strong></div>
                               <label>
                                 Weight (kg):{' '}
                                 <input
@@ -322,10 +293,7 @@ export default function DespatchReadyOrders() {
                                   onChange={e =>
                                     setPackageInfo(p => ({
                                       ...p,
-                                      [order.id]: {
-                                        ...info,
-                                        weight: e.target.value
-                                      }
+                                      [order.id]: { ...info, weight: e.target.value }
                                     }))
                                   }
                                 />
@@ -339,10 +307,7 @@ export default function DespatchReadyOrders() {
                                   onChange={e =>
                                     setPackageInfo(p => ({
                                       ...p,
-                                      [order.id]: {
-                                        ...info,
-                                        length: e.target.value
-                                      }
+                                      [order.id]: { ...info, length: e.target.value }
                                     }))
                                   }
                                 />
@@ -356,10 +321,7 @@ export default function DespatchReadyOrders() {
                                   onChange={e =>
                                     setPackageInfo(p => ({
                                       ...p,
-                                      [order.id]: {
-                                        ...info,
-                                        width: e.target.value
-                                      }
+                                      [order.id]: { ...info, width: e.target.value }
                                     }))
                                   }
                                 />
@@ -373,10 +335,7 @@ export default function DespatchReadyOrders() {
                                   onChange={e =>
                                     setPackageInfo(p => ({
                                       ...p,
-                                      [order.id]: {
-                                        ...info,
-                                        height: e.target.value
-                                      }
+                                      [order.id]: { ...info, height: e.target.value }
                                     }))
                                   }
                                 />
@@ -394,82 +353,84 @@ export default function DespatchReadyOrders() {
                         {loadingMap[order.id] && (
                           <tr className={styles.quotesRow}>
                             <td/>
-                            <td colSpan={5}>
-                              Getting cheapest 10 quotes...
-                            </td>
+                            <td colSpan={5}>Getting cheapest 10 quotes...</td>
                           </tr>
                         )}
 
                         {quotesMap[order.id]?.map((q, idx) => {
-                          const extCover = q.AvailableExtras.find(
-                            e => e.Type === 'ExtendedCover'
-                          );
                           const currentProtection = q.IncludedCover;
+                          const extCover = q.AvailableExtras.find(e => e.Type === 'ExtendedCover');
                           const extendedProtection = extCover?.Details
                             ? parseFloat(extCover.Details.IncludedCover)
-                            : null;
-                          const totalWithExtended =
-                            extendedProtection !== null
-                              ? q.TotalPrice + (extCover?.Total ?? 0)
-                              : null;
+                            : 0;
+                          const totalWithExtended = q.TotalPrice + (extCover?.Total ?? 0);
 
-                          return (
-                            <Fragment
-                              key={`quote-${order.id}-${idx}`}
-                            >
-                              <tr className={styles.quotesRow}>
+                          // Build the main quote row
+                          const quoteRow = (
+                            <tr key={`quote-${order.id}-${idx}`} className={styles.quotesRow}>
+                              <td/>
+                              <td className={styles.orderCell}>
+                                <img
+                                  src={q.Service.Links.ImageSvg}
+                                  alt={`${q.Service.CourierName} logo`}
+                                  className={styles.logo}
+                                />{' '}
+                                {q.Service.CourierName}
+                              </td>
+                              <td>
+                                <strong>{q.Service.Name}</strong><br/>
+                                ({q.Service.Slug})
+                              </td>
+                              <td>
+                                <strong>Est. Delivery</strong><br/>
+                                {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}<br/>
+                                <strong>Max:</strong> {q.Service.MaxWeight} kg<br/>
+                                {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100} cm
+                              </td>
+                              <td>
+                                <strong>£{q.TotalPrice.toFixed(2)}</strong><br/>
+                                Exc. VAT (£{q.TotalPriceExVat.toFixed(2)})
+                              </td>
+                              <td/>
+                            </tr>
+                          );
+
+                          // Build the INFO row based on currentProtection
+                          let infoRow: JSX.Element | null = null;
+                          if (currentProtection === 0) {
+                            // first INFO variant
+                            infoRow = (
+                              <tr key={`info-zero-${order.id}-${idx}`} className={styles.extraRow}>
                                 <td/>
-                                <td className={styles.orderCell}>
-                                  <img
-                                    src={q.Service.Links.ImageSvg}
-                                    alt={`${q.Service.CourierName} logo`}
-                                    className={styles.logo}
-                                  />{' '}
-                                  {q.Service.CourierName}
+                                <td colSpan={5}>
+                                  <strong>
+                                    INFO: Current Protection: £{currentProtection.toFixed(0)} |{' '}
+                                    Book with £{extendedProtection.toFixed(0)} Protection — Total: £
+                                    {totalWithExtended.toFixed(2)}
+                                  </strong>
                                 </td>
-                                <td>
-                                  <strong>{q.Service.Name}</strong><br/>
-                                  ({q.Service.Slug})
-                                </td>
-                                <td>
-                                  <strong>Est. Delivery</strong><br/>
-                                  {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}<br/>
-                                  <strong>Max:</strong> {q.Service.MaxWeight} kg<br/>
-                                  {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100} cm
-                                </td>
-                                <td>
-                                  <strong>£{q.TotalPrice.toFixed(2)}</strong><br/>
-                                  Exc. VAT (£{q.TotalPriceExVat.toFixed(2)})
-                                </td>
-                                <td/>
                               </tr>
+                            );
+                          } else if (currentProtection > 0) {
+                            // second INFO variant
+                            infoRow = (
+                              <tr key={`info-pos-${order.id}-${idx}`} className={styles.extraRow}>
+                                <td/>
+                                <td colSpan={5}>
+                                  <strong>
+                                    INFO: Current Protection: £{currentProtection.toFixed(0)} |{' '}
+                                    Extended protection not available.
+                                  </strong>
+                                </td>
+                              </tr>
+                            );
+                          }
 
-                              {extCover?.Details ? (
-                                <tr className={styles.extraRow}>
-                                  <td/>
-                                  <td colSpan={5}>
-                                    <strong>
-                                      INFO: Current Protection: £
-                                      {currentProtection.toFixed(0)} |{' '}
-                                      Book with £
-                                      {extendedProtection?.toFixed(0)} Protection —{' '}
-                                      Total: £
-                                      {totalWithExtended?.toFixed(2)}
-                                    </strong>
-                                  </td>
-                                </tr>
-                              ) : currentProtection >= 0 ? (
-                                <tr className={styles.extraRow}>
-                                  <td/>
-                                  <td colSpan={5}>
-                                    <strong>
-                                      INFO: Current Protection: £
-                                      {currentProtection.toFixed(0)} |{' '}
-                                      Extended protection not available.
-                                    </strong>
-                                  </td>
-                                </tr>
-                              ) : null}
+                          // Return both rows
+                          return (
+                            <Fragment key={`group-${order.id}-${idx}`}>
+                              {quoteRow}
+                              {infoRow}
                             </Fragment>
                           );
                         })}
