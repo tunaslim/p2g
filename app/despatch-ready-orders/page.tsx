@@ -83,12 +83,26 @@ export default function DespatchReadyOrders() {
 
   const getChannelLogo = (id: number) => {
     switch (id) {
-      case 24: case 15: return '/logos/ebay.png';
-      case 27: case 25: case 6: case 2: case 5: case 4: case 3: return '/logos/amazon.png';
-      case 11: return '/logos/etsy.png';
-      case 8: case 7: return '/logos/shopify.png';
-      case 26: return '/logos/woocommerce.png';
-      default: return '/logos/default.png';
+      case 24:
+      case 15:
+        return '/logos/ebay.png';
+      case 27:
+      case 25:
+      case 6:
+      case 2:
+      case 5:
+      case 4:
+      case 3:
+        return '/logos/amazon.png';
+      case 11:
+        return '/logos/etsy.png';
+      case 8:
+      case 7:
+        return '/logos/shopify.png';
+      case 26:
+        return '/logos/woocommerce.png';
+      default:
+        return '/logos/default.png';
     }
   };
 
@@ -122,23 +136,20 @@ export default function DespatchReadyOrders() {
           Postcode: order.shipping_address_postcode,
           Town: order.shipping_address_city,
         },
-        Parcels: [{
-          Value: parseFloat(order.total_paid) || 0,
-          Weight: parseFloat(info.weight) || 0,
-          Length: parseFloat(info.length) || 0,
-          Width: parseFloat(info.width) || 0,
-          Height: parseFloat(info.height) || 0,
-        }],
+        Parcels: [
+          {
+            Value: parseFloat(order.total_paid) || 0,
+            Weight: parseFloat(info.weight) || 0,
+            Length: parseFloat(info.length) || 0,
+            Width: parseFloat(info.width) || 0,
+            Height: parseFloat(info.height) || 0,
+          },
+        ],
       };
-      const resp = await axios.post<{ Quotes: Quote[] }>(
-        `${apiBase}/get-quote`,
-        { order: payload }
-      );
+      const resp = await axios.post<{ Quotes: Quote[] }>(`${apiBase}/get-quote`, { order: payload });
       setQuotesMap(prev => ({
         ...prev,
-        [order.id]: resp.data.Quotes
-          .sort((a, b) => a.TotalPrice - b.TotalPrice)
-          .slice(0, 10),
+        [order.id]: resp.data.Quotes.sort((a, b) => a.TotalPrice - b.TotalPrice).slice(0, 10),
       }));
     } catch (e) {
       console.error(e);
@@ -151,15 +162,9 @@ export default function DespatchReadyOrders() {
     if (!token) return;
     (async () => {
       try {
-        const resp = await axios.get<{ total: number; data: Order[] }>(
-          '/api/helm-orders',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'X-Helm-Filter': 'status[]=3',
-            },
-          }
-        );
+        const resp = await axios.get<{ total: number; data: Order[] }>('/api/helm-orders', {
+          headers: { Authorization: `Bearer ${token}`, 'X-Helm-Filter': 'status[]=3' },
+        });
         setOrders(resp.data.data || []);
         setTotal(resp.data.total || 0);
       } catch {
@@ -172,15 +177,13 @@ export default function DespatchReadyOrders() {
     <div className={styles.main}>
       <h1 className={styles.title}>Despatch Ready Orders ({total})</h1>
       {error && <p className={styles.error}>{error}</p>}
-      {!error && !orders.length && (
-        <p className={styles.subTitle}>No despatch-ready orders found.</p>
-      )}
+      {!error && !orders.length && <p className={styles.subTitle}>No despatch-ready orders found.</p>}
       {orders.length > 0 && (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th/>
+                <th />
                 <th className={styles.orderColumn}>Order</th>
                 <th className={styles.customerColumn}>Customer</th>
                 <th className={styles.itemsColumn}>Items</th>
@@ -199,14 +202,15 @@ export default function DespatchReadyOrders() {
 
                 return (
                   <Fragment key={order.id}>
+                    {/* Main order row */}
                     <tr className={styles.quotesRow}>
                       <td
                         className={styles.expandCell}
                         onClick={() =>
-                          setExpanded(p => {
-                            const n = new Set(p);
-                            n.has(order.id) ? n.delete(order.id) : n.add(order.id);
-                            return n;
+                          setExpanded(prev => {
+                            const next = new Set(prev);
+                            next.has(order.id) ? next.delete(order.id) : next.add(order.id);
+                            return next;
                           })
                         }
                       >
@@ -214,71 +218,73 @@ export default function DespatchReadyOrders() {
                       </td>
                       <td>
                         <div className={styles.orderCell}>
-                          <img
-                            src={getChannelLogo(order.channel_id)}
-                            className={styles.logo}
-                            alt=""
-                          />
+                          <img src={getChannelLogo(order.channel_id)} className={styles.logo} alt="" />
                           <strong>{order.channel_order_id}</strong>
                         </div>
                       </td>
                       <td>{order.shipping_name_company || order.shipping_name}</td>
                       <td>
-                        {order.inventory.length} item
-                        {order.inventory.length > 1 ? 's' : ''}
+                        {order.inventory.length} item{order.inventory.length > 1 ? 's' : ''}
                       </td>
-                      <td className={styles.totalColumn}>
-                        £{totalPaid.toFixed(2)}
-                      </td>
+                      <td className={styles.totalColumn}>£{totalPaid.toFixed(2)}</td>
                       <td className={styles.actionColumn}>
-                        <a
-                          href={order.access_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={styles.selectButton}
-                        >
+                        <a href={order.access_url} target="_blank" rel="noopener noreferrer" className={styles.selectButton}>
                           ↗
                         </a>
                       </td>
                     </tr>
 
+                    {/* Expanded details */}
                     {expanded.has(order.id) && (
                       <>
                         <tr className={styles.summaryRow}>
-                          <td/>
+                          <td />
                           <td>
                             <div className={styles.orderCell}>
                               <div>{order.date_received}</div>
-                              <div><strong>Alt ID:</strong> {order.channel_alt_id}</div>
-                              <div><strong>Sale:</strong> {order.sale_type}</div>
+                              <div>
+                                <strong>Alt ID:</strong> {order.channel_alt_id}
+                              </div>
+                              <div>
+                                <strong>Sale:</strong> {order.sale_type}
+                              </div>
                               <div>{order.status_description}</div>
                             </div>
                           </td>
                           <td>
                             <div className={styles.orderCell}>
-                              <div><strong>Phone:</strong> {order.phone_one}</div>
-                              <div><strong>Email:</strong> {truncateEmail(order.email)}</div>
+                              <div>
+                                <strong>Phone:</strong> {order.phone_one}
+                              </div>
+                              <div>
+                                <strong>Email:</strong> {truncateEmail(order.email)}
+                              </div>
                               <div>
                                 <strong>Address:</strong> {order.shipping_address_line_one}
-                                {order.shipping_address_line_two ? ` ${order.shipping_address_line_two}` : ''}
-                                , {order.shipping_address_city}, {order.shipping_address_postcode}, {country3}
+                                {order.shipping_address_line_two ? ` ${order.shipping_address_line_two}` : ''}, {order.shipping_address_city}, {order.shipping_address_postcode}, {country3}
                               </div>
                             </div>
                           </td>
                           <td>
                             <div className={styles.orderCell}>
-                              {order.inventory.map((i, idx) => (
-                                <div key={idx}>
-                                  <strong>{i.name}</strong> (x{i.quantity})
+                              {order.inventory.map((item, i) => (
+                                <div key={i}>
+                                  <strong>{item.name}</strong> (x{item.quantity})
                                 </div>
                               ))}
                             </div>
                           </td>
                           <td className={styles.totalColumn}>
                             <div className={styles.orderCell}>
-                              <div><strong>Total Tax:</strong> £{parseFloat(order.total_tax).toFixed(2)}</div>
-                              <div><strong>Shipping:</strong> £{shippingCost.toFixed(2)}</div>
-                              <div><strong>Parcel Val.:</strong> £{parcelValue.toFixed(2)}</div>
+                              <div>
+                                <strong>Total Tax:</strong> £{parseFloat(order.total_tax).toFixed(2)}
+                              </div>
+                              <div>
+                                <strong>Shipping:</strong> £{shippingCost.toFixed(2)}
+                              </div>
+                              <div>
+                                <strong>Parcel Val.:</strong> £{parcelValue.toFixed(2)}
+                              </div>
                             </div>
                           </td>
                           <td className={styles.actionColumn}>
@@ -291,8 +297,8 @@ export default function DespatchReadyOrders() {
                                   size={4}
                                   value={info.weight}
                                   onChange={e =>
-                                    setPackageInfo(p => ({
-                                      ...p,
+                                    setPackageInfo(prev => ({
+                                      ...prev,
                                       [order.id]: { ...info, weight: e.target.value }
                                     }))
                                   }
@@ -305,8 +311,8 @@ export default function DespatchReadyOrders() {
                                   size={4}
                                   value={info.length}
                                   onChange={e =>
-                                    setPackageInfo(p => ({
-                                      ...p,
+                                    setPackageInfo(prev => ({
+                                      ...prev,
                                       [order.id]: { ...info, length: e.target.value }
                                     }))
                                   }
@@ -319,8 +325,8 @@ export default function DespatchReadyOrders() {
                                   size={4}
                                   value={info.width}
                                   onChange={e =>
-                                    setPackageInfo(p => ({
-                                      ...p,
+                                    setPackageInfo(prev => ({
+                                      ...prev,
                                       [order.id]: { ...info, width: e.target.value }
                                     }))
                                   }
@@ -333,17 +339,14 @@ export default function DespatchReadyOrders() {
                                   size={4}
                                   value={info.height}
                                   onChange={e =>
-                                    setPackageInfo(p => ({
-                                      ...p,
+                                    setPackageInfo(prev => ({
+                                      ...prev,
                                       [order.id]: { ...info, height: e.target.value }
                                     }))
                                   }
                                 />
                               </label>
-                              <button
-                                onClick={() => fetchQuotesForOrder(order)}
-                                className={styles.primaryButton}
-                              >
+                              <button onClick={() => fetchQuotesForOrder(order)} className={styles.primaryButton}>
                                 Get Quotes
                               </button>
                             </div>
@@ -352,11 +355,12 @@ export default function DespatchReadyOrders() {
 
                         {loadingMap[order.id] && (
                           <tr className={styles.quotesRow}>
-                            <td/>
+                            <td />
                             <td colSpan={5}>Getting cheapest 10 quotes...</td>
                           </tr>
                         )}
 
+                        {/* Render quotes + INFO rows */}
                         {quotesMap[order.id]?.map((q, idx) => {
                           const currentProtection = q.IncludedCover;
                           const extCover = q.AvailableExtras.find(e => e.Type === 'ExtendedCover');
@@ -365,68 +369,56 @@ export default function DespatchReadyOrders() {
                             : 0;
                           const totalWithExtended = q.TotalPrice + (extCover?.Total ?? 0);
 
-                          // Build the main quote row
                           const quoteRow = (
                             <tr key={`quote-${order.id}-${idx}`} className={styles.quotesRow}>
-                              <td/>
+                              <td />
                               <td className={styles.orderCell}>
-                                <img
-                                  src={q.Service.Links.ImageSvg}
-                                  alt={`${q.Service.CourierName} logo`}
-                                  className={styles.logo}
-                                />{' '}
+                                <img src={q.Service.Links.ImageSvg} alt={`${q.Service.CourierName} logo`} className={styles.logo} />{' '}
                                 {q.Service.CourierName}
                               </td>
                               <td>
-                                <strong>{q.Service.Name}</strong><br/>
+                                <strong>{q.Service.Name}</strong><br />
                                 ({q.Service.Slug})
                               </td>
                               <td>
-                                <strong>Est. Delivery</strong><br/>
-                                {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}<br/>
-                                <strong>Max:</strong> {q.Service.MaxWeight} kg<br/>
+                                <strong>Est. Delivery</strong><br />
+                                {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}<br />
+                                <strong>Max:</strong> {q.Service.MaxWeight} kg<br />
                                 {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100} cm
                               </td>
                               <td>
-                                <strong>£{q.TotalPrice.toFixed(2)}</strong><br/>
+                                <strong>£{q.TotalPrice.toFixed(2)}</strong><br />
                                 Exc. VAT (£{q.TotalPriceExVat.toFixed(2)})
                               </td>
-                              <td/>
+                              <td />
                             </tr>
                           );
 
-                          // Build the INFO row based on currentProtection
-                          let infoRow: JSX.Element | null = null;
+                          let infoRow = null;
                           if (currentProtection === 0) {
-                            // first INFO variant
                             infoRow = (
                               <tr key={`info-zero-${order.id}-${idx}`} className={styles.extraRow}>
-                                <td/>
+                                <td />
                                 <td colSpan={5}>
                                   <strong>
-                                    INFO: Current Protection: £{currentProtection.toFixed(0)} |{' '}
-                                    Book with £{extendedProtection.toFixed(0)} Protection — Total: £
-                                    {totalWithExtended.toFixed(2)}
+                                    INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £{extendedProtection.toFixed(0)} Protection — Total: £{totalWithExtended.toFixed(2)}
                                   </strong>
                                 </td>
                               </tr>
                             );
                           } else if (currentProtection > 0) {
-                            // second INFO variant
                             infoRow = (
                               <tr key={`info-pos-${order.id}-${idx}`} className={styles.extraRow}>
-                                <td/>
+                                <td />
                                 <td colSpan={5}>
                                   <strong>
-                                    INFO: Current Protection: £{currentProtection.toFixed(0)} |{' '}
-                                    Extended protection not available.
+                                    INFO: Current Protection: £{currentProtection.toFixed(0)} | Extended protection not available.
                                   </strong>
                                 </td>
                               </tr>
                             );
                           }
 
-                          // Return both rows
                           return (
                             <Fragment key={`group-${order.id}-${idx}`}>
                               {quoteRow}
