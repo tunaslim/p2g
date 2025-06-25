@@ -201,7 +201,7 @@ export default function DespatchReadyOrders() {
                                 {q.Service.CourierName}
                             </td>
                             <td><strong>{q.Service.Name}</strong><br/>({q.Service.Slug})</td>
-                            <td><strong>Est. Delivery Date&nbsp;&nbsp;&nbsp;</strong><strong>Max: </strong>{q.Service.MaxWeight}kg<br/>{new Date(q.EstimatedDeliveryDate).toLocaleDateString()}{'\u00A0\u00A0\u00A0'}{q.Service.MaxHeight*100}x{q.Service.MaxWidth*100}x{q.Service.MaxLength*100}cm</td>
+                            <td><strong>Est. Delivery&nbsp;&nbsp;&nbsp;</strong><strong>Max: </strong>{q.Service.MaxWeight}kg<br/>{'\u00A0'}{new Date(q.EstimatedDeliveryDate).toLocaleDateString()}{'\u00A0\u00A0\u00A0\u00A0'}{q.Service.MaxHeight*100}x{q.Service.MaxWidth*100}x{q.Service.MaxLength*100}cm</td>
                             <td><strong>£{q.TotalPrice.toFixed(2)}</strong><br/>Exc.VAT (£{q.TotalPriceExVat.toFixed(2)})</td>
                             <td></td>
                           </tr>
