@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const response = await axios.get(
-      'https://goodlife.myhelm.app/public-api/orders?filters[status][]=3',
+      'https://goodlife.myhelm.app/public-api/orders?filters[status][]=3&filters[status][]=82',
       {
         headers: {
           Authorization: token,
