@@ -35,7 +35,14 @@ interface Quote {
 }
 
 interface Order {
-  inventory: { sku: string; quantity: number; name: string; options: string; price: string; unit_tax: string }[];
+  inventory: {
+    sku: string;
+    quantity: number;
+    name: string;
+    options: string;
+    price: string;
+    unit_tax: string;
+  }[];
   shipping_name_company: string | null;
   phone_one: string;
   email: string;
@@ -76,9 +83,21 @@ export default function DespatchReadyOrders() {
   const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({});
 
   const iso2to3: Record<string, string> = {
-    GB: 'GBR', US: 'USA', DE: 'DEU', FR: 'FRA', IT: 'ITA', TR: 'TUR',
-    ES: 'ESP', CA: 'CAN', NL: 'NLD', IL: 'ISR', BE: 'BEL', JP: 'JPN',
-    CH: 'CHE', CL: 'CHL', AT: 'AUT',
+    GB: 'GBR',
+    US: 'USA',
+    DE: 'DEU',
+    FR: 'FRA',
+    IT: 'ITA',
+    TR: 'TUR',
+    ES: 'ESP',
+    CA: 'CAN',
+    NL: 'NLD',
+    IL: 'ISR',
+    BE: 'BEL',
+    JP: 'JPN',
+    CH: 'CHE',
+    CL: 'CHL',
+    AT: 'AUT',
   };
 
   const getChannelLogo = (id: number) => {
@@ -149,7 +168,9 @@ export default function DespatchReadyOrders() {
       const resp = await axios.post<{ Quotes: Quote[] }>(`${apiBase}/get-quote`, { order: payload });
       setQuotesMap(prev => ({
         ...prev,
-        [order.id]: resp.data.Quotes.sort((a, b) => a.TotalPrice - b.TotalPrice).slice(0, 10),
+        [order.id]: resp.data.Quotes
+          .sort((a, b) => a.TotalPrice - b.TotalPrice)
+          .slice(0, 10),
       }));
     } catch (e) {
       console.error(e);
@@ -363,9 +384,14 @@ export default function DespatchReadyOrders() {
                         {/* Render quotes + INFO rows */}
                         {quotesMap[order.id]?.map((q, idx) => {
                           const currentProtection = q.IncludedCover;
-                          const extCover = q.AvailableExtras.find(e => e.Type === 'ExtendedCover');
-                          const extendedProtection = extCover?.Details
-                            ? parseFloat(extCover.Details.IncludedCover)
+                          const extCover = q.AvailableExtras.find(
+                            e =>
+                              e.Details != null &&
+                              e.Details.IncludedCover != null &&
+                              /\d/.test(e.Details.IncludedCover)
+                          );
+                          const extendedProtection = extCover
+                            ? parseFloat(extCover.Details.IncludedCover.replace(/[^0-9.]/g, ''))
                             : 0;
                           const totalWithExtended = q.TotalPrice + (extCover?.Total ?? 0);
 
@@ -401,7 +427,8 @@ export default function DespatchReadyOrders() {
                                 <td />
                                 <td colSpan={5}>
                                   <strong>
-                                    INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £{extendedProtection.toFixed(0)} Protection — Total: £{totalWithExtended.toFixed(2)}
+                                    INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £
+                                    {extendedProtection.toFixed(0)} Protection — Total: £{totalWithExtended.toFixed(2)}                                   
                                   </strong>
                                 </td>
                               </tr>
