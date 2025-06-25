@@ -1,20 +1,25 @@
 'use client';
-import { useEffect, useState, Fragment } from 'react';
-import { useRouter } from 'next/navigation';
-import styles from '../page.module.css';
-import axios from 'axios';
-import { useToken } from '../context/TokenContext';
 
-// Types for Parcel2Go quotes
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useSearchParams } from 'next/navigation';
+import styles from './page.module.css';
+
+// Type Definitions for Parcel2Go
+interface ServiceLinks {
+  ImageSmall: string;
+}
+
 interface Service {
   CourierName: string;
   Name: string;
   Slug: string;
+  ShortDescriptions?: string;
   MaxHeight: number;
   MaxWidth: number;
   MaxLength: number;
   MaxWeight: number;
-  Links: { ImageSvg: string };
+  Links: ServiceLinks;
 }
 
 interface AvailableExtra {
@@ -22,427 +27,391 @@ interface AvailableExtra {
   Price: number;
   Vat: number;
   Total: number;
-  Details: { IncludedCover: string; MaxWeight: string } | null;
+  Details: {
+    IncludedCover: string;
+    MaxWeight: string;
+  } | null;
 }
 
 interface Quote {
-  Service: Service;
-  TotalPriceExVat: number;
-  TotalPrice: number;
-  EstimatedDeliveryDate: string;
   AvailableExtras: AvailableExtra[];
+  Service: Service;
+  TotalPrice: number;
+  TotalPriceExVat: number;
+  EstimatedDeliveryDate: string;
   IncludedCover: number;
 }
 
-interface Order {
-  inventory: { sku: string; quantity: number; name: string; options: string; price: string; unit_tax: string }[];
-  shipping_name_company: string | null;
-  phone_one: string;
-  email: string;
-  shipping_address_line_two: string | null;
-  id: number;
-  channel_id: number;
-  channel_order_id: string;
-  shipping_name: string;
-  shipping_address_line_one: string;
-  shipping_address_city: string;
-  shipping_address_postcode: string;
-  shipping_address_iso: string;
-  access_url: string;
-  status_description: string;
-  channel_alt_id: string;
-  sale_type: string;
-  total_tax: string;
-  shipping_paid: string;
-  total_discount: string;
-  order_discount: string;
-  total_paid: string;
-  date_received: string;
+interface QuotesResponse {
+  Quotes: Quote[];
 }
 
-export default function DespatchReadyOrders() {
-  const router = useRouter();
-  const { token } = useToken();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [total, setTotal] = useState<number>(0);
+interface LabelResponse {
+  ShipmentLabels: { LabelUrl: string }[];
+}
+
+// Parcel2Go Order Types
+interface ParcelInput {
+  Value: string;
+  Weight: string;
+  Length: string;
+  Width: string;
+  Height: string;
+}
+
+interface Order {
+  CollectionAddress: {
+    Country: string;
+    Property: string;
+    Postcode: string;
+    Town: string;
+  };
+  DeliveryAddress: {
+    Country: string;
+    Property: string;
+    Postcode: string;
+    Town: string;
+  };
+  Parcels: ParcelInput[];
+}
+
+export default function HomeClient() {
+  const searchParams = useSearchParams();
+
+  const [order, setOrder] = useState<Order>({
+    CollectionAddress: {
+      Country: 'GBR',
+      Property: 'Unit 45B Basepoint, Denton Island',
+      Postcode: 'BN9 9BA',
+      Town: 'Newhaven',
+    },
+    DeliveryAddress: {
+      Country: '',
+      Property: '',
+      Postcode: '',
+      Town: '',
+    },
+    Parcels: [{ Value: '', Weight: '', Length: '', Width: '', Height: '' }],
+  });
+
+  const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [expanded, setExpanded] = useState<Set<number>>(new Set());
-
-  const [packageInfo, setPackageInfo] = useState<
-    Record<number, { weight: string; length: string; width: string; height: string }>
-  >({});
-
-  const [quotesMap, setQuotesMap] = useState<Record<number, Quote[]>>({});
-  const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({});
-
-  const iso2to3: Record<string, string> = {
-    GB: 'GBR', US: 'USA', DE: 'DEU', FR: 'FRA', IT: 'ITA', TR: 'TUR',
-    ES: 'ESP', CA: 'CAN', NL: 'NLD', IL: 'ISR', BE: 'BEL', JP: 'JPN',
-    CH: 'CHE', CL: 'CHL', AT: 'AUT',
-  };
-
-  const getChannelLogo = (id: number) => {
-    switch (id) {
-      case 24: case 15: return '/logos/ebay.png';
-      case 27: case 25: case 6: case 2: case 5: case 4: case 3: return '/logos/amazon.png';
-      case 11: return '/logos/etsy.png';
-      case 8: case 7: return '/logos/shopify.png';
-      case 26: return '/logos/woocommerce.png';
-      default: return '/logos/default.png';
-    }
-  };
-
-  const truncateEmail = (email: string) => {
-    const [local, domain] = email.split('@');
-    if (!local || !domain) return email;
-    return local.length > 15
-      ? `${local.slice(0, 5)}[...]${local.slice(-5)}@${domain}`
-      : email;
-  };
+  const [selectedService, setSelectedService] = useState<Quote | null>(null);
+  const [label, setLabel] = useState<LabelResponse | null>(null);
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Record<number, boolean>>({});
 
   const apiBase = 'https://p2g-api.up.railway.app';
 
-  const fetchQuotesForOrder = async (order: Order) => {
-    const country3 = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
-    const info = packageInfo[order.id] || { weight: '', length: '', width: '', height: '' };
-    setLoadingMap(prev => ({ ...prev, [order.id]: true }));
+  // Prefill from search params
+  useEffect(() => {
+    const prop = searchParams.get('deliveryProperty');
+    const parcelVal = searchParams.get('deliveryParcelValue');
+    setOrder(prev => {
+      const updated = { ...prev };
+      if (prop) {
+        updated.DeliveryAddress = {
+          Country: searchParams.get('deliveryCountry') || prev.DeliveryAddress.Country,
+          Property: prop,
+          Postcode: searchParams.get('deliveryPostcode') || prev.DeliveryAddress.Postcode,
+          Town: searchParams.get('deliveryTown') || prev.DeliveryAddress.Town,
+        };
+      }
+      if (parcelVal) {
+        updated.Parcels = [{ ...prev.Parcels[0], Value: parcelVal }];
+      }
+      return updated;
+    });
+  }, [searchParams]);
+
+  // Fetch quotes
+  const getQuotes = async () => {
+    setLoading(true);
+    setError('');
     try {
-      const payload = {
-        CollectionAddress: {
-          Country: 'GBR',
-          Property: 'Unit 45B Basepoint, Denton Island',
-          Postcode: 'BN9 9BA',
-          Town: 'Newhaven',
-        },
-        DeliveryAddress: {
-          Country: country3,
-          Property: order.shipping_address_line_two
-            ? `${order.shipping_address_line_one} ${order.shipping_address_line_two}`
-            : order.shipping_address_line_one,
-          Postcode: order.shipping_address_postcode,
-          Town: order.shipping_address_city,
-        },
-        Parcels: [{
-          Value: parseFloat(order.total_paid) || 0,
-          Weight: parseFloat(info.weight) || 0,
-          Length: parseFloat(info.length) || 0,
-          Width: parseFloat(info.width) || 0,
-          Height: parseFloat(info.height) || 0,
-        }],
+      const parsedOrder = {
+        ...order,
+        Parcels: order.Parcels.map(p => ({
+          Value: parseFloat(p.Value) || 0,
+          Weight: parseFloat(p.Weight) || 0,
+          Length: parseFloat(p.Length) || 0,
+          Width: parseFloat(p.Width) || 0,
+          Height: parseFloat(p.Height) || 0,
+        })),
       };
-      const resp = await axios.post<{ Quotes: Quote[] }>(
+
+      const response = await axios.post<QuotesResponse>(
         `${apiBase}/get-quote`,
-        { order: payload }
+        { order: parsedOrder }
       );
-      setQuotesMap(prev => ({
-        ...prev,
-        [order.id]: resp.data.Quotes
-          .sort((a, b) => a.TotalPrice - b.TotalPrice)
-          .slice(0, 10),
-      }));
-    } catch (e) {
-      console.error(e);
+      setQuotes(response.data.Quotes);
+    } catch (err: any) {
+      console.error(err);
+      setError(
+        axios.isAxiosError(err)
+          ? err.response?.data?.message || err.message
+          : err.message || 'Failed to get quotes.'
+      );
+      setQuotes([]);
     } finally {
-      setLoadingMap(prev => ({ ...prev, [order.id]: false }));
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (!token) return;
-    (async () => {
-      try {
-        const resp = await axios.get<{ total: number; data: Order[] }>(
-          '/api/helm-orders',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'X-Helm-Filter': 'status[]=3',
-            },
-          }
-        );
-        setOrders(resp.data.data || []);
-        setTotal(resp.data.total || 0);
-      } catch {
-        setError('Failed to fetch orders');
-      }
-    })();
-  }, [token]);
+  // Create label
+  const createLabel = async () => {
+    if (!selectedService) {
+      setError('No service selected');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const response = await axios.post<LabelResponse>(
+        `${apiBase}/create-label`,
+        { labelData: { ...order, SelectedService: selectedService } }
+      );
+      setLabel(response.data);
+    } catch (err: any) {
+      console.error(err);
+      setError(
+        axios.isAxiosError(err)
+          ? err.response?.data?.message || err.message
+          : err.message || 'Failed to create label.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className={styles.main}>
-      <h1 className={styles.title}>Despatch Ready Orders ({total})</h1>
-      {error && <p className={styles.error}>{error}</p>}
-      {!error && !orders.length && (
-        <p className={styles.subTitle}>No despatch-ready orders found.</p>
+    <main className={styles.main}>
+      <h1 className={styles.title}>Parcel2Go Integration</h1>
+
+      {loading && <p className={styles.loading}>Loading...</p>}
+      {error && <p className={styles.error}>Error: {error}</p>}
+
+      {!quotes.length && !label && (
+        <div className={styles.formSection}>
+          <h2 className={styles.sectionTitle}>Manual Quote</h2>
+
+          <h3 className={styles.subTitle}>Sender Address</h3>
+          {(['Country', 'Property', 'Postcode', 'Town'] as const).map(field => (
+            <input
+              key={field}
+              className={styles.input}
+              placeholder={
+                field === 'Country' ? 'Country (e.g., GBR)' : `Collection ${field}`
+              }
+              value={order.CollectionAddress[field]}
+              onChange={e =>
+                setOrder({
+                  ...order,
+                  CollectionAddress: {
+                    ...order.CollectionAddress,
+                    [field]: e.target.value,
+                  },
+                })
+              }
+            />
+          ))}
+
+          <h3 className={styles.subTitle}>Delivery Address</h3>
+          {(['Country', 'Property', 'Postcode', 'Town'] as const).map(field => (
+            <input
+              key={field}
+              className={styles.input}
+              placeholder={
+                field === 'Country' ? 'Country (e.g., GBR)' : `Delivery ${field}`
+              }
+              value={order.DeliveryAddress[field]}
+              onChange={e =>
+                setOrder({
+                  ...order,
+                  DeliveryAddress: {
+                    ...order.DeliveryAddress,
+                    [field]: e.target.value,
+                  },
+                })
+              }
+            />
+          ))}
+
+          <h3 className={styles.subTitle}>Parcel Details</h3>
+          {(['Value', 'Weight', 'Length', 'Width', 'Height'] as const).map(field => (
+            <input
+              key={field}
+              className={styles.input}
+              placeholder={
+                `Parcel ${field}` +
+                (field === 'Weight'
+                  ? ' (kg)'
+                  : ['Length', 'Width', 'Height'].includes(field)
+                  ? ' (cm)'
+                  : '')
+              }
+              type="number"
+              value={order.Parcels[0][field as keyof ParcelInput]}
+              onChange={e =>
+                setOrder({
+                  ...order,
+                  Parcels: [{ ...order.Parcels[0], [field]: e.target.value }],
+                })
+              }
+            />
+          ))}
+
+          <button onClick={getQuotes} className={styles.primaryButton}>
+            Get Quotes
+          </button>
+        </div>
       )}
-      {orders.length > 0 && (
+
+      {quotes.length > 0 && !label && (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th/>
-                <th className={styles.orderColumn}>Order</th>
-                <th className={styles.customerColumn}>Customer</th>
-                <th className={styles.itemsColumn}>Items</th>
-                <th className={styles.totalColumn}>Total</th>
-                <th className={styles.actionColumn}>Action</th>
+                <th></th>
+                <th>Courier</th>
+                <th>Service</th>
+                <th>Price (excl. VAT)</th>
+                <th>Total Price</th>
+                <th>Est. Delivery</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
-              {orders.map(order => {
-                const totalPaid = parseFloat(order.total_paid) || 0;
-                const shippingCost = parseFloat(order.shipping_paid) || 0;
-                const country3 = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
-                const baseValue = totalPaid - shippingCost;
-                const parcelValue = country3 === 'GBR' ? baseValue / 1.2 : baseValue;
-                const info = packageInfo[order.id] || { weight: '', length: '', width: '', height: '' };
+              {quotes
+                .slice()
+                .sort((a, b) => a.TotalPrice - b.TotalPrice)
+                .map((quote, idx) => {
+                  const svc = quote.Service;
+                  const isExpanded = !!expandedDescriptions[idx];
 
-                return (
-                  <Fragment key={order.id}>
-                    <tr className={styles.quotesRow}>
-                      <td
-                        className={styles.expandCell}
-                        onClick={() =>
-                          setExpanded(p => {
-                            const n = new Set(p);
-                            n.has(order.id) ? n.delete(order.id) : n.add(order.id);
-                            return n;
-                          })
-                        }
-                      >
-                        {expanded.has(order.id) ? '▼' : '►'}
-                      </td>
-                      <td>
-                        <div className={styles.orderCell}>
+                  return (
+                    <>
+                      <tr key={`svc-${idx}`}>
+                        <td>
                           <img
-                            src={getChannelLogo(order.channel_id)}
+                            src={svc.Links.ImageSmall}
+                            alt={svc.Name}
                             className={styles.logo}
-                            alt=""
                           />
-                          <strong>{order.channel_order_id}</strong>
-                        </div>
-                      </td>
-                      <td>{order.shipping_name_company || order.shipping_name}</td>
-                      <td>
-                        {order.inventory.length} item
-                        {order.inventory.length > 1 ? 's' : ''}
-                      </td>
-                      <td className={styles.totalColumn}>
-                        £{totalPaid.toFixed(2)}
-                      </td>
-                      <td className={styles.actionColumn}>
-                        <a
-                          href={order.access_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={styles.selectButton}
-                        >
-                          ↗
-                        </a>
-                      </td>
-                    </tr>
-
-                    {expanded.has(order.id) && (
-                      <>
-                        <tr className={styles.summaryRow}>
-                          <td/>
-                          <td>
-                            <div className={styles.orderCell}>
-                              <div>{order.date_received}</div>
-                              <div><strong>Alt ID:</strong> {order.channel_alt_id}</div>
-                              <div><strong>Sale:</strong> {order.sale_type}</div>
-                              <div>{order.status_description}</div>
-                            </div>
-                          </td>
-                          <td>
-                            <div className={styles.orderCell}>
-                              <div><strong>Phone:</strong> {order.phone_one}</div>
-                              <div><strong>Email:</strong> {truncateEmail(order.email)}</div>
-                              <div>
-                                <strong>Address:</strong> {order.shipping_address_line_one}
-                                {order.shipping_address_line_two ? ` ${order.shipping_address_line_two}` : ''}
-                                , {order.shipping_address_city}, {order.shipping_address_postcode}, {country3}
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <div className={styles.orderCell}>
-                              {order.inventory.map((i, idx) => (
-                                <div key={idx}>
-                                  <strong>{i.name}</strong> (x{i.quantity})
-                                </div>
-                              ))}
-                            </div>
-                          </td>
-                          <td className={styles.totalColumn}>
-                            <div className={styles.orderCell}>
-                              <div><strong>Total Tax:</strong> £{parseFloat(order.total_tax).toFixed(2)}</div>
-                              <div><strong>Shipping:</strong> £{shippingCost.toFixed(2)}</div>
-                              <div><strong>Parcel Val.:</strong> £{parcelValue.toFixed(2)}</div>
-                            </div>
-                          </td>
-                          <td className={styles.actionColumn}>
-                            <div className={styles.orderCell}>
-                              <div><strong>Package Info</strong></div>
-                              <label>
-                                Weight (kg):{' '}
-                                <input
-                                  type="number"
-                                  size={4}
-                                  value={info.weight}
-                                  onChange={e =>
-                                    setPackageInfo(p => ({
-                                      ...p,
-                                      [order.id]: { ...info, weight: e.target.value }
-                                    }))
-                                  }
-                                />
-                              </label>
-                              <label>
-                                Length (cm):{' '}
-                                <input
-                                  type="number"
-                                  size={4}
-                                  value={info.length}
-                                  onChange={e =>
-                                    setPackageInfo(p => ({
-                                      ...p,
-                                      [order.id]: { ...info, length: e.target.value }
-                                    }))
-                                  }
-                                />
-                              </label>
-                              <label>
-                                Width (cm):{' '}
-                                <input
-                                  type="number"
-                                  size={4}
-                                  value={info.width}
-                                  onChange={e =>
-                                    setPackageInfo(p => ({
-                                      ...p,
-                                      [order.id]: { ...info, width: e.target.value }
-                                    }))
-                                  }
-                                />
-                              </label>
-                              <label>
-                                Height (cm):{' '}
-                                <input
-                                  type="number"
-                                  size={4}
-                                  value={info.height}
-                                  onChange={e =>
-                                    setPackageInfo(p => ({
-                                      ...p,
-                                      [order.id]: { ...info, height: e.target.value }
-                                    }))
-                                  }
-                                />
-                              </label>
+                        </td>
+                        <td>
+                          <span className={styles.bold}>{svc.CourierName}</span><br/>
+                          <span className={styles.maxdims}>{svc.Slug}</span>
+                        </td>
+                        <td>
+                          <span className={styles.bold}>{svc.Name}</span>
+                          {svc.ShortDescriptions && (
+                            <>
                               <button
-                                onClick={() => fetchQuotesForOrder(order)}
-                                className={styles.primaryButton}
+                                className={styles.toggleButton}
+                                onClick={() =>
+                                  setExpandedDescriptions(prev => ({
+                                    ...prev,
+                                    [idx]: !prev[idx],
+                                  }))
+                                }
                               >
-                                Get Quotes
+                                {isExpanded ? 'Hide Details' : 'Show Details'}
                               </button>
-                            </div>
-                          </td>
-                        </tr>
+                              {isExpanded && (
+                                <div
+                                  className={styles.description}
+                                  dangerouslySetInnerHTML={{ __html: svc.ShortDescriptions! }}
+                                />
+                              )}
+                            </>
+                          )}
+                          <br />
+                          <span className={styles.maxdims}>
+                            Max: {svc.MaxWeight}kg MaxDims:{' '}
+                            {svc.MaxHeight * 100} x {svc.MaxWidth * 100} x{' '}
+                            {svc.MaxLength * 100} cm
+                          </span>
+                        </td>
+                        <td>£{quote.TotalPriceExVat.toFixed(2)}</td>
+                        <td>£{quote.TotalPrice.toFixed(2)}</td>
+                        <td>{new Date(quote.EstimatedDeliveryDate).toLocaleDateString()}</td>
+                        <td>
+                          <button
+                            onClick={() => {
+                              setSelectedService(quote);
+                              createLabel();
+                            }}
+                            className={styles.selectButton}
+                          >
+                            Select
+                          </button>
+                        </td>
+                      </tr>
 
-                        {loadingMap[order.id] && (
-                          <tr className={styles.quotesRow}>
-                            <td/>
-                            <td colSpan={5}>Getting cheapest 10 quotes...</td>
-                          </tr>
-                        )}
+                      {(() => {
+                        const extCover = quote.AvailableExtras.find(
+                          e => e.Type === 'ExtendedBaseCover'
+                        );
 
-                        {quotesMap[order.id]?.map((q, idx) => {
-                          const currentProtection = q.IncludedCover;
-                          const extCover = q.AvailableExtras.find(e => e.Type === 'ExtendedCover');
-                          const extendedProtection = extCover?.Details
-                            ? parseFloat(extCover.Details.IncludedCover)
-                            : 0;
-                          const totalWithExtended = q.TotalPrice + (extCover?.Total ?? 0);
+                        if (extCover && extCover.Details) {
+                          const currentProtection = quote.IncludedCover;
+                          const extendedProtection = parseFloat(
+                            extCover.Details.IncludedCover
+                          );
+                          const totalWithExtended = quote.TotalPrice + extCover.Total;
 
-                          // Build the main quote row
-                          const quoteRow = (
-                            <tr key={`quote-${order.id}-${idx}`} className={styles.quotesRow}>
-                              <td/>
-                              <td className={styles.orderCell}>
-                                <img
-                                  src={q.Service.Links.ImageSvg}
-                                  alt={`${q.Service.CourierName} logo`}
-                                  className={styles.logo}
-                                />{' '}
-                                {q.Service.CourierName}
+                          return (
+                            <tr key={`extra-${idx}`} className={styles.extraRow}>
+                              <td />
+                              <td colSpan={5}>
+                                <strong>
+                                  INFO: Current Protection: £{currentProtection.toFixed(0)} | Book
+                                  with £{extendedProtection.toFixed(0)} Protection Total: £
+                                  {totalWithExtended.toFixed(2)}
+                                </strong>
                               </td>
-                              <td>
-                                <strong>{q.Service.Name}</strong><br/>
-                                ({q.Service.Slug})
-                              </td>
-                              <td>
-                                <strong>Est. Delivery</strong><br/>
-                                {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}<br/>
-                                <strong>Max:</strong> {q.Service.MaxWeight} kg<br/>
-                                {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100} cm
-                              </td>
-                              <td>
-                                <strong>£{q.TotalPrice.toFixed(2)}</strong><br/>
-                                Exc. VAT (£{q.TotalPriceExVat.toFixed(2)})
-                              </td>
-                              <td/>
+                              <td />
                             </tr>
                           );
-
-                          // Build the INFO row based on currentProtection
-                          let infoRow: JSX.Element | null = null;
-                          if (currentProtection === 0) {
-                            // first INFO variant
-                            infoRow = (
-                              <tr key={`info-zero-${order.id}-${idx}`} className={styles.extraRow}>
-                                <td/>
-                                <td colSpan={5}>
-                                  <strong>
-                                    INFO: Current Protection: £{currentProtection.toFixed(0)} |{' '}
-                                    Book with £{extendedProtection.toFixed(0)} Protection — Total: £
-                                    {totalWithExtended.toFixed(2)}
-                                  </strong>
-                                </td>
-                              </tr>
-                            );
-                          } else if (currentProtection > 0) {
-                            // second INFO variant
-                            infoRow = (
-                              <tr key={`info-pos-${order.id}-${idx}`} className={styles.extraRow}>
-                                <td/>
-                                <td colSpan={5}>
-                                  <strong>
-                                    INFO: Current Protection: £{currentProtection.toFixed(0)} |{' '}
-                                    Extended protection not available.
-                                  </strong>
-                                </td>
-                              </tr>
-                            );
-                          }
-
-                          // Return both rows
+                        } else if (quote.IncludedCover > 0) {
                           return (
-                            <Fragment key={`group-${order.id}-${idx}`}>
-                              {quoteRow}
-                              {infoRow}
-                            </Fragment>
+                            <tr key={`included-${idx}`} className={styles.extraRow}>
+                              <td />
+                              <td colSpan={5}>
+                                <strong>
+                                  INFO: Current Protection: £
+                                  {quote.IncludedCover.toFixed(0)} | Extended protection not available.
+                                </strong>
+                              </td>
+                              <td />
+                            </tr>
                           );
-                        })}
-                      </>
-                    )}
-                  </Fragment>
-                );
-              })}
+                        }
+
+                        return null;
+                      })()}
+                    </>
+                  );
+                })}
             </tbody>
           </table>
         </div>
       )}
-    </div>
+
+      {label && (
+        <div className={styles.labelSection}>
+          <h2 className={styles.sectionTitle}>Label Created!</h2>
+          <a
+            href={label.ShipmentLabels[0].LabelUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.downloadButton}
+          >
+            Download Label
+          </a>
+        </div>
+      )}
+    </main>
   );
 }
