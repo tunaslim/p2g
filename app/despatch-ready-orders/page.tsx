@@ -150,7 +150,7 @@ export default function DespatchReadyOrders() {
             <thead>
               <tr>
                 <th/>
-                <th>Order</th>
+                <th className={styles.orderColumn}>Order</th>
                 <th className={styles.customerColumn}>Customer</th>
                 <th className={styles.itemsColumn}>Items</th>
                 <th className={styles.totalColumn}>Total</th>
