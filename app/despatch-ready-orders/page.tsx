@@ -1,4 +1,3 @@
-```tsx
 'use client';
 import { useEffect, useState, Fragment } from 'react';
 import { useRouter } from 'next/navigation';
