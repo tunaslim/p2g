@@ -182,7 +182,7 @@ export default function DespatchReadyOrders() {
                       <>
                         <tr className={styles.summaryRow}>
                           <td/>
-                          <td><div className={styles.orderCell}><div>{order.date_received}</div><div><strong>Alt ID:</strong> {order.channel_alt_id}</div><div><strong>Sale:</strong> {order.sale_type}</div></div></td>
+                          <td><div className={styles.orderCell}><div>{order.date_received}</div><div><strong>Alt ID:</strong> {order.channel_alt_id}</div><div><strong>Sale:</strong> {order.sale_type}</div><div>{order.status_description}</div></div></td>
                           <td><div className={styles.orderCell}><div><strong>Phone:</strong> {order.phone_one}</div><div><strong>Email:</strong> {truncateEmail(order.email)}</div><div><strong>Address:</strong> {order.shipping_address_line_one}{order.shipping_address_line_two?` ${order.shipping_address_line_two}`:''}, {order.shipping_address_city}, {order.shipping_address_postcode}, {country3}</div></div></td>
                           <td><div className={styles.orderCell}>{order.inventory.map((i,idx)=><div key={idx}><strong>{i.name}</strong> (x{i.quantity})</div>)}</div></td>
                           <td className={styles.totalColumn}><div className={styles.orderCell}><div><strong>Total Tax:</strong> £{parseFloat(order.total_tax).toFixed(2)}</div><div><strong>Shipping:</strong> £{shippingCost.toFixed(2)}</div><div><strong>Parcel Val.:</strong> £{parcelValue.toFixed(2)}</div></div></td>
