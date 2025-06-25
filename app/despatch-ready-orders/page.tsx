@@ -23,6 +23,19 @@ interface Quote {
   TotalPriceExVat: number;
   TotalPrice: number;
   EstimatedDeliveryDate: string;
+  AvailableExtras: AvailableExtra[];
+  IncludedCover: number;
+}
+
+interface AvailableExtra {
+  Type: string;
+  Price: number;
+  Vat: number;
+  Total: number;
+  Details: {
+    IncludedCover: string;
+    MaxWeight: string;
+  } | null;
 }
 
 interface Order {
