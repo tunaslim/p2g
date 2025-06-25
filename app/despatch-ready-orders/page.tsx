@@ -117,7 +117,7 @@ export default function DespatchReadyOrders() {
       const resp = await axios.post<{ Quotes: Quote[] }>(`${apiBase}/get-quote`, { order: payload });
       setQuotesMap(prev => ({
         ...prev,
-        [order.id]: resp.data.Quotes.sort((a,b)=>a.TotalPrice-b.TotalPrice).slice(0,5)
+        [order.id]: resp.data.Quotes.sort((a,b)=>a.TotalPrice-b.TotalPrice).slice(0,10)
       }));
     } catch (e) { console.error(e); } finally {
       setLoadingMap(prev => ({ ...prev, [order.id]: false }));
@@ -188,7 +188,7 @@ export default function DespatchReadyOrders() {
                           <td className={styles.totalColumn}><div className={styles.orderCell}><div><strong>Total Tax:</strong> £{parseFloat(order.total_tax).toFixed(2)}</div><div><strong>Shipping:</strong> £{shippingCost.toFixed(2)}</div><div><strong>Parcel Val.:</strong> £{parcelValue.toFixed(2)}</div></div></td>
                           <td className={styles.actionColumn}><div className={styles.orderCell}><div><strong>Package Info</strong></div><label>Weight (kg): <input type="number" size={4} value={info.weight} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,weight:e.target.value}}))}/></label><label>Length (cm): <input type="number" size={4} value={info.length} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,length:e.target.value}}))}/></label><label>Width (cm): <input type="number" size={4} value={info.width} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,width:e.target.value}}))}/></label><label>Height (cm): <input type="number" size={4} value={info.height} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,height:e.target.value}}))}/></label><button onClick={()=>fetchQuotesForOrder(order)} className={styles.primaryButton}>Get Quotes</button></div></td>
                         </tr>
-                        {loadingMap[order.id]&&<tr className={styles.quotesRow}><td/><td colSpan={5}>Getting cheapest 5 quotes...</td></tr>}
+                        {loadingMap[order.id]&&<tr className={styles.quotesRow}><td/><td colSpan={5}>Getting cheapest 10 quotes...</td></tr>}
                         {quotesMap[order.id]?.map((q,idx)=>(
                           <tr key={idx} className={styles.quotesRow}>
                             <td/>
