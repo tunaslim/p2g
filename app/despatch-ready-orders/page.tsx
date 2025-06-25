@@ -151,8 +151,8 @@ export default function DespatchReadyOrders() {
               <tr>
                 <th/>
                 <th>Order</th>
-                <th>Customer</th>
-                <th>Items</th>
+                <th className={styles.customerColumn}>Customer</th>
+                <th className={styles.itemsColumn}>Items</th>
                 <th className={styles.totalColumn}>Total</th>
                 <th className={styles.actionColumn}>Action</th>
               </tr>
