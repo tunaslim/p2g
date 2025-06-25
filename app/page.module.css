@@ -58,7 +58,10 @@
   font-size: 0.9rem;
   line-height: 1.4;
 }
-
+.orderColumn {
+  min-width: 150px;
+  width: 200px;
+}
 .customerColumn {
   min-width: 300px;
   width: 400px;
