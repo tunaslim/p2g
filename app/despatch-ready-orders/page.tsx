@@ -385,14 +385,11 @@ export default function DespatchReadyOrders() {
                         {quotesMap[order.id]?.map((q, idx) => {
                           const currentProtection = q.IncludedCover;
                           const extCover = q.AvailableExtras.find(
-                            e =>
-                              e.Details != null &&
-                              e.Details.IncludedCover != null &&
-                              /\d/.test(e.Details.IncludedCover)
+                          e => e.Details?.IncludedCover != null && /\d/.test(e.Details.IncludedCover)
                           );
                           const extendedProtection = extCover
-                            ? parseFloat(extCover.Details.IncludedCover.replace(/[^0-9.]/g, ''))
-                            : 0;
+                          ? parseFloat(extCover.Details!.IncludedCover.replace(/[^0-9.]/g, ''))
+                          : 0;
                           const totalWithExtended = q.TotalPrice + (extCover?.Total ?? 0);
 
                           const quoteRow = (
