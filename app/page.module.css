@@ -59,6 +59,16 @@
   line-height: 1.4;
 }
 
+.customerColumn {
+  min-width: 300px;
+  width: 400px;
+}
+.itemsColumn {
+  min-width: 300px;
+  width: 450px;
+  text-align: center;
+}
+
 .totalColumn {
   min-width: 100px;
   width: 150px;
