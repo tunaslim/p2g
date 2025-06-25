@@ -1,3 +1,4 @@
+```tsx
 'use client';
 import { useEffect, useState, Fragment } from 'react';
 import { useRouter } from 'next/navigation';
@@ -18,15 +19,6 @@ interface Service {
     ImageSvg: string;
   };
 }
-interface Quote {
-  Service: Service;
-  TotalPriceExVat: number;
-  TotalPrice: number;
-  EstimatedDeliveryDate: string;
-  AvailableExtras: AvailableExtra[];
-  IncludedCover: number;
-}
-
 interface AvailableExtra {
   Type: string;
   Price: number;
@@ -36,6 +28,14 @@ interface AvailableExtra {
     IncludedCover: string;
     MaxWeight: string;
   } | null;
+}
+interface Quote {
+  Service: Service;
+  TotalPriceExVat: number;
+  TotalPrice: number;
+  EstimatedDeliveryDate: string;
+  AvailableExtras: AvailableExtra[];
+  IncludedCover: number;
 }
 
 interface Order {
@@ -73,7 +73,9 @@ export default function DespatchReadyOrders() {
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   // Package input state per order
-  const [packageInfo, setPackageInfo] = useState<Record<number, { weight: string; length: string; width: string; height: string }>>({});
+  const [packageInfo, setPackageInfo] = useState<
+    Record<number, { weight: string; length: string; width: string; height: string }>
+  >({});
 
   // Quotes and loading state per order
   const [quotesMap, setQuotesMap] = useState<Record<number, Quote[]>>({});
@@ -99,7 +101,9 @@ export default function DespatchReadyOrders() {
   const truncateEmail = (email: string) => {
     const [local, domain] = email.split('@');
     if (!local || !domain) return email;
-    return local.length > 15 ? `${local.slice(0,5)}[...]${local.slice(-5)}@${domain}` : email;
+    return local.length > 15
+      ? `${local.slice(0, 5)}[...]${local.slice(-5)}@${domain}`
+      : email;
   };
 
   const apiBase = 'https://p2g-api.up.railway.app';
@@ -110,7 +114,12 @@ export default function DespatchReadyOrders() {
     setLoadingMap(prev => ({ ...prev, [order.id]: true }));
     try {
       const payload = {
-        CollectionAddress: { Country: 'GBR', Property: 'Unit 45B Basepoint, Denton Island', Postcode: 'BN9 9BA', Town: 'Newhaven' },
+        CollectionAddress: {
+          Country: 'GBR',
+          Property: 'Unit 45B Basepoint, Denton Island',
+          Postcode: 'BN9 9BA',
+          Town: 'Newhaven'
+        },
         DeliveryAddress: {
           Country: country3,
           Property: order.shipping_address_line_two
@@ -127,12 +136,19 @@ export default function DespatchReadyOrders() {
           Height: parseFloat(info.height) || 0,
         }]
       };
-      const resp = await axios.post<{ Quotes: Quote[] }>(`${apiBase}/get-quote`, { order: payload });
+      const resp = await axios.post<{ Quotes: Quote[] }>(
+        `${apiBase}/get-quote`,
+        { order: payload }
+      );
       setQuotesMap(prev => ({
         ...prev,
-        [order.id]: resp.data.Quotes.sort((a,b)=>a.TotalPrice-b.TotalPrice).slice(0,10)
+        [order.id]: resp.data.Quotes
+          .sort((a, b) => a.TotalPrice - b.TotalPrice)
+          .slice(0, 10)
       }));
-    } catch (e) { console.error(e); } finally {
+    } catch (e) {
+      console.error(e);
+    } finally {
       setLoadingMap(prev => ({ ...prev, [order.id]: false }));
     }
   };
@@ -141,9 +157,15 @@ export default function DespatchReadyOrders() {
     if (!token) return;
     (async () => {
       try {
-        const resp = await axios.get<{ total: number; data: Order[] }>('/api/helm-orders', {
-          headers: { Authorization: `Bearer ${token}`, 'X-Helm-Filter': 'status[]=3' }
-        });
+        const resp = await axios.get<{ total: number; data: Order[] }>(
+          '/api/helm-orders',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'X-Helm-Filter': 'status[]=3'
+            }
+          }
+        );
         setOrders(resp.data.data || []);
         setTotal(resp.data.total || 0);
       } catch {
@@ -156,7 +178,9 @@ export default function DespatchReadyOrders() {
     <div className={styles.main}>
       <h1 className={styles.title}>Despatch Ready Orders ({total})</h1>
       {error && <p className={styles.error}>{error}</p>}
-      {!error && !orders.length && <p className={styles.subTitle}>No despatch-ready orders found.</p>}
+      {!error && !orders.length && (
+        <p className={styles.subTitle}>No despatch-ready orders found.</p>
+      )}
       {orders.length > 0 && (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
@@ -172,53 +196,284 @@ export default function DespatchReadyOrders() {
             </thead>
             <tbody>
               {orders.map(order => {
-                const totalPaid = parseFloat(order.total_paid)||0;
-                const shippingCost = parseFloat(order.shipping_paid)||0;
-                const country3 = iso2to3[order.shipping_address_iso]||order.shipping_address_iso;
+                const totalPaid = parseFloat(order.total_paid) || 0;
+                const shippingCost = parseFloat(order.shipping_paid) || 0;
+                const country3 = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
                 const baseValue = totalPaid - shippingCost;
-                const parcelValue = country3==='GBR'?baseValue/1.2:baseValue;
-                const info = packageInfo[order.id]||{weight:'',length:'',width:'',height:''};
+                const parcelValue = country3 === 'GBR' ? baseValue / 1.2 : baseValue;
+                const info = packageInfo[order.id] || { weight: '', length: '', width: '', height: '' };
 
                 return (
                   <Fragment key={order.id}>
                     <tr className={styles.quotesRow}>
-                      <td className={styles.expandCell} onClick={()=>setExpanded(p=>{const n=new Set(p);n.has(order.id)?n.delete(order.id):n.add(order.id);return n;})}>
-                        {expanded.has(order.id)?'▼':'►'}
+                      <td
+                        className={styles.expandCell}
+                        onClick={() =>
+                          setExpanded(p => {
+                            const n = new Set(p);
+                            n.has(order.id) ? n.delete(order.id) : n.add(order.id);
+                            return n;
+                          })
+                        }
+                      >
+                        {expanded.has(order.id) ? '▼' : '►'}
                       </td>
-                      <td><div className={styles.orderCell}><img src={getChannelLogo(order.channel_id)} className={styles.logo} alt=""/><strong>{order.channel_order_id}</strong></div></td>
-                      <td>{order.shipping_name_company||order.shipping_name}</td>
-                      <td>{order.inventory.length} item{order.inventory.length>1?'s':''}</td>
-                      <td className={styles.totalColumn}>£{totalPaid.toFixed(2)}</td>
-                      <td className={styles.actionColumn}><a href={order.access_url} target="_blank" rel="noopener noreferrer" className={styles.selectButton}>↗</a></td>
+                      <td>
+                        <div className={styles.orderCell}>
+                          <img
+                            src={getChannelLogo(order.channel_id)}
+                            className={styles.logo}
+                            alt=""
+                          />
+                          <strong>{order.channel_order_id}</strong>
+                        </div>
+                      </td>
+                      <td>{order.shipping_name_company || order.shipping_name}</td>
+                      <td>
+                        {order.inventory.length} item
+                        {order.inventory.length > 1 ? 's' : ''}
+                      </td>
+                      <td className={styles.totalColumn}>
+                        £{totalPaid.toFixed(2)}
+                      </td>
+                      <td className={styles.actionColumn}>
+                        <a
+                          href={order.access_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.selectButton}
+                        >
+                          ↗
+                        </a>
+                      </td>
                     </tr>
-                    {expanded.has(order.id)&&(
+
+                    {expanded.has(order.id) && (
                       <>
                         <tr className={styles.summaryRow}>
                           <td/>
-                          <td><div className={styles.orderCell}><div>{order.date_received}</div><div><strong>Alt ID:</strong> {order.channel_alt_id}</div><div><strong>Sale:</strong> {order.sale_type}</div><div>{order.status_description}</div></div></td>
-                          <td><div className={styles.orderCell}><div><strong>Phone:</strong> {order.phone_one}</div><div><strong>Email:</strong> {truncateEmail(order.email)}</div><div><strong>Address:</strong> {order.shipping_address_line_one}{order.shipping_address_line_two?` ${order.shipping_address_line_two}`:''}, {order.shipping_address_city}, {order.shipping_address_postcode}, {country3}</div></div></td>
-                          <td><div className={styles.orderCell}>{order.inventory.map((i,idx)=><div key={idx}><strong>{i.name}</strong> (x{i.quantity})</div>)}</div></td>
-                          <td className={styles.totalColumn}><div className={styles.orderCell}><div><strong>Total Tax:</strong> £{parseFloat(order.total_tax).toFixed(2)}</div><div><strong>Shipping:</strong> £{shippingCost.toFixed(2)}</div><div><strong>Parcel Val.:</strong> £{parcelValue.toFixed(2)}</div></div></td>
-                          <td className={styles.actionColumn}><div className={styles.orderCell}><div><strong>Package Info</strong></div><label>Weight (kg): <input type="number" size={4} value={info.weight} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,weight:e.target.value}}))}/></label><label>Length (cm): <input type="number" size={4} value={info.length} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,length:e.target.value}}))}/></label><label>Width (cm): <input type="number" size={4} value={info.width} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,width:e.target.value}}))}/></label><label>Height (cm): <input type="number" size={4} value={info.height} onChange={e=>setPackageInfo(p=>({...p,[order.id]:{...info,height:e.target.value}}))}/></label><button onClick={()=>fetchQuotesForOrder(order)} className={styles.primaryButton}>Get Quotes</button></div></td>
+                          <td>
+                            <div className={styles.orderCell}>
+                              <div>{order.date_received}</div>
+                              <div>
+                                <strong>Alt ID:</strong> {order.channel_alt_id}
+                              </div>
+                              <div>
+                                <strong>Sale:</strong> {order.sale_type}
+                              </div>
+                              <div>{order.status_description}</div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className={styles.orderCell}>
+                              <div>
+                                <strong>Phone:</strong> {order.phone_one}
+                              </div>
+                              <div>
+                                <strong>Email:</strong> {truncateEmail(order.email)}
+                              </div>
+                              <div>
+                                <strong>Address:</strong>{' '}
+                                {order.shipping_address_line_one}
+                                {order.shipping_address_line_two
+                                  ? ` ${order.shipping_address_line_two}`
+                                  : ''}
+                                , {order.shipping_address_city},{' '}
+                                {order.shipping_address_postcode},{' '}
+                                {country3}
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className={styles.orderCell}>
+                              {order.inventory.map((i, idx) => (
+                                <div key={idx}>
+                                  <strong>{i.name}</strong> (x{i.quantity})
+                                </div>
+                              ))}
+                            </div>
+                          </td>
+                          <td className={styles.totalColumn}>
+                            <div className={styles.orderCell}>
+                              <div>
+                                <strong>Total Tax:</strong> £
+                                {parseFloat(order.total_tax).toFixed(2)}
+                              </div>
+                              <div>
+                                <strong>Shipping:</strong> £
+                                {shippingCost.toFixed(2)}
+                              </div>
+                              <div>
+                                <strong>Parcel Val.:</strong> £
+                                {parcelValue.toFixed(2)}
+                              </div>
+                            </div>
+                          </td>
+                          <td className={styles.actionColumn}>
+                            <div className={styles.orderCell}>
+                              <div>
+                                <strong>Package Info</strong>
+                              </div>
+                              <label>
+                                Weight (kg):{' '}
+                                <input
+                                  type="number"
+                                  size={4}
+                                  value={info.weight}
+                                  onChange={e =>
+                                    setPackageInfo(p => ({
+                                      ...p,
+                                      [order.id]: {
+                                        ...info,
+                                        weight: e.target.value
+                                      }
+                                    }))
+                                  }
+                                />
+                              </label>
+                              <label>
+                                Length (cm):{' '}
+                                <input
+                                  type="number"
+                                  size={4}
+                                  value={info.length}
+                                  onChange={e =>
+                                    setPackageInfo(p => ({
+                                      ...p,
+                                      [order.id]: {
+                                        ...info,
+                                        length: e.target.value
+                                      }
+                                    }))
+                                  }
+                                />
+                              </label>
+                              <label>
+                                Width (cm):{' '}
+                                <input
+                                  type="number"
+                                  size={4}
+                                  value={info.width}
+                                  onChange={e =>
+                                    setPackageInfo(p => ({
+                                      ...p,
+                                      [order.id]: {
+                                        ...info,
+                                        width: e.target.value
+                                      }
+                                    }))
+                                  }
+                                />
+                              </label>
+                              <label>
+                                Height (cm):{' '}
+                                <input
+                                  type="number"
+                                  size={4}
+                                  value={info.height}
+                                  onChange={e =>
+                                    setPackageInfo(p => ({
+                                      ...p,
+                                      [order.id]: {
+                                        ...info,
+                                        height: e.target.value
+                                      }
+                                    }))
+                                  }
+                                />
+                              </label>
+                              <button
+                                onClick={() => fetchQuotesForOrder(order)}
+                                className={styles.primaryButton}
+                              >
+                                Get Quotes
+                              </button>
+                            </div>
+                          </td>
                         </tr>
-                        {loadingMap[order.id]&&<tr className={styles.quotesRow}><td/><td colSpan={5}>Getting cheapest 10 quotes...</td></tr>}
-                        {quotesMap[order.id]?.map((q,idx)=>(
-                          <tr key={idx} className={styles.quotesRow}>
+
+                        {loadingMap[order.id] && (
+                          <tr className={styles.quotesRow}>
                             <td/>
-                            <td className={styles.orderCell}>
-                              <img
-                                src={q.Service.Links.ImageSvg}
-                                alt={`${q.Service.CourierName} logo`}
-                                className={styles.logo}
-                                />{' '}
-                                {q.Service.CourierName}
+                            <td colSpan={5}>
+                              Getting cheapest 10 quotes...
                             </td>
-                            <td><strong>{q.Service.Name}</strong><br/>({q.Service.Slug})</td>
-                            <td><strong>Est. Delivery&nbsp;&nbsp;&nbsp;</strong><strong>Max: </strong>{q.Service.MaxWeight}kg<br/>{'\u00A0\u00A0'}{new Date(q.EstimatedDeliveryDate).toLocaleDateString()}{'\u00A0\u00A0\u00A0\u00A0\u00A0'}{q.Service.MaxHeight*100}x{q.Service.MaxWidth*100}x{q.Service.MaxLength*100}cm</td>
-                            <td><strong>£{q.TotalPrice.toFixed(2)}</strong><br/>Exc.VAT (£{q.TotalPriceExVat.toFixed(2)})</td>
-                            <td></td>
                           </tr>
-                        ))}
+                        )}
+
+                        {quotesMap[order.id]?.map((q, idx) => {
+                          const extCover = q.AvailableExtras.find(
+                            e => e.Type === 'ExtendedCover'
+                          );
+                          const currentProtection = q.IncludedCover;
+                          const extendedProtection = extCover?.Details
+                            ? parseFloat(extCover.Details.IncludedCover)
+                            : null;
+                          const totalWithExtended =
+                            extendedProtection !== null
+                              ? q.TotalPrice + (extCover?.Total ?? 0)
+                              : null;
+
+                          return (
+                            <Fragment
+                              key={`quote-${order.id}-${idx}`}
+                            >
+                              <tr className={styles.quotesRow}>
+                                <td/>
+                                <td className={styles.orderCell}>
+                                  <img
+                                    src={q.Service.Links.ImageSvg}
+                                    alt={`${q.Service.CourierName} logo`}
+                                    className={styles.logo}
+                                  />{' '}
+                                  {q.Service.CourierName}
+                                </td>
+                                <td>
+                                  <strong>{q.Service.Name}</strong><br/>
+                                  ({q.Service.Slug})
+                                </td>
+                                <td>
+                                  <strong>Est. Delivery</strong><br/>
+                                  {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}<br/>
+                                  <strong>Max:</strong> {q.Service.MaxWeight} kg<br/>
+                                  {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100} cm
+                                </td>
+                                <td>
+                                  <strong>£{q.TotalPrice.toFixed(2)}</strong><br/>
+                                  Exc. VAT (£{q.TotalPriceExVat.toFixed(2)})
+                                </td>
+                                <td/>
+                              </tr>
+
+                              {extCover?.Details ? (
+                                <tr className={styles.extraRow}>
+                                  <td/>
+                                  <td colSpan={5}>
+                                    <strong>
+                                      INFO: Current Protection: £
+                                      {currentProtection.toFixed(0)} |{' '}
+                                      Book with £
+                                      {extendedProtection?.toFixed(0)} Protection —{' '}
+                                      Total: £
+                                      {totalWithExtended?.toFixed(2)}
+                                    </strong>
+                                  </td>
+                                </tr>
+                              ) : currentProtection > 0 ? (
+                                <tr className={styles.extraRow}>
+                                  <td/>
+                                  <td colSpan={5}>
+                                    <strong>
+                                      INFO: Current Protection: £
+                                      {currentProtection.toFixed(0)} |{' '}
+                                      Extended protection not available.
+                                    </strong>
+                                  </td>
+                                </tr>
+                              ) : null}
+                            </Fragment>
+                          );
+                        })}
                       </>
                     )}
                   </Fragment>
