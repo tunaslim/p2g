@@ -439,7 +439,7 @@ export default function DespatchReadyOrders() {
                             infoRow = (
                               <tr key={`info-zero-${order.id}-${idx}`} className={styles.extraRow}>
                                 <td />
-                                <td colSpan={5}>
+                                <td colSpan={6}>
                                   <strong>
                                     INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £
                                     {extendedProtection.toFixed(0)} Protection — Total: £{totalWithExtended.toFixed(2)}                                   
@@ -451,7 +451,7 @@ export default function DespatchReadyOrders() {
                             infoRow = (
                               <tr key={`info-pos-${order.id}-${idx}`} className={styles.extraRow}>
                                 <td />
-                                <td colSpan={5}>
+                                <td colSpan={6}>
                                   <strong>
                                     INFO: Current Protection: £{currentProtection.toFixed(0)} | Extended protection not available.
                                   </strong>
