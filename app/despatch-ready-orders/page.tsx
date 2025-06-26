@@ -249,6 +249,7 @@ export default function DespatchReadyOrders() {
                         {order.inventory.length} item{order.inventory.length > 1 ? 's' : ''}
                       </td>
                       <td className={styles.totalColumn}>£{totalPaid.toFixed(2)}</td>
+                      <td></td>
                       <td className={styles.actionColumn}>
                         <a href={order.access_url} target="_blank" rel="noopener noreferrer" className={styles.selectButton}>
                           ↗
