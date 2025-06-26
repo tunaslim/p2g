@@ -319,10 +319,9 @@ export default function DespatchReadyOrders() {
                               </div>
                             </div>
                           </td>
-                          <td></td>
-                          <td className={styles.actionColumn}>
-                            <div className={styles.orderCell}>
-                              <div><strong>Package Info</strong></div>
+                          <td className={styles.actionColumn>
+                           <div className={styles.orderCell}>
+                           <div><strong>Package Info</strong></div>
                               <label>
                                 Weight (kg):{' '}
                                 <input
@@ -379,6 +378,10 @@ export default function DespatchReadyOrders() {
                                   }
                                 />
                               </label>
+                             </div>
+                          </td>
+                          <td className={styles.actionColumn}>
+                            <div className={styles.orderCell}>
                               <button onClick={() => fetchQuotesForOrder(order)} className={styles.primaryButton}>
                                 Get Quotes
                               </button>
