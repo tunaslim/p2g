@@ -209,6 +209,7 @@ export default function DespatchReadyOrders() {
                 <th className={styles.customerColumn}>Customer</th>
                 <th className={styles.itemsColumn}>Items</th>
                 <th className={styles.totalColumn}>Total</th>
+                <th className={styles.totalColumn}>Package</th>
                 <th className={styles.actionColumn}>Action</th>
               </tr>
             </thead>
@@ -317,6 +318,7 @@ export default function DespatchReadyOrders() {
                               </div>
                             </div>
                           </td>
+                          <td></td>
                           <td className={styles.actionColumn}>
                             <div className={styles.orderCell}>
                               <div><strong>Package Info</strong></div>
