@@ -338,7 +338,7 @@
   background-color: #d3d0d0;
 }
 
-table .serviceQuoteRow tr {
+table .serviceQuoteRow td {
   background-color: #f5ef9a;
   font-size: 0.9rem;
   color: #555;
