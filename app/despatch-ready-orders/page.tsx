@@ -392,7 +392,7 @@ export default function DespatchReadyOrders() {
                         {loadingMap[order.id] && (
                           <tr className={styles.quotesRow}>
                             <td />
-                            <td colSpan={5}>Getting cheapest 10 quotes...</td>
+                            <td colSpan={6}>Getting cheapest 10 quotes...</td>
                           </tr>
                         )}
 
