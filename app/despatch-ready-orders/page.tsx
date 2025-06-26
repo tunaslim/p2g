@@ -408,7 +408,7 @@ export default function DespatchReadyOrders() {
                           const totalWithExtended = q.TotalPrice + (extCover?.Total ?? 0);
 
                           const quoteRow = (
-                            <tr key={`quote-${order.id}-${idx}`} className={styles.quotesRow}>
+                            <tr key={`quote-${order.id}-${idx}`} className={styles.serviceQuoteRow}>
                               <td />
                               <td className={styles.orderCell}>
                                 <img src={q.Service.Links.ImageSvg} alt={`${q.Service.CourierName} logo`} className={styles.logo} />{' '}
