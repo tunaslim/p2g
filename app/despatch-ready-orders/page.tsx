@@ -421,7 +421,9 @@ export default function DespatchReadyOrders() {
                               <td>
                                 <strong>Est. Delivery</strong><br />
                                 {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}<br />
-                                <strong>Max:</strong> {q.Service.MaxWeight} kg<br />
+                              </td>
+                              <td>
+                              <strong>Max:</strong> {q.Service.MaxWeight} kg<br />
                                 {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100} cm
                               </td>
                               <td>
