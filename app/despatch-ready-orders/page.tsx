@@ -307,7 +307,7 @@ export default function DespatchReadyOrders() {
                                 <strong>Total Tax:</strong> £{parseFloat(order.total_tax).toFixed(2)}
                               </div>
                             )}
-                            {parseFloat(order.shippingCost) > 0 && (
+                            {parseFloat(shippingCost) > 0 && (
                               <div>
                                 <strong>Shipping:</strong> £{shippingCost.toFixed(2)}
                               </div>
