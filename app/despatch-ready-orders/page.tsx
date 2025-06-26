@@ -319,7 +319,7 @@ export default function DespatchReadyOrders() {
                               </div>
                             </div>
                           </td>
-                          <td className={styles.actionColumn>
+                          <td className={styles.actionColumn}>
                            <div className={styles.orderCell}>
                            <div><strong>Package Info</strong></div>
                               <label>
