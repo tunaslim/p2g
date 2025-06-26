@@ -298,7 +298,10 @@ export default function DespatchReadyOrders() {
                           <td className={styles.totalColumn}>
                             <div className={styles.orderCell}>
                               <div>
-                                <strong>Total Tax:</strong> £{parseFloat(order.total_tax).toFixed(2)}
+                                <strong>Total Discount:</strong> £{parseFloat(order.total_discount).toFixed(2)}
+                              </div>
+                              <div>
+                                <strong>Total Tax:total_discount</strong> £{parseFloat(order.total_tax).toFixed(2)}
                               </div>
                               <div>
                                 <strong>Shipping:</strong> £{shippingCost.toFixed(2)}
