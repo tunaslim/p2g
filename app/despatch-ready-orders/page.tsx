@@ -423,12 +423,12 @@ export default function DespatchReadyOrders() {
                                 {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}<br />
                               </td>
                               <td>
-                              <strong>Max:</strong> {q.Service.MaxWeight} kg<br />
-                                {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100} cm
+                                <strong>£{q.TotalPrice.toFixed(2)}</strong><br />
+                                (£{q.TotalPriceExVat.toFixed(2)}) Ex.Vat
                               </td>
                               <td>
-                                <strong>£{q.TotalPrice.toFixed(2)}</strong><br />
-                                Exc. VAT (£{q.TotalPriceExVat.toFixed(2)})
+                              <strong>Max:</strong> {q.Service.MaxWeight} kg<br />
+                                {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100} cm
                               </td>
                               <td />
                             </tr>
