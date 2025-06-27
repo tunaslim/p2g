@@ -319,7 +319,9 @@ export default function DespatchReadyOrders() {
                               </div>
                             </div>
                           </td>
-                          <td className={styles.actionColumn}>
+                          </tr>
+                          <tr className={styles.quotesRow}>
+                          <td colSpan={5} className={styles.actionColumn}>
                            <div className={styles.orderCell}>
                            <div><strong>Package Info</strong></div>
                               <label>
@@ -380,7 +382,7 @@ export default function DespatchReadyOrders() {
                               </label>
                              </div>
                           </td>
-                          <td className={styles.actionColumn}>
+                          <td colSpan={1} className={styles.actionColumn}>
                             <div className={styles.orderCell}>
                               <button onClick={() => fetchQuotesForOrder(order)} className={styles.primaryButton}>
                                 Get Quotes
