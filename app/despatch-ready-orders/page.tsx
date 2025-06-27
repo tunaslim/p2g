@@ -352,9 +352,9 @@ export default function DespatchReadyOrders() {
                                     }))
                                   }
                                 />
-                                <label>Width (cm):</label>
                               </div>
                               <div>
+                                <label>Width (cm):</label>
                                 <input
                                   type="number"
                                   size={4}
