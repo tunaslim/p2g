@@ -418,6 +418,7 @@ export default function DespatchReadyOrders() {
                                 ({q.Service.Slug})
                               </td>
                               <td>
+                                <div className={styles.inlineFieldsleft}>
                                 <div>
                                 <strong>Est. Delivery</strong><br />
                                 {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}<br />
@@ -425,6 +426,7 @@ export default function DespatchReadyOrders() {
                                 <div>
                                 <strong>Max:</strong> {q.Service.MaxWeight} kg<br />
                                 {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100} cm
+                                </div>
                                 </div>
                               </td>
                               <td>
