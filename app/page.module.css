@@ -367,3 +367,7 @@ table .serviceQuoteRow td {
   flex-direction: column;
   white-space: nowrap;
 }
+
+.noWrap {
+  white-space: nowrap;
+}
