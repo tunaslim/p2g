@@ -360,7 +360,6 @@ table .serviceQuoteRow td {
   justify-content: flex-start;   /* <-- align children to the left */
   gap: 2rem;          /* spacing between each field */
   align-items: center;/* vertical align inputs & labels */
-  white-space: nowrap;
 }
 
 .inlineFieldsleft > div {
