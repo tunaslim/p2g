@@ -418,17 +418,20 @@ export default function DespatchReadyOrders() {
                                 ({q.Service.Slug})
                               </td>
                               <td>
+                                <div>
                                 <strong>Est. Delivery</strong><br />
                                 {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}<br />
+                                </div>
+                                <div>
+                                <strong>Max:</strong> {q.Service.MaxWeight} kg<br />
+                                {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100} cm
+                                </div>
                               </td>
                               <td>
                                 <strong>£{q.TotalPrice.toFixed(2)}</strong><br />
                                 (£{q.TotalPriceExVat.toFixed(2)}) Ex.Vat
                               </td>
-                              <td>
-                              <strong>Max:</strong> {q.Service.MaxWeight} kg<br />
-                                {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100} cm
-                              </td>
+                              <td></td>
                             </tr>
                           );
 
