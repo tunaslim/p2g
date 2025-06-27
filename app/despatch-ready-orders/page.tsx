@@ -157,7 +157,7 @@ export default function DespatchReadyOrders() {
         },
         Parcels: [
           {
-            Value: parseFloat(order.total_paid) || 0,
+            Value: parseFloat(order.parcelValue) || 0,
             Weight: parseFloat(info.weight) || 0,
             Length: parseFloat(info.length) || 0,
             Width: parseFloat(info.width) || 0,
