@@ -136,9 +136,14 @@ export default function DespatchReadyOrders() {
   const apiBase = 'https://p2g-api.up.railway.app';
 
   const fetchQuotesForOrder = async (order: Order) => {
-    const country3 = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
-    const info = packageInfo[order.id] || { weight: '', length: '', width: '', height: '' };
-    setLoadingMap(prev => ({ ...prev, [order.id]: true }));
+  const totalPaid    = parseFloat(order.total_paid)    || 0;
+  const shippingCost = parseFloat(order.shipping_paid) || 0;
+  const baseValue    = totalPaid - shippingCost;
+  const country3     = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
+  const parcelValue  = country3 === 'GBR' ? baseValue / 1.2 : baseValue;
+
+  const info = packageInfo[order.id] || { weight: '', length: '', width: '', height: '' };
+  setLoadingMap(prev => ({ ...prev, [order.id]: true }));
     try {
       const payload = {
         CollectionAddress: {
@@ -157,7 +162,7 @@ export default function DespatchReadyOrders() {
         },
         Parcels: [
           {
-            Value: parseFloat(order.parcelValue) || 0,
+            Value: parcelValue,
             Weight: parseFloat(info.weight) || 0,
             Length: parseFloat(info.length) || 0,
             Width: parseFloat(info.width) || 0,
