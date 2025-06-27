@@ -323,10 +323,8 @@ export default function DespatchReadyOrders() {
                           <td></td>
                           </tr>
                           <tr className={styles.quotesRow}>
-                          <td colSpan={5} className={styles.actionColumn}>
-                           <div className={styles.orderCell}>
-                           <div><strong>Package Info</strong></div>
-                                Weight (kg):<br />
+                          <td colSpan={6} className={styles.actionColumn}>
+                                Weight (kg):
                                 <input
                                   type="number"
                                   size={4}
@@ -338,7 +336,7 @@ export default function DespatchReadyOrders() {
                                     }))
                                   }
                                 />
-                                Length (cm):<br />
+                                Length (cm):
                                 <input
                                   type="number"
                                   size={4}
@@ -350,7 +348,7 @@ export default function DespatchReadyOrders() {
                                     }))
                                   }
                                 />
-                                Width (cm):<br />
+                                Width (cm):
                                 <input
                                   type="number"
                                   size={4}
@@ -362,7 +360,7 @@ export default function DespatchReadyOrders() {
                                     }))
                                   }
                                 />
-                                Height (cm):<br />
+                                Height (cm):
                                 <input
                                   type="number"
                                   size={4}
@@ -374,7 +372,6 @@ export default function DespatchReadyOrders() {
                                     }))
                                   }
                                 />
-                             </div>
                           </td>
                           <td colSpan={1} className={styles.actionColumn}>
                             <div className={styles.orderCell}>
