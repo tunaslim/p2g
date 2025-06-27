@@ -343,3 +343,13 @@ table .serviceQuoteRow td {
   font-size: 0.9rem;
   color: #555;
 }
+
+.inlineFields {
+  display: flex;
+  gap: 1rem;          /* spacing between each field */
+  align-items: center;/* vertical align inputs & labels */
+}
+.inlineFields > div {
+  display: flex;
+  flex-direction: column;
+}
