@@ -319,13 +319,14 @@ export default function DespatchReadyOrders() {
                               </div>
                             </div>
                           </td>
+                          <td></td>
+                          <td></td>
                           </tr>
                           <tr className={styles.quotesRow}>
                           <td colSpan={5} className={styles.actionColumn}>
                            <div className={styles.orderCell}>
                            <div><strong>Package Info</strong></div>
-                              <label>
-                                Weight (kg):{' '}
+                                Weight (kg):<br />
                                 <input
                                   type="number"
                                   size={4}
@@ -337,9 +338,7 @@ export default function DespatchReadyOrders() {
                                     }))
                                   }
                                 />
-                              </label>
-                              <label>
-                                Length (cm):{' '}
+                                Length (cm):<br />
                                 <input
                                   type="number"
                                   size={4}
@@ -351,9 +350,7 @@ export default function DespatchReadyOrders() {
                                     }))
                                   }
                                 />
-                              </label>
-                              <label>
-                                Width (cm):{' '}
+                                Width (cm):<br />
                                 <input
                                   type="number"
                                   size={4}
@@ -365,9 +362,7 @@ export default function DespatchReadyOrders() {
                                     }))
                                   }
                                 />
-                              </label>
-                              <label>
-                                Height (cm):{' '}
+                                Height (cm):<br />
                                 <input
                                   type="number"
                                   size={4}
@@ -379,7 +374,6 @@ export default function DespatchReadyOrders() {
                                     }))
                                   }
                                 />
-                              </label>
                              </div>
                           </td>
                           <td colSpan={1} className={styles.actionColumn}>
