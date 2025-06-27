@@ -420,11 +420,11 @@ export default function DespatchReadyOrders() {
                               <td>
                                 <div className={styles.inlineFieldsleft}>
                                 <div>
-                                <strong>Est. Delivery</strong><br />
+                                <strong>Est. Delivery</strong>
                                 {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}
                                 </div>
                                 <div>
-                                <strong>Max:</strong> {q.Service.MaxWeight}kg<br />
+                                <strong>Max:</strong> {q.Service.MaxWeight}kg
                                 {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100}cm
                                 </div>
                                 </div>
