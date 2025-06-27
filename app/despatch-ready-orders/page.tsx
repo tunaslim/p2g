@@ -381,15 +381,13 @@ export default function DespatchReadyOrders() {
                                   }
                                 />
                                 </div>
-                              </div>
-                          </td>
-                          <td colSpan={1} className={styles.actionColumn}>
                             <div className={styles.orderCell}>
                               <button onClick={() => fetchQuotesForOrder(order)} className={styles.primaryButton}>
                                 Get Quotes
                               </button>
                             </div>
-                          </td>
+                            </div>
+                            </td>
                         </tr>
 
                         {loadingMap[order.id] && (
