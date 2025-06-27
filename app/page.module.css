@@ -347,7 +347,7 @@ table .serviceQuoteRow td {
 .inlineFields {
   display: flex;
   justify-content: flex-end;   /* <-- align children to the right */
-  gap: 1rem;          /* spacing between each field */
+  gap: 2rem;          /* spacing between each field */
   align-items: center;/* vertical align inputs & labels */
 }
 .inlineFields > div {
