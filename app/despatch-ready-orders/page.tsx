@@ -411,7 +411,7 @@ export default function DespatchReadyOrders() {
                             <tr key={`quote-${order.id}-${idx}`} className={styles.serviceQuoteRow}>
                               <td />
                               <td>
-                                <img src={q.Service.Links.ImageSvg} alt={`${q.Service.CourierName} logo`} className={styles.logo} />{' '}
+                                <img src={q.Service.Links.ImageSvg} alt={`${q.Service.CourierName} logo`} className={styles.logo} /><br />
                                 {q.Service.CourierName}
                               </td>
                               <td>
