@@ -209,7 +209,6 @@ export default function DespatchReadyOrders() {
                 <th className={styles.customerColumn}>Customer</th>
                 <th className={styles.itemsColumn}>Items</th>
                 <th className={styles.totalColumn}>Total</th>
-                <th className={styles.totalColumn}>Package</th>
                 <th className={styles.actionColumn}>Action</th>
               </tr>
             </thead>
@@ -320,10 +319,9 @@ export default function DespatchReadyOrders() {
                             </div>
                           </td>
                           <td></td>
-                          <td></td>
                           </tr>
                           <tr className={styles.quotesRow}>
-                          <td colSpan={6} className={styles.actionColumn}>
+                          <td colSpan={5} className={styles.actionColumn}>
                             <div className={styles.inlineFields}>
                             <div>
                                 <label>Weight (kg):</label>
@@ -388,13 +386,12 @@ export default function DespatchReadyOrders() {
                             </div>
                             </div>
                             </td>
-                            <td></td>
                         </tr>
 
                         {loadingMap[order.id] && (
                           <tr className={styles.quotesRow}>
                             <td />
-                            <td colSpan={6}>Getting cheapest 10 quotes...</td>
+                            <td colSpan={5}>Getting cheapest 10 quotes...</td>
                           </tr>
                         )}
 
@@ -432,7 +429,6 @@ export default function DespatchReadyOrders() {
                               <strong>Max:</strong> {q.Service.MaxWeight} kg<br />
                                 {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100} cm
                               </td>
-                              <td />
                             </tr>
                           );
 
@@ -441,7 +437,7 @@ export default function DespatchReadyOrders() {
                             infoRow = (
                               <tr key={`info-zero-${order.id}-${idx}`} className={styles.extraRow}>
                                 <td />
-                                <td colSpan={6}>
+                                <td colSpan={5}>
                                   <strong>
                                     INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £
                                     {extendedProtection.toFixed(0)} Protection — Total: £{totalWithExtended.toFixed(2)}                                   
@@ -453,7 +449,7 @@ export default function DespatchReadyOrders() {
                             infoRow = (
                               <tr key={`info-pos-${order.id}-${idx}`} className={styles.extraRow}>
                                 <td />
-                                <td colSpan={6}>
+                                <td colSpan={5}>
                                   <strong>
                                     INFO: Current Protection: £{currentProtection.toFixed(0)} | Extended protection not available.
                                   </strong>
