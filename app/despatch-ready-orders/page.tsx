@@ -322,8 +322,8 @@ export default function DespatchReadyOrders() {
                           <td></td>
                           <td></td>
                           </tr>
-                          <tr className={styles.quotesRow}>
-                          <td colSpan={6} className={styles.actionColumn}>
+                          <tr colSpan={6} className={styles.quotesRow}>
+                          <td className={styles.actionColumn}>
                             <div className={styles.inlineFields}>
                             <div>
                                 <label>Weight (kg):</label>
