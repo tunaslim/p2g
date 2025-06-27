@@ -320,6 +320,7 @@ export default function DespatchReadyOrders() {
                           <td></td>
                           </tr>
                           <tr className={styles.quotesRow}>
+                          <td />
                           <td colSpan={5} className={styles.actionColumn}>
                             <div className={styles.inlineFields}>
                             <div>
