@@ -354,3 +354,14 @@ table .serviceQuoteRow td {
   display: flex;
   flex-direction: column;
 }
+
+.inlineFieldsleft {
+  display: flex;
+  justify-content: flex-start;   /* <-- align children to the left */
+  gap: 1rem;          /* spacing between each field */
+  align-items: center;/* vertical align inputs & labels */
+}
+.inlineFieldsleft > div {
+  display: flex;
+  flex-direction: column;
+}
