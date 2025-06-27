@@ -322,8 +322,8 @@ export default function DespatchReadyOrders() {
                           <td></td>
                           <td></td>
                           </tr>
-                          <tr colSpan={6} className={styles.quotesRow}>
-                          <td className={styles.actionColumn}>
+                          <tr className={styles.quotesRow}>
+                          <td colSpan={6} className={styles.actionColumn}>
                             <div className={styles.inlineFields}>
                             <div>
                                 <label>Weight (kg):</label>
@@ -388,6 +388,7 @@ export default function DespatchReadyOrders() {
                             </div>
                             </div>
                             </td>
+                            <td></td>
                         </tr>
 
                         {loadingMap[order.id] && (
