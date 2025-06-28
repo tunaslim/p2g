@@ -384,7 +384,7 @@ export default function DespatchReadyOrders() {
   <td colSpan={5} className={styles.actionColumn}>
     <div className={styles.infoGroup}>
       {/* Weight */}
-      <div className={styles.styles.fieldBox}>
+      <div className={styles.fieldBox}>
         <div className={styles.subInfo}>Weight (kg)</div>
         <input
           type="number"
