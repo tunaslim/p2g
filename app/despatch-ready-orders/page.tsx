@@ -382,7 +382,7 @@ export default function DespatchReadyOrders() {
                         <tr className={styles.quotesRow}>
   <td />
   <td colSpan={5} className={styles.actionColumn}>
-    <div className={styles.styles.infoGroup}>
+    <div className={styles.infoGroup}>
       {/* Weight */}
       <div className={styles.styles.fieldBox}>
         <div className={styles.subInfo}>Weight (kg)</div>
