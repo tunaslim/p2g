@@ -380,88 +380,85 @@ export default function DespatchReadyOrders() {
                           <td></td>
                         </tr>
                         <tr className={styles.quotesRow}>
-                          <td />
-                          <td colSpan={5} className={styles.actionColumn}>
-                            <div className={styles.inlineFields}>
-                              <div>
-                                <label>Weight (kg):</label>
-                                <input
-                                  type="number"
-                                  size={4}
-                                  value={info.weight}
-                                  onChange={(e) =>
-                                    setPackageInfo((prev) => ({
-                                      ...prev,
-                                      [order.id]: {
-                                        ...info,
-                                        weight: e.target.value,
-                                      },
-                                    }))
-                                  }
-                                />
-                              </div>
-                              <div>
-                                <label>Length (cm):</label>
-                                <input
-                                  type="number"
-                                  size={4}
-                                  value={info.length}
-                                  onChange={(e) =>
-                                    setPackageInfo((prev) => ({
-                                      ...prev,
-                                      [order.id]: {
-                                        ...info,
-                                        length: e.target.value,
-                                      },
-                                    }))
-                                  }
-                                />
-                              </div>
-                              <div>
-                                <label>Width (cm):</label>
-                                <input
-                                  type="number"
-                                  size={4}
-                                  value={info.width}
-                                  onChange={(e) =>
-                                    setPackageInfo((prev) => ({
-                                      ...prev,
-                                      [order.id]: {
-                                        ...info,
-                                        width: e.target.value,
-                                      },
-                                    }))
-                                  }
-                                />
-                              </div>
-                              <div>
-                                <label>Height (cm):</label>
-                                <input
-                                  type="number"
-                                  size={4}
-                                  value={info.height}
-                                  onChange={(e) =>
-                                    setPackageInfo((prev) => ({
-                                      ...prev,
-                                      [order.id]: {
-                                        ...info,
-                                        height: e.target.value,
-                                      },
-                                    }))
-                                  }
-                                />
-                              </div>
-                              <div className={styles.orderCell}>
-                                <button
-                                  onClick={() => fetchQuotesForOrder(order)}
-                                  className={styles.primaryButton}
-                                >
-                                  Get Quotes
-                                </button>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
+  <td />
+  <td colSpan={5} className={styles.actionColumn}>
+    <div className={styles.buttonGroup}>
+      {/* Weight */}
+      <div className={styles.buttonOption}>
+        <label className={styles.subInfo}>Weight (kg):</label>
+        <input
+          type="number"
+          value={info.weight}
+          onChange={(e) =>
+            setPackageInfo((prev) => ({
+              ...prev,
+              [order.id]: { ...info, weight: e.target.value },
+            }))
+          }
+          className={styles.price}
+        />
+      </div>
+
+      {/* Length */}
+      <div className={styles.buttonOption}>
+        <label className={styles.subInfo}>Length (cm):</label>
+        <input
+          type="number"
+          value={info.length}
+          onChange={(e) =>
+            setPackageInfo((prev) => ({
+              ...prev,
+              [order.id]: { ...info, length: e.target.value },
+            }))
+          }
+          className={styles.price}
+        />
+      </div>
+
+      {/* Width */}
+      <div className={styles.buttonOption}>
+        <label className={styles.subInfo}>Width (cm):</label>
+        <input
+          type="number"
+          value={info.width}
+          onChange={(e) =>
+            setPackageInfo((prev) => ({
+              ...prev,
+              [order.id]: { ...info, width: e.target.value },
+            }))
+          }
+          className={styles.price}
+        />
+      </div>
+
+      {/* Height */}
+      <div className={styles.buttonOption}>
+        <label className={styles.subInfo}>Height (cm):</label>
+        <input
+          type="number"
+          value={info.height}
+          onChange={(e) =>
+            setPackageInfo((prev) => ({
+              ...prev,
+              [order.id]: { ...info, height: e.target.value },
+            }))
+          }
+          className={styles.price}
+        />
+      </div>
+
+      {/* Get Quotes */}
+      <div className={styles.buttonOption}>
+        <button
+          onClick={() => fetchQuotesForOrder(order)}
+          className={styles.outlineButton}
+        >
+          Get Quotes
+        </button>
+      </div>
+    </div>
+  </td>
+</tr>
 
                         {loadingMap[order.id] && (
                           <tr className={styles.quotesRow}>
