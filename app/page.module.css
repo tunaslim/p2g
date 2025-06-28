@@ -371,3 +371,55 @@ table .serviceQuoteRow td {
 .noWrap {
   white-space: nowrap;
 }
+
+.button-group {
+  display: flex;
+  border: 1px solid #d0d5dd;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f9fafb;
+  padding: 8px;
+  max-width: 500px;
+  gap: 8px;
+}
+
+.button-option {
+  background: #fff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  flex: 1;
+  text-align: center;
+  box-shadow: 0 0 0 1px #d0d5dd;
+}
+
+.button-option.active {
+  background: #e6f0ff;
+  box-shadow: none;
+}
+
+.price {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.outline-button,
+.solid-button {
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.outline-button {
+  background: #fff;
+  border: 1px solid #d0d5dd;
+  color: #333;
+}
+
+.solid-button {
+  background-color: #28a745; /* green */
+  color: white;
+}
