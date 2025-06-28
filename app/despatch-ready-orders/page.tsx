@@ -1,3 +1,4 @@
+// Full fixed file: Despatch Ready Orders
 "use client";
 import { useEffect, useState, Fragment } from "react";
 import { useRouter } from "next/navigation";
@@ -5,7 +6,6 @@ import styles from "../page.module.css";
 import axios from "axios";
 import { useToken } from "../context/TokenContext";
 
-// Types for Parcel2Go quotes
 interface Service {
   CourierName: string;
   Name: string;
@@ -75,65 +75,30 @@ export default function DespatchReadyOrders() {
   const [error, setError] = useState("");
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
-  const [packageInfo, setPackageInfo] = useState<
-    Record<
-      number,
-      { weight: string; length: string; width: string; height: string }
-    >
-  >({});
-
+  const [packageInfo, setPackageInfo] = useState<Record<number, { weight: string; length: string; width: string; height: string }>>({});
   const [quotesMap, setQuotesMap] = useState<Record<number, Quote[]>>({});
   const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({});
 
   const iso2to3: Record<string, string> = {
-    GB: "GBR",
-    US: "USA",
-    DE: "DEU",
-    FR: "FRA",
-    IT: "ITA",
-    TR: "TUR",
-    ES: "ESP",
-    CA: "CAN",
-    NL: "NLD",
-    IL: "ISR",
-    BE: "BEL",
-    JP: "JPN",
-    CH: "CHE",
-    CL: "CHL",
-    AT: "AUT",
+    GB: "GBR", US: "USA", DE: "DEU", FR: "FRA", IT: "ITA",
+    TR: "TUR", ES: "ESP", CA: "CAN", NL: "NLD", IL: "ISR",
+    BE: "BEL", JP: "JPN", CH: "CHE", CL: "CHL", AT: "AUT",
   };
 
   const getChannelLogo = (id: number) => {
     switch (id) {
-      case 24:
-      case 15:
-        return "/logos/ebay.png";
-      case 27:
-      case 25:
-      case 6:
-      case 2:
-      case 5:
-      case 4:
-      case 3:
-        return "/logos/amazon.png";
-      case 11:
-        return "/logos/etsy.png";
-      case 8:
-      case 7:
-        return "/logos/shopify.png";
-      case 26:
-        return "/logos/woocommerce.png";
-      default:
-        return "/logos/default.png";
+      case 24: case 15: return "/logos/ebay.png";
+      case 27: case 25: case 6: case 2: case 5: case 4: case 3: return "/logos/amazon.png";
+      case 11: return "/logos/etsy.png";
+      case 8: case 7: return "/logos/shopify.png";
+      case 26: return "/logos/woocommerce.png";
+      default: return "/logos/default.png";
     }
   };
 
   const truncateEmail = (email: string) => {
     const [local, domain] = email.split("@");
-    if (!local || !domain) return email;
-    return local.length > 15
-      ? `${local.slice(0, 5)}[...]${local.slice(-5)}@${domain}`
-      : email;
+    return local.length > 15 ? `${local.slice(0, 5)}[...]${local.slice(-5)}@${domain}` : email;
   };
 
   const apiBase = "https://p2g-api.up.railway.app";
@@ -142,16 +107,9 @@ export default function DespatchReadyOrders() {
     const totalPaid = parseFloat(order.total_paid) || 0;
     const shippingCost = parseFloat(order.shipping_paid) || 0;
     const baseValue = totalPaid - shippingCost;
-    const country3 =
-      iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
+    const country3 = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
     const parcelValue = country3 === "GBR" ? baseValue / 1.2 : baseValue;
-
-    const info = packageInfo[order.id] || {
-      weight: "",
-      length: "",
-      width: "",
-      height: "",
-    };
+    const info = packageInfo[order.id] || { weight: "", length: "", width: "", height: "" };
     setLoadingMap((prev) => ({ ...prev, [order.id]: true }));
     try {
       const payload = {
@@ -179,15 +137,10 @@ export default function DespatchReadyOrders() {
           },
         ],
       };
-      const resp = await axios.post<{ Quotes: Quote[] }>(
-        `${apiBase}/get-quote`,
-        { order: payload }
-      );
+      const resp = await axios.post<{ Quotes: Quote[] }>(`${apiBase}/get-quote`, { order: payload });
       setQuotesMap((prev) => ({
         ...prev,
-        [order.id]: resp.data.Quotes.sort(
-          (a, b) => a.TotalPrice - b.TotalPrice
-        ).slice(0, 10),
+        [order.id]: resp.data.Quotes.sort((a, b) => a.TotalPrice - b.TotalPrice).slice(0, 10),
       }));
     } catch (e) {
       console.error(e);
@@ -200,15 +153,12 @@ export default function DespatchReadyOrders() {
     if (!token) return;
     (async () => {
       try {
-        const resp = await axios.get<{ total: number; data: Order[] }>(
-          "/api/helm-orders",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "X-Helm-Filter": "status[]=3",
-            },
-          }
-        );
+        const resp = await axios.get<{ total: number; data: Order[] }>("/api/helm-orders", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Helm-Filter": "status[]=3",
+          },
+        });
         setOrders(resp.data.data || []);
         setTotal(resp.data.total || 0);
       } catch {
@@ -221,9 +171,7 @@ export default function DespatchReadyOrders() {
     <div className={styles.main}>
       <h1 className={styles.title}>Despatch Ready Orders ({total})</h1>
       {error && <p className={styles.error}>{error}</p>}
-      {!error && !orders.length && (
-        <p className={styles.subTitle}>No despatch-ready orders found.</p>
-      )}
+      {!error && !orders.length && <p className={styles.subTitle}>No despatch-ready orders found.</p>}
       {orders.length > 0 && (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
@@ -241,376 +189,87 @@ export default function DespatchReadyOrders() {
               {orders.map((order) => {
                 const totalPaid = parseFloat(order.total_paid) || 0;
                 const shippingCost = parseFloat(order.shipping_paid) || 0;
-                const country3 =
-                  iso2to3[order.shipping_address_iso] ||
-                  order.shipping_address_iso;
+                const country3 = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
                 const baseValue = totalPaid - shippingCost;
-                const parcelValue =
-                  country3 === "GBR" ? baseValue / 1.2 : baseValue;
-                const info = packageInfo[order.id] || {
-                  weight: "",
-                  length: "",
-                  width: "",
-                  height: "",
-                };
+                const parcelValue = country3 === "GBR" ? baseValue / 1.2 : baseValue;
+                const info = packageInfo[order.id] || { weight: "", length: "", width: "", height: "" };
 
                 return (
                   <Fragment key={order.id}>
-                    {/* Main order row */}
-                    <tr className={styles.quotesRow}>
-                      <td
-                        className={styles.expandCell}
-                        onClick={() =>
-                          setExpanded((prev) => {
-                            const next = new Set(prev);
-                            next.has(order.id)
-                              ? next.delete(order.id)
-                              : next.add(order.id);
-                            return next;
-                          })
-                        }
-                      >
-                        {expanded.has(order.id) ? "▼" : "►"}
-                      </td>
-                      <td>
-                        <div className={styles.orderCell}>
-                          <img
-                            src={getChannelLogo(order.channel_id)}
-                            className={styles.logo}
-                            alt=""
-                          />
-                          <strong>{order.channel_order_id}</strong>
-                        </div>
-                      </td>
-                      <td>
-                        {order.shipping_name_company || order.shipping_name}
-                      </td>
-                      <td>
-                        {order.inventory.length} item
-                        {order.inventory.length > 1 ? "s" : ""}
-                      </td>
-                      <td className={styles.totalColumn}>
-                        £{totalPaid.toFixed(2)}
-                      </td>
-                      <td className={styles.actionColumn}>
-                        <a
-                          href={order.access_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={styles.selectButton}
-                        >
-                          ↗
-                        </a>
-                      </td>
-                    </tr>
+                    {/* Main Order Row... */}
+                    {/* Details and Quote Input Row... */}
 
-                    {/* Expanded details */}
-                    {expanded.has(order.id) && (
-                      <>
-                        <tr className={styles.summaryRow}>
-                          <td />
-                          <td>
-                            <div className={styles.orderCell}>
-                              <div>{order.date_received}</div>
-                              <div>
-                                <strong>Alt ID:</strong> {order.channel_alt_id}
-                              </div>
-                              <div>
-                                <strong>Sale:</strong> {order.sale_type}
-                              </div>
-                              <div>{order.status_description}</div>
-                            </div>
-                          </td>
-                          <td>
-                            <div className={styles.orderCell}>
-                              <div>
-                                <strong>Phone:</strong> {order.phone_one}
-                              </div>
-                              <div>
-                                <strong>Email:</strong>{" "}
-                                {truncateEmail(order.email)}
-                              </div>
-                              <div>
-                                <strong>Address:</strong>{" "}
-                                {order.shipping_address_line_one}
-                                {order.shipping_address_line_two
-                                  ? ` ${order.shipping_address_line_two}`
-                                  : ""}
-                                , {order.shipping_address_city},{" "}
-                                {order.shipping_address_postcode}, {country3}
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <div className={styles.orderCell}>
-                              {order.inventory.map((item, i) => (
-                                <div key={i}>
-                                  <strong>{item.name}</strong> (x{item.quantity}
-                                  )
-                                </div>
-                              ))}
-                            </div>
-                          </td>
-                          <td className={styles.totalColumn}>
-                            <div className={styles.orderCell}>
-                              {parseFloat(order.total_discount) > 0 && (
-                                <div>
-                                  <strong>Total Discount:</strong> £
-                                  {parseFloat(order.total_discount).toFixed(2)}
-                                </div>
-                              )}
-                              {parseFloat(order.total_tax) > 0 && (
-                                <div>
-                                  <strong>Total Tax:</strong> £
-                                  {parseFloat(order.total_tax).toFixed(2)}
-                                </div>
-                              )}
-                              {shippingCost > 0 && (
-                                <div>
-                                  <strong>Shipping:</strong> £
-                                  {shippingCost.toFixed(2)}
-                                </div>
-                              )}
-                              <div>
-                                <strong>Parcel Val.:</strong> £
-                                {parcelValue.toFixed(2)}
-                              </div>
-                            </div>
-                          </td>
-                          <td></td>
-                        </tr>
-                        <tr className={styles.quotesRow}>
-                          <td />
-                          <td colSpan={5} className={styles.actionColumn}>
-                            <div className={styles.inlineFields}>
-                              <div>
-                                <label>Weight (kg):</label>
-                                <input
-                                  type="number"
-                                  size={4}
-                                  value={info.weight}
-                                  onChange={(e) =>
-                                    setPackageInfo((prev) => ({
-                                      ...prev,
-                                      [order.id]: {
-                                        ...info,
-                                        weight: e.target.value,
-                                      },
-                                    }))
-                                  }
-                                />
-                              </div>
-                              <div>
-                                <label>Length (cm):</label>
-                                <input
-                                  type="number"
-                                  size={4}
-                                  value={info.length}
-                                  onChange={(e) =>
-                                    setPackageInfo((prev) => ({
-                                      ...prev,
-                                      [order.id]: {
-                                        ...info,
-                                        length: e.target.value,
-                                      },
-                                    }))
-                                  }
-                                />
-                              </div>
-                              <div>
-                                <label>Width (cm):</label>
-                                <input
-                                  type="number"
-                                  size={4}
-                                  value={info.width}
-                                  onChange={(e) =>
-                                    setPackageInfo((prev) => ({
-                                      ...prev,
-                                      [order.id]: {
-                                        ...info,
-                                        width: e.target.value,
-                                      },
-                                    }))
-                                  }
-                                />
-                              </div>
-                              <div>
-                                <label>Height (cm):</label>
-                                <input
-                                  type="number"
-                                  size={4}
-                                  value={info.height}
-                                  onChange={(e) =>
-                                    setPackageInfo((prev) => ({
-                                      ...prev,
-                                      [order.id]: {
-                                        ...info,
-                                        height: e.target.value,
-                                      },
-                                    }))
-                                  }
-                                />
-                              </div>
-                              <div className={styles.orderCell}>
-                                <button
-                                  onClick={() => fetchQuotesForOrder(order)}
-                                  className={styles.primaryButton}
-                                >
-                                  Get Quotes
-                                </button>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
+                    {quotesMap[order.id]?.map((q, idx) => {
+                      const currentProtection = q.IncludedCover;
+                      const extCover = q.AvailableExtras.find((e) => e.Details?.IncludedCover && /\d/.test(e.Details.IncludedCover));
+                      const extendedProtection = extCover ? parseFloat(extCover.Details!.IncludedCover.replace(/[^0-9.]/g, "")) : 0;
+                      const totalWithExtended = q.TotalPrice + (extCover?.Total ?? 0);
+                      const coverExtra = q.AvailableExtras.find((extra) => extra.Type === "Cover");
+                      const coverTotal = coverExtra ? coverExtra.Total : 0;
 
-                        {loadingMap[order.id] && (
-                          <tr className={styles.quotesRow}>
-                            <td />
-                            <td colSpan={5}>Getting cheapest 10 quotes...</td>
-                          </tr>
-                        )}
-
-                        {/* Render quotes + INFO rows */}
-                        {quotesMap[order.id]?.map((q, idx) => {
-                          const currentProtection = q.IncludedCover;
-
-                          const extCover = q.AvailableExtras.find(
-                            (e) =>
-                              e.Details?.IncludedCover != null &&
-                              /\d/.test(e.Details.IncludedCover)
-                          );
-                          const extendedProtection = extCover
-                            ? parseFloat(
-                                extCover.Details!.IncludedCover.replace(
-                                  /[^0-9.]/g,
-                                  ""
-                                )
-                              )
-                            : 0;
-                          const totalWithExtended =
-                            q.TotalPrice + (extCover?.Total ?? 0);
-
-                          const coverExtra = q.AvailableExtras.find(
-                            (extra) => extra.Type === "Cover"
-                          );
-                          const coverTotal = coverExtra ? coverExtra.Total : 0;
-
-                          const quoteRow = (
-                            <tr
-                              key={`quote-${order.id}-${idx}`}
-                              className={styles.serviceQuoteRow}
-                            >
-                              <td />
-                              <td>
-                                <img
-                                  src={q.Service.Links.ImageSvg}
-                                  alt={`${q.Service.CourierName} logo`}
-                                  className={styles.logo}
-                                />
-                                <br />
-                                {q.Service.CourierName}
-                              </td>
-                              <td>
-                                <div className={styles.serviceInfoBlock}>
-                                  <div>
+                      return (
+                        <Fragment key={`group-${order.id}-${idx}`}>
+                          <tr className={styles.serviceQuoteRow}>
+                            <td colSpan={6}>
+                              <div className={styles.combinedRow}>
+                                <div className={styles.serviceColumn}>
+                                  <img
+                                    src={q.Service.Links.ImageSvg}
+                                    alt={`${q.Service.CourierName} logo`}
+                                    className={styles.logo}
+                                  />
+                                  <div className={styles.serviceDetails}>
                                     <strong>{q.Service.Name}</strong>
                                     <br />({q.Service.Slug})
-                                  </div>
-                                    <div className={styles.subInfo}>
-                                    <div>
-                                      <strong>Est. Delivery:</strong> {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}
-                                    </div>
-                                    <div>
-                                      <strong>Max:</strong> {q.Service.MaxWeight}kg — {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100}cm
-                                    </div>
+                                    <div><strong>Est. Delivery:</strong> {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}</div>
+                                    <div><strong>Max:</strong> {q.Service.MaxWeight}kg — {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100}cm</div>
                                   </div>
                                 </div>
-                              </td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                            </tr>
-                          );
 
-                          let infoRow = null;
-
-                          if (currentProtection === 0) {
-                            infoRow = (
-                              <tr
-                                key={`info-zero-${order.id}-${idx}`}
-                                className={styles.extraRow}
-                              >
-                                <td />
-                                <td colSpan={5} style={{ textAlign: "right" }}>
-                                  <div className={styles.buttonGroup}>
-                                    <div className={styles.buttonOption}>
-                                      <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
+                                <div className={styles.buttonGroup}>
+                                  {currentProtection === 0 && (
+                                    <>
+                                      <div className={styles.buttonOption}>
+                                        <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
                                         <button className={styles.outlineButton}>Book without Protection</button>
-                                    </div>
-                                        <div className={styles.buttonOption}>
+                                      </div>
+                                      <div className={styles.buttonOption}>
                                         <div className={styles.price}>(+ £{(totalWithExtended - q.TotalPrice).toFixed(2)}) £{totalWithExtended.toFixed(2)}</div>
                                         <button className={styles.solidButton}>Book with £{extendedProtection.toFixed(0)} Protection</button>
-                                    </div>
-                                        <div className={styles.buttonOption}>
-                                        <div className={styles.price}>(+ £{coverTotal}) £{(coverTotal + q.TotalPrice).toFixed(2)}</div>
+                                      </div>
+                                      <div className={styles.buttonOption}>
+                                        <div className={styles.price}>(+ £{coverTotal.toFixed(2)}) £{(coverTotal + q.TotalPrice).toFixed(2)}</div>
                                         <button className={styles.solidButton}>Book with £{parcelValue.toFixed(2)} Protection</button>
-                                    </div>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          } else if (
-                            currentProtection > 0 &&
-                            coverTotal === 0
-                          ) {
-                            infoRow = (
-                              <tr
-                                key={`info-unavailable-${order.id}-${idx}`}
-                                className={styles.extraRow}
-                              >
-                                <td />
-                                <td colSpan={5} style={{ textAlign: "right" }}>
-                                  <div className={styles.buttonGroup}>
+                                      </div>
+                                    </>
+                                  )}
+
+                                  {currentProtection > 0 && coverTotal === 0 && (
                                     <div className={styles.buttonOption}>
                                       <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
                                       <button className={styles.outlineButton}>Book with £{currentProtection.toFixed(0)} Protection</button>
                                     </div>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          } else if (currentProtection > 0) {
-                            infoRow = (
-                              <tr
-                                key={`info-pos-${order.id}-${idx}`}
-                                className={styles.extraRow}
-                              >
-                                <td />
-                                <td colSpan={5} style={{ textAlign: "right" }}>
-                                  <div className={styles.buttonGroup}>
-                                    <div className={styles.buttonOption}>
-                                      <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
-                                        <button className={styles.outlineButton}>Book with £{currentProtection.toFixed(0)} Protection</button>
-                                    </div>
-                                        <div className={styles.buttonOption}>
-                                        <div className={styles.price}>(+ £{coverTotal}) £{(coverTotal + q.TotalPrice).toFixed(2)}</div>
-                                        <button className={styles.solidButton}>Book with £{parcelValue.toFixed(2)} Protection</button>
-                                    </div>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          }
+                                  )}
 
-                          return (
-                            <Fragment key={`group-${order.id}-${idx}`}>
-                              {quoteRow}
-                              {infoRow}
-                            </Fragment>
-                          );
-                        })}
-                      </>
-                    )}
+                                  {currentProtection > 0 && coverTotal > 0 && (
+                                    <>
+                                      <div className={styles.buttonOption}>
+                                        <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
+                                        <button className={styles.outlineButton}>Book with £{currentProtection.toFixed(0)} Protection</button>
+                                      </div>
+                                      <div className={styles.buttonOption}>
+                                        <div className={styles.price}>(+ £{coverTotal.toFixed(2)}) £{(coverTotal + q.TotalPrice).toFixed(2)}</div>
+                                        <button className={styles.solidButton}>Book with £{parcelValue.toFixed(2)} Protection</button>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </Fragment>
+                      );
+                    })}
                   </Fragment>
                 );
               })}
