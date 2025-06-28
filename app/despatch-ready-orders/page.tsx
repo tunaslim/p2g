@@ -384,69 +384,65 @@ export default function DespatchReadyOrders() {
   <td colSpan={5} className={styles.actionColumn}>
     <div className={styles.buttonGroup}>
       {/* Weight */}
-      <div className={styles.fieldOption}>
-        <label>Weight (kg):</label>
+      <div className={styles.buttonOption}>
+        <div className={styles.subInfo}>Weight (kg)</div>
         <input
           type="number"
           value={info.weight}
           onChange={(e) =>
-            setPackageInfo((prev) => ({
+            setPackageInfo(prev => ({
               ...prev,
-              [order.id]: { ...info, weight: e.target.value },
+              [order.id]: { ...info, weight: e.target.value }
             }))
           }
-          className={styles.fieldInput}
+          className={styles.priceInput}
         />
       </div>
-
       {/* Length */}
-      <div className={styles.fieldOption}>
-        <label>Length (cm):</label>
+      <div className={styles.buttonOption}>
+        <div className={styles.subInfo}>Length (cm)</div>
         <input
           type="number"
           value={info.length}
           onChange={(e) =>
-            setPackageInfo((prev) => ({
+            setPackageInfo(prev => ({
               ...prev,
-              [order.id]: { ...info, length: e.target.value },
+              [order.id]: { ...info, length: e.target.value }
             }))
           }
-          className={styles.fieldInput}
+          className={styles.priceInput}
         />
       </div>
-
       {/* Width */}
-      <div className={styles.fieldOption}>
-        <label>Width (cm):</label>
+      <div className={styles.buttonOption}>
+        <div className={styles.subInfo}>Width (cm)</div>
         <input
           type="number"
           value={info.width}
           onChange={(e) =>
-            setPackageInfo((prev) => ({
+            setPackageInfo(prev => ({
               ...prev,
-              [order.id]: { ...info, width: e.target.value },
+              [order.id]: { ...info, width: e.target.value }
             }))
           }
-          className={styles.fieldInput}
+          className={styles.priceInput}
         />
       </div>
-
       {/* Height */}
-      <div className={styles.fieldOption}>
-        <label>Height (cm):</label>
+      <div className={styles.buttonOption}>
+        <div className={styles.subInfo}>Height (cm)</div>
         <input
           type="number"
           value={info.height}
           onChange={(e) =>
-            setPackageInfo((prev) => ({
+            setPackageInfo(prev => ({
               ...prev,
-              [order.id]: { ...info, height: e.target.value },
+              [order.id]: { ...info, height: e.target.value }
             }))
           }
-          className={styles.fieldInput}
+          className={styles.priceInput}
         />
       </div>
-
       {/* Get Quotes */}
       <div className={styles.buttonOption}>
         <button
