@@ -428,3 +428,15 @@ table .serviceQuoteRow td {
 .solidButton:hover {
   background: #218838;
 }
+
+.serviceInfoBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.subInfo {
+  font-size: 0.85rem;
+  margin-top: 4px;
+  color: #444;
+}
