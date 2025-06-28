@@ -555,7 +555,7 @@ export default function DespatchReadyOrders() {
                                   <div className={styles.buttonGroup}>
                                     <div className={styles.buttonOption}>
                                       <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
-                                        <button className={styles.outlineButton}>Book with £{currentProtection.toFixed(0)} Protection</button>
+                                        <button className={styles.outlineButton}>Book without Protection</button>
                                     </div>
                                         <div className={styles.buttonOption}>
                                         <div className={styles.price}>(+ £{(totalWithExtended - q.TotalPrice).toFixed(2)}) £{totalWithExtended.toFixed(2)}</div>
