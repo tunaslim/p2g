@@ -384,8 +384,8 @@ export default function DespatchReadyOrders() {
   <td colSpan={5} className={styles.actionColumn}>
     <div className={styles.buttonGroup}>
       {/* Weight */}
-      <div className={styles.buttonOption}>
-        <label className={styles.subInfo}>Weight (kg):</label>
+      <div className={styles.fieldOption}>
+        <label>Weight (kg):</label>
         <input
           type="number"
           value={info.weight}
@@ -395,13 +395,13 @@ export default function DespatchReadyOrders() {
               [order.id]: { ...info, weight: e.target.value },
             }))
           }
-          className={styles.price}
+          className={styles.fieldInput}
         />
       </div>
 
       {/* Length */}
-      <div className={styles.buttonOption}>
-        <label className={styles.subInfo}>Length (cm):</label>
+      <div className={styles.fieldOption}>
+        <label>Length (cm):</label>
         <input
           type="number"
           value={info.length}
@@ -411,13 +411,13 @@ export default function DespatchReadyOrders() {
               [order.id]: { ...info, length: e.target.value },
             }))
           }
-          className={styles.price}
+          className={styles.fieldInput}
         />
       </div>
 
       {/* Width */}
-      <div className={styles.buttonOption}>
-        <label className={styles.subInfo}>Width (cm):</label>
+      <div className={styles.fieldOption}>
+        <label>Width (cm):</label>
         <input
           type="number"
           value={info.width}
@@ -427,13 +427,13 @@ export default function DespatchReadyOrders() {
               [order.id]: { ...info, width: e.target.value },
             }))
           }
-          className={styles.price}
+          className={styles.fieldInput}
         />
       </div>
 
       {/* Height */}
-      <div className={styles.buttonOption}>
-        <label className={styles.subInfo}>Height (cm):</label>
+      <div className={styles.fieldOption}>
+        <label>Height (cm):</label>
         <input
           type="number"
           value={info.height}
@@ -443,7 +443,7 @@ export default function DespatchReadyOrders() {
               [order.id]: { ...info, height: e.target.value },
             }))
           }
-          className={styles.price}
+          className={styles.fieldInput}
         />
       </div>
 
