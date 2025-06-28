@@ -1,9 +1,9 @@
-'use client';
-import { useEffect, useState, Fragment } from 'react';
-import { useRouter } from 'next/navigation';
-import styles from '../page.module.css';
-import axios from 'axios';
-import { useToken } from '../context/TokenContext';
+"use client";
+import { useEffect, useState, Fragment } from "react";
+import { useRouter } from "next/navigation";
+import styles from "../page.module.css";
+import axios from "axios";
+import { useToken } from "../context/TokenContext";
 
 // Types for Parcel2Go quotes
 interface Service {
@@ -72,39 +72,42 @@ export default function DespatchReadyOrders() {
   const { token } = useToken();
   const [orders, setOrders] = useState<Order[]>([]);
   const [total, setTotal] = useState<number>(0);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   const [packageInfo, setPackageInfo] = useState<
-    Record<number, { weight: string; length: string; width: string; height: string }>
+    Record<
+      number,
+      { weight: string; length: string; width: string; height: string }
+    >
   >({});
 
   const [quotesMap, setQuotesMap] = useState<Record<number, Quote[]>>({});
   const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({});
 
   const iso2to3: Record<string, string> = {
-    GB: 'GBR',
-    US: 'USA',
-    DE: 'DEU',
-    FR: 'FRA',
-    IT: 'ITA',
-    TR: 'TUR',
-    ES: 'ESP',
-    CA: 'CAN',
-    NL: 'NLD',
-    IL: 'ISR',
-    BE: 'BEL',
-    JP: 'JPN',
-    CH: 'CHE',
-    CL: 'CHL',
-    AT: 'AUT',
+    GB: "GBR",
+    US: "USA",
+    DE: "DEU",
+    FR: "FRA",
+    IT: "ITA",
+    TR: "TUR",
+    ES: "ESP",
+    CA: "CAN",
+    NL: "NLD",
+    IL: "ISR",
+    BE: "BEL",
+    JP: "JPN",
+    CH: "CHE",
+    CL: "CHL",
+    AT: "AUT",
   };
 
   const getChannelLogo = (id: number) => {
     switch (id) {
       case 24:
       case 15:
-        return '/logos/ebay.png';
+        return "/logos/ebay.png";
       case 27:
       case 25:
       case 6:
@@ -112,45 +115,51 @@ export default function DespatchReadyOrders() {
       case 5:
       case 4:
       case 3:
-        return '/logos/amazon.png';
+        return "/logos/amazon.png";
       case 11:
-        return '/logos/etsy.png';
+        return "/logos/etsy.png";
       case 8:
       case 7:
-        return '/logos/shopify.png';
+        return "/logos/shopify.png";
       case 26:
-        return '/logos/woocommerce.png';
+        return "/logos/woocommerce.png";
       default:
-        return '/logos/default.png';
+        return "/logos/default.png";
     }
   };
 
   const truncateEmail = (email: string) => {
-    const [local, domain] = email.split('@');
+    const [local, domain] = email.split("@");
     if (!local || !domain) return email;
     return local.length > 15
       ? `${local.slice(0, 5)}[...]${local.slice(-5)}@${domain}`
       : email;
   };
 
-  const apiBase = 'https://p2g-api.up.railway.app';
+  const apiBase = "https://p2g-api.up.railway.app";
 
   const fetchQuotesForOrder = async (order: Order) => {
-  const totalPaid    = parseFloat(order.total_paid)    || 0;
-  const shippingCost = parseFloat(order.shipping_paid) || 0;
-  const baseValue    = totalPaid - shippingCost;
-  const country3     = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
-  const parcelValue  = country3 === 'GBR' ? baseValue / 1.2 : baseValue;
+    const totalPaid = parseFloat(order.total_paid) || 0;
+    const shippingCost = parseFloat(order.shipping_paid) || 0;
+    const baseValue = totalPaid - shippingCost;
+    const country3 =
+      iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
+    const parcelValue = country3 === "GBR" ? baseValue / 1.2 : baseValue;
 
-  const info = packageInfo[order.id] || { weight: '', length: '', width: '', height: '' };
-  setLoadingMap(prev => ({ ...prev, [order.id]: true }));
+    const info = packageInfo[order.id] || {
+      weight: "",
+      length: "",
+      width: "",
+      height: "",
+    };
+    setLoadingMap((prev) => ({ ...prev, [order.id]: true }));
     try {
       const payload = {
         CollectionAddress: {
-          Country: 'GBR',
-          Property: 'Unit 45B Basepoint, Denton Island',
-          Postcode: 'BN9 9BA',
-          Town: 'Newhaven',
+          Country: "GBR",
+          Property: "Unit 45B Basepoint, Denton Island",
+          Postcode: "BN9 9BA",
+          Town: "Newhaven",
         },
         DeliveryAddress: {
           Country: country3,
@@ -170,17 +179,20 @@ export default function DespatchReadyOrders() {
           },
         ],
       };
-      const resp = await axios.post<{ Quotes: Quote[] }>(`${apiBase}/get-quote`, { order: payload });
-      setQuotesMap(prev => ({
+      const resp = await axios.post<{ Quotes: Quote[] }>(
+        `${apiBase}/get-quote`,
+        { order: payload }
+      );
+      setQuotesMap((prev) => ({
         ...prev,
-        [order.id]: resp.data.Quotes
-          .sort((a, b) => a.TotalPrice - b.TotalPrice)
-          .slice(0, 10),
+        [order.id]: resp.data.Quotes.sort(
+          (a, b) => a.TotalPrice - b.TotalPrice
+        ).slice(0, 10),
       }));
     } catch (e) {
       console.error(e);
     } finally {
-      setLoadingMap(prev => ({ ...prev, [order.id]: false }));
+      setLoadingMap((prev) => ({ ...prev, [order.id]: false }));
     }
   };
 
@@ -188,13 +200,19 @@ export default function DespatchReadyOrders() {
     if (!token) return;
     (async () => {
       try {
-        const resp = await axios.get<{ total: number; data: Order[] }>('/api/helm-orders', {
-          headers: { Authorization: `Bearer ${token}`, 'X-Helm-Filter': 'status[]=3' },
-        });
+        const resp = await axios.get<{ total: number; data: Order[] }>(
+          "/api/helm-orders",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "X-Helm-Filter": "status[]=3",
+            },
+          }
+        );
         setOrders(resp.data.data || []);
         setTotal(resp.data.total || 0);
       } catch {
-        setError('Failed to fetch orders');
+        setError("Failed to fetch orders");
       }
     })();
   }, [token]);
@@ -203,7 +221,9 @@ export default function DespatchReadyOrders() {
     <div className={styles.main}>
       <h1 className={styles.title}>Despatch Ready Orders ({total})</h1>
       {error && <p className={styles.error}>{error}</p>}
-      {!error && !orders.length && <p className={styles.subTitle}>No despatch-ready orders found.</p>}
+      {!error && !orders.length && (
+        <p className={styles.subTitle}>No despatch-ready orders found.</p>
+      )}
       {orders.length > 0 && (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
@@ -218,13 +238,21 @@ export default function DespatchReadyOrders() {
               </tr>
             </thead>
             <tbody>
-              {orders.map(order => {
+              {orders.map((order) => {
                 const totalPaid = parseFloat(order.total_paid) || 0;
                 const shippingCost = parseFloat(order.shipping_paid) || 0;
-                const country3 = iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
+                const country3 =
+                  iso2to3[order.shipping_address_iso] ||
+                  order.shipping_address_iso;
                 const baseValue = totalPaid - shippingCost;
-                const parcelValue = country3 === 'GBR' ? baseValue / 1.2 : baseValue;
-                const info = packageInfo[order.id] || { weight: '', length: '', width: '', height: '' };
+                const parcelValue =
+                  country3 === "GBR" ? baseValue / 1.2 : baseValue;
+                const info = packageInfo[order.id] || {
+                  weight: "",
+                  length: "",
+                  width: "",
+                  height: "",
+                };
 
                 return (
                   <Fragment key={order.id}>
@@ -233,28 +261,44 @@ export default function DespatchReadyOrders() {
                       <td
                         className={styles.expandCell}
                         onClick={() =>
-                          setExpanded(prev => {
+                          setExpanded((prev) => {
                             const next = new Set(prev);
-                            next.has(order.id) ? next.delete(order.id) : next.add(order.id);
+                            next.has(order.id)
+                              ? next.delete(order.id)
+                              : next.add(order.id);
                             return next;
                           })
                         }
                       >
-                        {expanded.has(order.id) ? '▼' : '►'}
+                        {expanded.has(order.id) ? "▼" : "►"}
                       </td>
                       <td>
                         <div className={styles.orderCell}>
-                          <img src={getChannelLogo(order.channel_id)} className={styles.logo} alt="" />
+                          <img
+                            src={getChannelLogo(order.channel_id)}
+                            className={styles.logo}
+                            alt=""
+                          />
                           <strong>{order.channel_order_id}</strong>
                         </div>
                       </td>
-                      <td>{order.shipping_name_company || order.shipping_name}</td>
                       <td>
-                        {order.inventory.length} item{order.inventory.length > 1 ? 's' : ''}
+                        {order.shipping_name_company || order.shipping_name}
                       </td>
-                      <td className={styles.totalColumn}>£{totalPaid.toFixed(2)}</td>
+                      <td>
+                        {order.inventory.length} item
+                        {order.inventory.length > 1 ? "s" : ""}
+                      </td>
+                      <td className={styles.totalColumn}>
+                        £{totalPaid.toFixed(2)}
+                      </td>
                       <td className={styles.actionColumn}>
-                        <a href={order.access_url} target="_blank" rel="noopener noreferrer" className={styles.selectButton}>
+                        <a
+                          href={order.access_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.selectButton}
+                        >
                           ↗
                         </a>
                       </td>
@@ -283,11 +327,17 @@ export default function DespatchReadyOrders() {
                                 <strong>Phone:</strong> {order.phone_one}
                               </div>
                               <div>
-                                <strong>Email:</strong> {truncateEmail(order.email)}
+                                <strong>Email:</strong>{" "}
+                                {truncateEmail(order.email)}
                               </div>
                               <div>
-                                <strong>Address:</strong> {order.shipping_address_line_one}
-                                {order.shipping_address_line_two ? ` ${order.shipping_address_line_two}` : ''}, {order.shipping_address_city}, {order.shipping_address_postcode}, {country3}
+                                <strong>Address:</strong>{" "}
+                                {order.shipping_address_line_one}
+                                {order.shipping_address_line_two
+                                  ? ` ${order.shipping_address_line_two}`
+                                  : ""}
+                                , {order.shipping_address_city},{" "}
+                                {order.shipping_address_postcode}, {country3}
                               </div>
                             </div>
                           </td>
@@ -295,63 +345,74 @@ export default function DespatchReadyOrders() {
                             <div className={styles.orderCell}>
                               {order.inventory.map((item, i) => (
                                 <div key={i}>
-                                  <strong>{item.name}</strong> (x{item.quantity})
+                                  <strong>{item.name}</strong> (x{item.quantity}
+                                  )
                                 </div>
                               ))}
                             </div>
                           </td>
                           <td className={styles.totalColumn}>
                             <div className={styles.orderCell}>
-                            {parseFloat(order.total_discount) > 0 && (
+                              {parseFloat(order.total_discount) > 0 && (
+                                <div>
+                                  <strong>Total Discount:</strong> £
+                                  {parseFloat(order.total_discount).toFixed(2)}
+                                </div>
+                              )}
+                              {parseFloat(order.total_tax) > 0 && (
+                                <div>
+                                  <strong>Total Tax:</strong> £
+                                  {parseFloat(order.total_tax).toFixed(2)}
+                                </div>
+                              )}
+                              {shippingCost > 0 && (
+                                <div>
+                                  <strong>Shipping:</strong> £
+                                  {shippingCost.toFixed(2)}
+                                </div>
+                              )}
                               <div>
-                                <strong>Total Discount:</strong> £{parseFloat(order.total_discount).toFixed(2)}
-                              </div>
-                            )}
-                            {parseFloat(order.total_tax) > 0 && (
-                              <div>
-                                <strong>Total Tax:</strong> £{parseFloat(order.total_tax).toFixed(2)}
-                              </div>
-                            )}
-                            { shippingCost > 0 && (
-                              <div>
-                                <strong>Shipping:</strong> £{shippingCost.toFixed(2)}
-                              </div>
-                             )}
-                              <div>
-                                <strong>Parcel Val.:</strong> £{parcelValue.toFixed(2)}
+                                <strong>Parcel Val.:</strong> £
+                                {parcelValue.toFixed(2)}
                               </div>
                             </div>
                           </td>
                           <td></td>
-                          </tr>
-                          <tr className={styles.quotesRow}>
+                        </tr>
+                        <tr className={styles.quotesRow}>
                           <td />
                           <td colSpan={5} className={styles.actionColumn}>
                             <div className={styles.inlineFields}>
-                            <div>
+                              <div>
                                 <label>Weight (kg):</label>
                                 <input
                                   type="number"
                                   size={4}
                                   value={info.weight}
-                                  onChange={e =>
-                                    setPackageInfo(prev => ({
+                                  onChange={(e) =>
+                                    setPackageInfo((prev) => ({
                                       ...prev,
-                                      [order.id]: { ...info, weight: e.target.value }
+                                      [order.id]: {
+                                        ...info,
+                                        weight: e.target.value,
+                                      },
                                     }))
                                   }
                                 />
-                            </div>
-                            <div>
+                              </div>
+                              <div>
                                 <label>Length (cm):</label>
                                 <input
                                   type="number"
                                   size={4}
                                   value={info.length}
-                                  onChange={e =>
-                                    setPackageInfo(prev => ({
+                                  onChange={(e) =>
+                                    setPackageInfo((prev) => ({
                                       ...prev,
-                                      [order.id]: { ...info, length: e.target.value }
+                                      [order.id]: {
+                                        ...info,
+                                        length: e.target.value,
+                                      },
                                     }))
                                   }
                                 />
@@ -362,10 +423,13 @@ export default function DespatchReadyOrders() {
                                   type="number"
                                   size={4}
                                   value={info.width}
-                                  onChange={e =>
-                                    setPackageInfo(prev => ({
+                                  onChange={(e) =>
+                                    setPackageInfo((prev) => ({
                                       ...prev,
-                                      [order.id]: { ...info, width: e.target.value }
+                                      [order.id]: {
+                                        ...info,
+                                        width: e.target.value,
+                                      },
                                     }))
                                   }
                                 />
@@ -376,21 +440,27 @@ export default function DespatchReadyOrders() {
                                   type="number"
                                   size={4}
                                   value={info.height}
-                                  onChange={e =>
-                                    setPackageInfo(prev => ({
+                                  onChange={(e) =>
+                                    setPackageInfo((prev) => ({
                                       ...prev,
-                                      [order.id]: { ...info, height: e.target.value }
+                                      [order.id]: {
+                                        ...info,
+                                        height: e.target.value,
+                                      },
                                     }))
                                   }
                                 />
-                                </div>
-                            <div className={styles.orderCell}>
-                              <button onClick={() => fetchQuotesForOrder(order)} className={styles.primaryButton}>
-                                Get Quotes
-                              </button>
+                              </div>
+                              <div className={styles.orderCell}>
+                                <button
+                                  onClick={() => fetchQuotesForOrder(order)}
+                                  className={styles.primaryButton}
+                                >
+                                  Get Quotes
+                                </button>
+                              </div>
                             </div>
-                            </div>
-                            </td>
+                          </td>
                         </tr>
 
                         {loadingMap[order.id] && (
@@ -402,99 +472,148 @@ export default function DespatchReadyOrders() {
 
                         {/* Render quotes + INFO rows */}
                         {quotesMap[order.id]?.map((q, idx) => {
-  const currentProtection = q.IncludedCover;
+                          const currentProtection = q.IncludedCover;
 
-  const extCover = q.AvailableExtras.find(
-    e => e.Details?.IncludedCover != null && /\d/.test(e.Details.IncludedCover)
-  );
-  const extendedProtection = extCover
-    ? parseFloat(extCover.Details!.IncludedCover.replace(/[^0-9.]/g, ''))
-    : 0;
-  const totalWithExtended = q.TotalPrice + (extCover?.Total ?? 0);
+                          const extCover = q.AvailableExtras.find(
+                            (e) =>
+                              e.Details?.IncludedCover != null &&
+                              /\d/.test(e.Details.IncludedCover)
+                          );
+                          const extendedProtection = extCover
+                            ? parseFloat(
+                                extCover.Details!.IncludedCover.replace(
+                                  /[^0-9.]/g,
+                                  ""
+                                )
+                              )
+                            : 0;
+                          const totalWithExtended =
+                            q.TotalPrice + (extCover?.Total ?? 0);
 
-  const coverExtra = q.AvailableExtras.find(extra => extra.Type === 'Cover');
-  const coverTotal = coverExtra ? coverExtra.Total : 0;
+                          const coverExtra = q.AvailableExtras.find(
+                            (extra) => extra.Type === "Cover"
+                          );
+                          const coverTotal = coverExtra ? coverExtra.Total : 0;
 
-  const quoteRow = (
-    <tr key={`quote-${order.id}-${idx}`} className={styles.serviceQuoteRow}>
-      <td />
-      <td>
-        <img src={q.Service.Links.ImageSvg} alt={`${q.Service.CourierName} logo`} className={styles.logo} /><br />
-        {q.Service.CourierName}
-      </td>
-      <td>
-        <strong>{q.Service.Name}</strong><br />
-        ({q.Service.Slug})
-      </td>
-      <td>
-        <div className={styles.inlineFieldsleft}>
-          <div>
-            <strong>Est. Delivery</strong>
-            {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}
-          </div>
-          <div>
-            <span className={styles.noWrap}>
-              <strong>Max:</strong> {q.Service.MaxWeight}kg
-            </span>
-            {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100}cm
-          </div>
-        </div>
-      </td>
-      <td>
-        <strong>£{q.TotalPrice.toFixed(2)}</strong><br />
-        (£{q.TotalPriceExVat.toFixed(2)}) Ex.Vat
-      </td>
-      <td></td>
-    </tr>
-  );
+                          const quoteRow = (
+                            <tr
+                              key={`quote-${order.id}-${idx}`}
+                              className={styles.serviceQuoteRow}
+                            >
+                              <td />
+                              <td>
+                                <img
+                                  src={q.Service.Links.ImageSvg}
+                                  alt={`${q.Service.CourierName} logo`}
+                                  className={styles.logo}
+                                />
+                                <br />
+                                {q.Service.CourierName}
+                              </td>
+                              <td>
+                                <strong>{q.Service.Name}</strong>
+                                <br />({q.Service.Slug})
+                              </td>
+                              <td>
+                                <div className={styles.inlineFieldsleft}>
+                                  <div>
+                                    <strong>Est. Delivery</strong>
+                                    {new Date(
+                                      q.EstimatedDeliveryDate
+                                    ).toLocaleDateString()}
+                                  </div>
+                                  <div>
+                                    <span className={styles.noWrap}>
+                                      <strong>Max:</strong>{" "}
+                                      {q.Service.MaxWeight}kg
+                                    </span>
+                                    {q.Service.MaxHeight * 100}×
+                                    {q.Service.MaxWidth * 100}×
+                                    {q.Service.MaxLength * 100}cm
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <strong>£{q.TotalPrice.toFixed(2)}</strong>
+                                <br />
+                                (£{q.TotalPriceExVat.toFixed(2)}) Ex.Vat
+                              </td>
+                              <td></td>
+                            </tr>
+                          );
 
-  let infoRow = null;
+                          let infoRow = null;
 
-  if (currentProtection === 0) {
-    infoRow = (
-      <tr key={`info-zero-${order.id}-${idx}`} className={styles.extraRow}>
-        <td />
-        <td colSpan={5}>
-          <strong>
-            INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £
-            {extendedProtection.toFixed(0)} Protection — (+ £{(totalWithExtended - q.TotalPrice).toFixed(2)}) Total: £{totalWithExtended.toFixed(2)} | Book with £{parcelValue.toFixed(2)} Protection — (+ £{coverTotal}) Total: £
-            {(coverTotal + q.TotalPrice).toFixed(2)}
-          </strong>
-        </td>
-      </tr>
-    );
-  } else if (currentProtection > 0 && coverTotal === 0) {
-    infoRow = (
-      <tr key={`info-unavailable-${order.id}-${idx}`} className={styles.extraRow}>
-        <td />
-        <td colSpan={5}>
-          <strong>
-            INFO: Current Protection: £{currentProtection.toFixed(0)} | Extended or Parcel Value protection not available.
-          </strong>
-        </td>
-      </tr>
-    );
-  } else if (currentProtection > 0) {
-    infoRow = (
-      <tr key={`info-pos-${order.id}-${idx}`} className={styles.extraRow}>
-        <td />
-        <td colSpan={5}>
-          <strong>
-            INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £{parcelValue.toFixed(2)} Protection — (+£{coverTotal}) Total: £
-            {(coverTotal + q.TotalPrice).toFixed(2)}
-          </strong>
-        </td>
-      </tr>
-    );
-  }
+                          if (currentProtection === 0) {
+                            infoRow = (
+                              <tr
+                                key={`info-zero-${order.id}-${idx}`}
+                                className={styles.extraRow}
+                              >
+                                <td />
+                                <td colSpan={5}>
+                                  <strong>
+                                    INFO: Current Protection: £
+                                    {currentProtection.toFixed(0)} | Book with £
+                                    {extendedProtection.toFixed(0)} Protection —
+                                    (+ £
+                                    {(totalWithExtended - q.TotalPrice).toFixed(
+                                      2
+                                    )}
+                                    ) Total: £{totalWithExtended.toFixed(2)} |
+                                    Book with £{parcelValue.toFixed(2)}{" "}
+                                    Protection — (+ £{coverTotal}) Total: £
+                                    {(coverTotal + q.TotalPrice).toFixed(2)}
+                                  </strong>
+                                </td>
+                              </tr>
+                            );
+                          } else if (
+                            currentProtection > 0 &&
+                            coverTotal === 0
+                          ) {
+                            infoRow = (
+                              <tr
+                                key={`info-unavailable-${order.id}-${idx}`}
+                                className={styles.extraRow}
+                              >
+                                <td />
+                                <td colSpan={5}>
+                                  <strong>
+                                    INFO: Current Protection: £
+                                    {currentProtection.toFixed(0)} | Extended or
+                                    Parcel Value protection not available.
+                                  </strong>
+                                </td>
+                              </tr>
+                            );
+                          } else if (currentProtection > 0) {
+                            infoRow = (
+                              <tr
+                                key={`info-pos-${order.id}-${idx}`}
+                                className={styles.extraRow}
+                              >
+                                <td />
+                                <td colSpan={5}>
+                                  <strong>
+                                    INFO: Current Protection: £
+                                    {currentProtection.toFixed(0)} | Book with £
+                                    {parcelValue.toFixed(2)} Protection — (+£
+                                    {coverTotal}) Total: £
+                                    {(coverTotal + q.TotalPrice).toFixed(2)}
+                                  </strong>
+                                </td>
+                              </tr>
+                            );
+                          }
 
-  return (
-    <Fragment key={`group-${order.id}-${idx}`}>
-      {quoteRow}
-      {infoRow}
-    </Fragment>
-  );
-})}
+                          return (
+                            <Fragment key={`group-${order.id}-${idx}`}>
+                              {quoteRow}
+                              {infoRow}
+                            </Fragment>
+                          );
+                        })}
                       </>
                     )}
                   </Fragment>
