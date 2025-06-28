@@ -372,7 +372,7 @@ table .serviceQuoteRow td {
   white-space: nowrap;
 }
 
-.button-group {
+.buttonGroup {
   display: flex;
   border: 1px solid #d0d5dd;
   border-radius: 12px;
@@ -383,7 +383,7 @@ table .serviceQuoteRow td {
   gap: 8px;
 }
 
-.button-option {
+.buttonOption {
   background: #fff;
   padding: 12px 16px;
   border-radius: 8px;
@@ -392,7 +392,7 @@ table .serviceQuoteRow td {
   box-shadow: 0 0 0 1px #d0d5dd;
 }
 
-.button-option.active {
+.buttonOption.active {
   background: #e6f0ff;
   box-shadow: none;
 }
@@ -403,8 +403,8 @@ table .serviceQuoteRow td {
   margin-bottom: 4px;
 }
 
-.outline-button,
-.solid-button {
+.outlineButton,
+.solidButton {
   border: none;
   border-radius: 6px;
   padding: 6px 12px;
@@ -413,7 +413,7 @@ table .serviceQuoteRow td {
   cursor: pointer;
 }
 
-.outline-button {
+.outlineButton {
   background: #fff;
   border: 1px solid #d0d5dd;
   color: #333;
