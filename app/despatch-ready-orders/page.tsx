@@ -468,7 +468,7 @@ export default function DespatchReadyOrders() {
                                 <td />
                                 <td colSpan={5}>
                                   <strong>
-                                    INFO: Current Protection: £{currentProtection.toFixed(0)} | Extended protection not available. | Book with £{parcelValue.toFixed(0)} Protection — Total: £
+                                    INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £{parcelValue.toFixed(0)} Protection — Total: £
                                     {(coverTotal + q.TotalPrice).toFixed(2)} 
                                   </strong>
                                 </td>
