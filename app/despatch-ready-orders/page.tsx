@@ -474,7 +474,17 @@ export default function DespatchReadyOrders() {
                                 </td>
                               </tr>
                             );
-                          }
+                          } else if (currentProtection > 0) and (coverTotal === 0) {
+                            infoRow = (
+                              <tr key={`info-pos-${order.id}-${idx}`} className={styles.extraRow}>
+                                <td />
+                                <td colSpan={5}>
+                                  <strong>
+                                    INFO: Current Protection: £{currentProtection.toFixed(0)} | Extended or Parcel Value protection not available.
+                                  </strong>
+                                </td>
+                              </tr>
+                            );
 
                           return (
                             <Fragment key={`group-${order.id}-${idx}`}>
