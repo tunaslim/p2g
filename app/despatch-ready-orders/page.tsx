@@ -595,14 +595,14 @@ export default function DespatchReadyOrders() {
                               >
                                 <td />
                                 <td colSpan={5}>
-                                  <div class="button-group">
-                                    <div class="button-option">
-                                      <div class="price">£{q.TotalPrice.toFixed(2)}</div>
-                                        <button class="outline-button">Book with £{currentProtection.toFixed(0)} Protection</button>
+                                  <div className={styles.buttonGroup}>
+                                    <div className={styles.buttonOption}>
+                                      <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
+                                        <button className={styles.outlineButton}>Book with £{currentProtection.toFixed(0)} Protection</button>
                                     </div>
-                                        <div class="button-option active">
-                                        <div class="price">(+£{coverTotal}) £{(coverTotal + q.TotalPrice).toFixed(2)}</div>
-                                        <button class="solid-button">Book with £{parcelValue.toFixed(2)} Protection</button>
+                                        <div className={styles.buttonOption.active}>
+                                        <div className={styles.price}>(+£{coverTotal}) £{(coverTotal + q.TotalPrice).toFixed(2)}</div>
+                                        <button className={styles.solidButton}>Book with £{parcelValue.toFixed(2)} Protection</button>
                                     </div>
                                   </div>
                                 </td>
