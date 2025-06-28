@@ -414,7 +414,6 @@ export default function DespatchReadyOrders() {
                           {/* Find Insurance Total */}
                           const coverExtra = q.AvailableExtras.find(extra => extra.Type === 'Cover');
                           const coverTotal = coverExtra ? coverExtra.Total : 0;
-                          console.log('Cover Total:', coverTotal);
 
                           const quoteRow = (
                             <tr key={`quote-${order.id}-${idx}`} className={styles.serviceQuoteRow}>
@@ -457,7 +456,8 @@ export default function DespatchReadyOrders() {
                                 <td colSpan={5}>
                                   <strong>
                                     INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £
-                                    {extendedProtection.toFixed(0)} Protection — Total: £{totalWithExtended.toFixed(2)}                                   
+                                    {extendedProtection.toFixed(0)} Protection — Total: £{totalWithExtended.toFixed(2)} | Book with £{parcelValue.toFixed(0)} Protection — Total: £
+                                    {(coverTotal + q.TotalPrice).toFixed(2)}                                 
                                   </strong>
                                 </td>
                               </tr>
@@ -468,7 +468,8 @@ export default function DespatchReadyOrders() {
                                 <td />
                                 <td colSpan={5}>
                                   <strong>
-                                    INFO: Current Protection: £{currentProtection.toFixed(0)} | Extended protection not available.
+                                    INFO: Current Protection: £{currentProtection.toFixed(0)} | Extended protection not available. | Book with £{parcelValue.toFixed(0)} Protection — Total: £
+                                    {(coverTotal + q.TotalPrice).toFixed(2)} 
                                   </strong>
                                 </td>
                               </tr>
