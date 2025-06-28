@@ -474,7 +474,7 @@ export default function DespatchReadyOrders() {
                                 </td>
                               </tr>
                             );
-                          } else if (currentProtection > 0) and (coverTotal === 0) {
+                          } else if (currentProtection > 0 && coverTotal === 0) {
                             infoRow = (
                               <tr key={`info-pos-${order.id}-${idx}`} className={styles.extraRow}>
                                 <td />
