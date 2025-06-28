@@ -382,9 +382,9 @@ export default function DespatchReadyOrders() {
                         <tr className={styles.quotesRow}>
   <td />
   <td colSpan={5} className={styles.actionColumn}>
-    <div className={styles.buttonGroup}>
+    <div className={styles.styles.infoGroup}>
       {/* Weight */}
-      <div className={styles.buttonOption}>
+      <div className={styles.styles.fieldBox}>
         <div className={styles.subInfo}>Weight (kg)</div>
         <input
           type="number"
@@ -395,11 +395,10 @@ export default function DespatchReadyOrders() {
               [order.id]: { ...info, weight: e.target.value }
             }))
           }
-          className={styles.priceInput}
         />
       </div>
       {/* Length */}
-      <div className={styles.buttonOption}>
+      <div className={styles.fieldBox}>
         <div className={styles.subInfo}>Length (cm)</div>
         <input
           type="number"
@@ -410,11 +409,10 @@ export default function DespatchReadyOrders() {
               [order.id]: { ...info, length: e.target.value }
             }))
           }
-          className={styles.priceInput}
         />
       </div>
       {/* Width */}
-      <div className={styles.buttonOption}>
+      <div className={styles.fieldBox}>
         <div className={styles.subInfo}>Width (cm)</div>
         <input
           type="number"
@@ -425,11 +423,10 @@ export default function DespatchReadyOrders() {
               [order.id]: { ...info, width: e.target.value }
             }))
           }
-          className={styles.priceInput}
         />
       </div>
       {/* Height */}
-      <div className={styles.buttonOption}>
+      <div className={styles.fieldBox}>
         <div className={styles.subInfo}>Height (cm)</div>
         <input
           type="number"
@@ -440,7 +437,6 @@ export default function DespatchReadyOrders() {
               [order.id]: { ...info, height: e.target.value }
             }))
           }
-          className={styles.priceInput}
         />
       </div>
       {/* Get Quotes */}
