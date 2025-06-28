@@ -440,3 +440,28 @@ table .serviceQuoteRow td {
   margin-top: 4px;
   color: #444;
 }
+
+/* Wraps each label+input */
+.fieldOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80px;          /* adjust as needed */
+  margin-right: 8px;    /* space between fields */
+}
+
+/* Inputs take full width of their container */
+.fieldInput {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Optional: smaller label under the same styling as subInfo */
+.fieldOption label {
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+  color: #555;
+}
