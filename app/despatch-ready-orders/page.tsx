@@ -508,8 +508,6 @@ export default function DespatchReadyOrders() {
                                   </div>
                                 </div>
                               </td>
-                              <td />
-                              <td />
                               <td colSpan={2} style={{ textAlign: "right" }}>
                                 <div className={styles.buttonGroup}>
                                   {currentProtection === 0 && (
