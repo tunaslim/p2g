@@ -89,6 +89,8 @@
 }
 
 .table .extraRow td {
+  display: flex;
+  justify-content: flex-end;   /* <-- align children to the right */
   background-color: #ebe8c0;
   font-size: 0.9rem;
   color: #555;
