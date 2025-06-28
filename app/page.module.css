@@ -475,3 +475,16 @@ table .serviceQuoteRow td {
   text-align: center;
   font-size: 0.9rem;
 }
+
+/* Force inputs to respect width inside .buttonOption */
+.buttonOption :global(input.priceInput) {
+  display: block;
+  box-sizing: border-box;
+  width: 30px !important;    /* your desired width */
+  padding: 4px 6px;
+  border: none;
+  background: #f5f5f5;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.9rem;
+}
