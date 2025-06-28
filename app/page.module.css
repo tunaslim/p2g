@@ -374,52 +374,54 @@ table .serviceQuoteRow td {
 
 .buttonGroup {
   display: flex;
-  border: 1px solid #d0d5dd;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #f9fafb;
-  padding: 8px;
-  max-width: 500px;
+  flex-wrap: wrap;
   gap: 8px;
+  padding-top: 8px;
 }
 
 .buttonOption {
-  background: #fff;
-  padding: 12px 16px;
-  border-radius: 8px;
   flex: 1;
+  min-width: 180px;
+  background: #fff;
+  border: 1px solid #d0d5dd;
+  border-radius: 12px;
+  padding: 10px 12px;
   text-align: center;
-  box-shadow: 0 0 0 1px #d0d5dd;
+  box-shadow: 0 0 0 1px #e0e0e0;
 }
 
-.buttonOption.active {
-  background: #e6f0ff;
-  box-shadow: none;
+.buttonOption:hover {
+  box-shadow: 0 0 0 2px #0078d4;
 }
 
 .price {
   font-weight: bold;
   font-size: 1.1rem;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
-.outlineButton,
-.solidButton {
-  border: none;
+.outlineButton {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 6px 10px;
   border-radius: 6px;
-  padding: 6px 12px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #333;
+}
+
+.solidButton {
+  background: #28a745;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
   font-weight: 500;
   font-size: 0.9rem;
   cursor: pointer;
 }
 
-.outlineButton {
-  background: #fff;
-  border: 1px solid #d0d5dd;
-  color: #333;
-}
-
-.solid-button {
-  background-color: #28a745; /* green */
-  color: white;
+.solidButton:hover {
+  background: #218838;
 }
