@@ -603,7 +603,6 @@ export default function DespatchReadyOrders() {
                                 <td />
                                 <td />
                                 <td />
-                                <td />
                                 <td colSpan={5}>
                                   <div className={styles.buttonGroup}>
                                     <div className={styles.buttonOption}>
