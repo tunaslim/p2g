@@ -533,11 +533,7 @@ export default function DespatchReadyOrders() {
                                   </div>
                                 </div>
                               </td>
-                              <td>
-                                <strong>£{q.TotalPrice.toFixed(2)}</strong>
-                                <br />
-                                (£{q.TotalPriceExVat.toFixed(2)}) Ex.Vat
-                              </td>
+                              <td></td>
                               <td></td>
                             </tr>
                           );
