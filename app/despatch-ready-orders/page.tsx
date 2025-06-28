@@ -470,43 +470,24 @@ export default function DespatchReadyOrders() {
                           </tr>
                         )}
 
-                        {/* Render quotes + INFO rows */}
+                         {/* Combined Quote + Info row */}
                         {quotesMap[order.id]?.map((q, idx) => {
                           const currentProtection = q.IncludedCover;
-
                           const extCover = q.AvailableExtras.find(
-                            (e) =>
-                              e.Details?.IncludedCover != null &&
-                              /\d/.test(e.Details.IncludedCover)
+                            (e) => e.Details?.IncludedCover && /\d/.test(e.Details.IncludedCover)
                           );
                           const extendedProtection = extCover
-                            ? parseFloat(
-                                extCover.Details!.IncludedCover.replace(
-                                  /[^0-9.]/g,
-                                  ""
-                                )
-                              )
+                            ? parseFloat(extCover.Details!.IncludedCover.replace(/[^0-9.]/g, ""))
                             : 0;
-                          const totalWithExtended =
-                            q.TotalPrice + (extCover?.Total ?? 0);
-
-                          const coverExtra = q.AvailableExtras.find(
-                            (extra) => extra.Type === "Cover"
-                          );
+                          const totalWithExtended = q.TotalPrice + (extCover?.Total || 0);
+                          const coverExtra = q.AvailableExtras.find((extra) => extra.Type === "Cover");
                           const coverTotal = coverExtra ? coverExtra.Total : 0;
 
-                          const quoteRow = (
-                            <tr
-                              key={`quote-${order.id}-${idx}`}
-                              className={styles.serviceQuoteRow}
-                            >
+                          return (
+                            <tr key={`quote-${order.id}-${idx}`} className={styles.serviceQuoteRow}>
                               <td />
                               <td>
-                                <img
-                                  src={q.Service.Links.ImageSvg}
-                                  alt={`${q.Service.CourierName} logo`}
-                                  className={styles.logo}
-                                />
+                                <img src={q.Service.Links.ImageSvg} alt={`${q.Service.CourierName} logo`} className={styles.logo} />
                                 <br />
                                 {q.Service.CourierName}
                               </td>
@@ -514,9 +495,10 @@ export default function DespatchReadyOrders() {
                                 <div className={styles.serviceInfoBlock}>
                                   <div>
                                     <strong>{q.Service.Name}</strong>
-                                    <br />({q.Service.Slug})
+                                    <br />
+                                    ({q.Service.Slug})
                                   </div>
-                                    <div className={styles.subInfo}>
+                                  <div className={styles.subInfo}>
                                     <div>
                                       <strong>Est. Delivery:</strong> {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}
                                     </div>
@@ -526,87 +508,47 @@ export default function DespatchReadyOrders() {
                                   </div>
                                 </div>
                               </td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                            </tr>
-                          );
-
-                          let infoRow = null;
-
-                          if (currentProtection === 0) {
-                            infoRow = (
-                              <tr
-                                key={`info-zero-${order.id}-${idx}`}
-                                className={styles.extraRow}
-                              >
-                                <td />
-                                <td colSpan={5} style={{ textAlign: "right" }}>
-                                  <div className={styles.buttonGroup}>
-                                    <div className={styles.buttonOption}>
-                                      <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
+                              <td />
+                              <td />
+                              <td colSpan={2} style={{ textAlign: "right" }}>
+                                <div className={styles.buttonGroup}>
+                                  {currentProtection === 0 && (
+                                    <>
+                                      <div className={styles.buttonOption}>
+                                        <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
                                         <button className={styles.outlineButton}>Book without Protection</button>
-                                    </div>
-                                        <div className={styles.buttonOption}>
+                                      </div>
+                                      <div className={styles.buttonOption}>
                                         <div className={styles.price}>(+ £{(totalWithExtended - q.TotalPrice).toFixed(2)}) £{totalWithExtended.toFixed(2)}</div>
                                         <button className={styles.solidButton}>Book with £{extendedProtection.toFixed(0)} Protection</button>
-                                    </div>
-                                        <div className={styles.buttonOption}>
+                                      </div>
+                                      <div className={styles.buttonOption}>
                                         <div className={styles.price}>(+ £{coverTotal}) £{(coverTotal + q.TotalPrice).toFixed(2)}</div>
                                         <button className={styles.solidButton}>Book with £{parcelValue.toFixed(2)} Protection</button>
-                                    </div>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          } else if (
-                            currentProtection > 0 &&
-                            coverTotal === 0
-                          ) {
-                            infoRow = (
-                              <tr
-                                key={`info-unavailable-${order.id}-${idx}`}
-                                className={styles.extraRow}
-                              >
-                                <td />
-                                <td colSpan={5} style={{ textAlign: "right" }}>
-                                  <div className={styles.buttonGroup}>
+                                      </div>
+                                    </>
+                                  )}
+                                  {currentProtection > 0 && coverTotal === 0 && (
                                     <div className={styles.buttonOption}>
                                       <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
                                       <button className={styles.outlineButton}>Book with £{currentProtection.toFixed(0)} Protection</button>
                                     </div>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          } else if (currentProtection > 0) {
-                            infoRow = (
-                              <tr
-                                key={`info-pos-${order.id}-${idx}`}
-                                className={styles.extraRow}
-                              >
-                                <td />
-                                <td colSpan={5} style={{ textAlign: "right" }}>
-                                  <div className={styles.buttonGroup}>
-                                    <div className={styles.buttonOption}>
-                                      <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
+                                  )}
+                                  {currentProtection > 0 && coverTotal > 0 && (
+                                    <>
+                                      <div className={styles.buttonOption}>
+                                        <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
                                         <button className={styles.outlineButton}>Book with £{currentProtection.toFixed(0)} Protection</button>
-                                    </div>
-                                        <div className={styles.buttonOption}>
+                                      </div>
+                                      <div className={styles.buttonOption}>
                                         <div className={styles.price}>(+ £{coverTotal}) £{(coverTotal + q.TotalPrice).toFixed(2)}</div>
                                         <button className={styles.solidButton}>Book with £{parcelValue.toFixed(2)} Protection</button>
-                                    </div>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          }
-
-                          return (
-                            <Fragment key={`group-${order.id}-${idx}`}>
-                              {quoteRow}
-                              {infoRow}
-                            </Fragment>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
                           );
                         })}
                       </>
