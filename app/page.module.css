@@ -511,3 +511,35 @@ table .serviceQuoteRow td {
   font-size: 0.9rem;
   box-sizing: border-box;
 }
+
+.infoGroup {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;              /* space between each field/button */
+}
+
+.fieldBox {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 60px;            /* your fixed width */
+}
+
+/* Label styling */
+.fieldBox label {
+  font-size: 0.75rem;
+  color: #555;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+/* Input styling */
+.fieldBox input {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+  box-sizing: border-box;
+}
