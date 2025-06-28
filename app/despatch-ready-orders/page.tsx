@@ -511,10 +511,6 @@ export default function DespatchReadyOrders() {
                                 {q.Service.CourierName}
                               </td>
                               <td>
-                                <strong>{q.Service.Name}</strong>
-                                <br />({q.Service.Slug})
-                              </td>
-                              <td>
                                 <div className={styles.serviceInfoBlock}>
                                   <div>
                                     <strong>{q.Service.Name}</strong>
@@ -530,6 +526,7 @@ export default function DespatchReadyOrders() {
                                   </div>
                                 </div>
                               </td>
+                              <td></td>
                               <td></td>
                               <td></td>
                             </tr>
