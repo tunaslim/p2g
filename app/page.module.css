@@ -523,7 +523,7 @@ table .serviceQuoteRow td {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 70px;            /* your fixed width */
+  width: 80px;            /* your fixed width */
 }
 
 /* Label styling */
