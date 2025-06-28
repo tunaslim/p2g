@@ -600,7 +600,7 @@ export default function DespatchReadyOrders() {
                                       <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
                                         <button className={styles.outlineButton}>Book with £{currentProtection.toFixed(0)} Protection</button>
                                     </div>
-                                        <div className={styles.buttonOption.active}>
+                                        <div className={styles.buttonOption}>
                                         <div className={styles.price}>(+£{coverTotal}) £{(coverTotal + q.TotalPrice).toFixed(2)}</div>
                                         <button className={styles.solidButton}>Book with £{parcelValue.toFixed(2)} Protection</button>
                                     </div>
