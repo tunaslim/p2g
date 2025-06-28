@@ -551,8 +551,6 @@ export default function DespatchReadyOrders() {
                                 className={styles.extraRow}
                               >
                                 <td />
-                                <td />
-                                <td />
                                 <td colSpan={5}>
                                   <div className={styles.buttonGroup}>
                                     <div className={styles.buttonOption}>
@@ -581,9 +579,6 @@ export default function DespatchReadyOrders() {
                                 className={styles.extraRow}
                               >
                                 <td />
-                                <td />
-                                <td />
-                                <td />
                                 <td colSpan={5}>
                                   <div className={styles.buttonGroup}>
                                     <div className={styles.buttonOption}>
@@ -600,8 +595,6 @@ export default function DespatchReadyOrders() {
                                 key={`info-pos-${order.id}-${idx}`}
                                 className={styles.extraRow}
                               >
-                                <td />
-                                <td />
                                 <td />
                                 <td colSpan={5}>
                                   <div className={styles.buttonGroup}>
