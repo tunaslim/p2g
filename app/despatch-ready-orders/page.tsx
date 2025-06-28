@@ -402,96 +402,99 @@ export default function DespatchReadyOrders() {
 
                         {/* Render quotes + INFO rows */}
                         {quotesMap[order.id]?.map((q, idx) => {
-                          const currentProtection = q.IncludedCover;
-                          const extCover = q.AvailableExtras.find(
-                          e => e.Details?.IncludedCover != null && /\d/.test(e.Details.IncludedCover)
-                          );
-                          const extendedProtection = extCover
-                          ? parseFloat(extCover.Details!.IncludedCover.replace(/[^0-9.]/g, ''))
-                          : 0;
-                          const totalWithExtended = q.TotalPrice + (extCover?.Total ?? 0);
+  const currentProtection = q.IncludedCover;
 
-                          const coverExtra = q.AvailableExtras.find(extra => extra.Type === 'Cover');
-                          const coverTotal = coverExtra ? coverExtra.Total : 0;
+  const extCover = q.AvailableExtras.find(
+    e => e.Details?.IncludedCover != null && /\d/.test(e.Details.IncludedCover)
+  );
+  const extendedProtection = extCover
+    ? parseFloat(extCover.Details!.IncludedCover.replace(/[^0-9.]/g, ''))
+    : 0;
+  const totalWithExtended = q.TotalPrice + (extCover?.Total ?? 0);
 
-                          const quoteRow = (
-                            <tr key={`quote-${order.id}-${idx}`} className={styles.serviceQuoteRow}>
-                              <td />
-                              <td>
-                                <img src={q.Service.Links.ImageSvg} alt={`${q.Service.CourierName} logo`} className={styles.logo} /><br />
-                                {q.Service.CourierName}
-                              </td>
-                              <td>
-                                <strong>{q.Service.Name}</strong><br />
-                                ({q.Service.Slug})
-                              </td>
-                              <td>
-                                <div className={styles.inlineFieldsleft}>
-                                <div>
-                                <strong>Est. Delivery</strong>
-                                {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}
-                                </div>
-                                <div>
-                                <span className={styles.noWrap}>
-                                <strong>Max:</strong> {q.Service.MaxWeight}kg
-                                </span>
-                                {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100}cm
-                                </div>
-                                </div>
-                              </td>
-                              <td>
-                                <strong>£{q.TotalPrice.toFixed(2)}</strong><br />
-                                (£{q.TotalPriceExVat.toFixed(2)}) Ex.Vat
-                              </td>
-                              <td></td>
-                            </tr>
-                          );
+  const coverExtra = q.AvailableExtras.find(extra => extra.Type === 'Cover');
+  const coverTotal = coverExtra ? coverExtra.Total : 0;
 
-                          let infoRow = null;
-                          if (currentProtection === 0) {
-                            infoRow = (
-                              <tr key={`info-zero-${order.id}-${idx}`} className={styles.extraRow}>
-                                <td />
-                                <td colSpan={5}>
-                                  <strong>
-                                    INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £
-                                    {extendedProtection.toFixed(0)} Protection — (+ £{(totalWithExtended - q.TotalPrice).toFixed(2)}) Total: £{totalWithExtended.toFixed(2)} | Book with £{parcelValue.toFixed(2)} Protection — (+ £{coverTotal}) Total: £
-                                    {(coverTotal + q.TotalPrice).toFixed(2)}                                 
-                                  </strong>
-                                </td>
-                              </tr>
-                            );
-                          } else if (currentProtection > 0) {
-                            infoRow = (
-                              <tr key={`info-pos-${order.id}-${idx}`} className={styles.extraRow}>
-                                <td />
-                                <td colSpan={5}>
-                                  <strong>
-                                    INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £{parcelValue.toFixed(2)} Protection — (+£{coverTotal}) Total: £
-                                    {(coverTotal + q.TotalPrice).toFixed(2)} 
-                                  </strong>
-                                </td>
-                              </tr>
-                            );
-                          } else if (currentProtection > 0 && coverTotal === 0) {
-                            infoRow = (
-                              <tr key={`info-pos-${order.id}-${idx}`} className={styles.extraRow}>
-                                <td />
-                                <td colSpan={5}>
-                                  <strong>
-                                    INFO: Current Protection: £{currentProtection.toFixed(0)} | Extended or Parcel Value protection not available.
-                                  </strong>
-                                </td>
-                              </tr>
-                            );
+  const quoteRow = (
+    <tr key={`quote-${order.id}-${idx}`} className={styles.serviceQuoteRow}>
+      <td />
+      <td>
+        <img src={q.Service.Links.ImageSvg} alt={`${q.Service.CourierName} logo`} className={styles.logo} /><br />
+        {q.Service.CourierName}
+      </td>
+      <td>
+        <strong>{q.Service.Name}</strong><br />
+        ({q.Service.Slug})
+      </td>
+      <td>
+        <div className={styles.inlineFieldsleft}>
+          <div>
+            <strong>Est. Delivery</strong>
+            {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}
+          </div>
+          <div>
+            <span className={styles.noWrap}>
+              <strong>Max:</strong> {q.Service.MaxWeight}kg
+            </span>
+            {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100}cm
+          </div>
+        </div>
+      </td>
+      <td>
+        <strong>£{q.TotalPrice.toFixed(2)}</strong><br />
+        (£{q.TotalPriceExVat.toFixed(2)}) Ex.Vat
+      </td>
+      <td></td>
+    </tr>
+  );
 
-                          return (
-                            <Fragment key={`group-${order.id}-${idx}`}>
-                              {quoteRow}
-                              {infoRow}
-                            </Fragment>
-                          );
-                        })}
+  let infoRow = null;
+
+  if (currentProtection === 0) {
+    infoRow = (
+      <tr key={`info-zero-${order.id}-${idx}`} className={styles.extraRow}>
+        <td />
+        <td colSpan={5}>
+          <strong>
+            INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £
+            {extendedProtection.toFixed(0)} Protection — (+ £{(totalWithExtended - q.TotalPrice).toFixed(2)}) Total: £{totalWithExtended.toFixed(2)} | Book with £{parcelValue.toFixed(2)} Protection — (+ £{coverTotal}) Total: £
+            {(coverTotal + q.TotalPrice).toFixed(2)}
+          </strong>
+        </td>
+      </tr>
+    );
+  } else if (currentProtection > 0 && coverTotal === 0) {
+    infoRow = (
+      <tr key={`info-unavailable-${order.id}-${idx}`} className={styles.extraRow}>
+        <td />
+        <td colSpan={5}>
+          <strong>
+            INFO: Current Protection: £{currentProtection.toFixed(0)} | Extended or Parcel Value protection not available.
+          </strong>
+        </td>
+      </tr>
+    );
+  } else if (currentProtection > 0) {
+    infoRow = (
+      <tr key={`info-pos-${order.id}-${idx}`} className={styles.extraRow}>
+        <td />
+        <td colSpan={5}>
+          <strong>
+            INFO: Current Protection: £{currentProtection.toFixed(0)} | Book with £{parcelValue.toFixed(2)} Protection — (+£{coverTotal}) Total: £
+            {(coverTotal + q.TotalPrice).toFixed(2)}
+          </strong>
+        </td>
+      </tr>
+    );
+  }
+
+  return (
+    <Fragment key={`group-${order.id}-${idx}`}>
+      {quoteRow}
+      {infoRow}
+    </Fragment>
+  );
+})}
                       </>
                     )}
                   </Fragment>
