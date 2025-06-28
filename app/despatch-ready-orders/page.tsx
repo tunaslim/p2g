@@ -411,6 +411,11 @@ export default function DespatchReadyOrders() {
                           : 0;
                           const totalWithExtended = q.TotalPrice + (extCover?.Total ?? 0);
 
+                          {/* Find Insurance Total */}
+                          const coverExtra = q.AvailableExtras.find(extra => extra.Type === 'Cover');
+                          const coverTotal = coverExtra ? coverExtra.Total : 0;
+                          console.log('Cover Total:', coverTotal);
+
                           const quoteRow = (
                             <tr key={`quote-${order.id}-${idx}`} className={styles.serviceQuoteRow}>
                               <td />
