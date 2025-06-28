@@ -488,3 +488,26 @@ table .serviceQuoteRow td {
   text-align: center;
   font-size: 0.9rem;
 }
+
+/* Ensure input boxes inside .buttonOption stay the size we give them */
+.buttonOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.buttonOption input {
+  /* Lock in our desired width */
+  flex: 0 0 auto;
+  width: 30px;       /* change this to whatever you like */
+  max-width: 60px;
+  min-width: 60px;
+  /* styling */
+  padding: 4px 6px;
+  border: none;
+  background: #f5f5f5;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
