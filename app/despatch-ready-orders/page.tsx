@@ -551,7 +551,7 @@ export default function DespatchReadyOrders() {
                                 className={styles.extraRow}
                               >
                                 <td />
-                                <td colSpan={5}>
+                                <td colSpan={5} style={{ textAlign: "right" }}>
                                   <div className={styles.buttonGroup}>
                                     <div className={styles.buttonOption}>
                                       <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
@@ -579,7 +579,7 @@ export default function DespatchReadyOrders() {
                                 className={styles.extraRow}
                               >
                                 <td />
-                                <td colSpan={5}>
+                                <td colSpan={5} style={{ textAlign: "right" }}>
                                   <div className={styles.buttonGroup}>
                                     <div className={styles.buttonOption}>
                                       <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
@@ -596,7 +596,7 @@ export default function DespatchReadyOrders() {
                                 className={styles.extraRow}
                               >
                                 <td />
-                                <td colSpan={5}>
+                                <td colSpan={5} style={{ textAlign: "right" }}>
                                   <div className={styles.buttonGroup}>
                                     <div className={styles.buttonOption}>
                                       <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
