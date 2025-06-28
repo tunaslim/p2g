@@ -515,21 +515,18 @@ export default function DespatchReadyOrders() {
                                 <br />({q.Service.Slug})
                               </td>
                               <td>
-                                <div className={styles.inlineFieldsleft}>
+                                <div className={styles.serviceInfoBlock}>
                                   <div>
-                                    <strong>Est. Delivery</strong>
-                                    {new Date(
-                                      q.EstimatedDeliveryDate
-                                    ).toLocaleDateString()}
+                                    <strong>{q.Service.Name}</strong>
+                                    <br />({q.Service.Slug})
                                   </div>
-                                  <div>
-                                    <span className={styles.noWrap}>
-                                      <strong>Max:</strong>{" "}
-                                      {q.Service.MaxWeight}kg
-                                    </span>
-                                    {q.Service.MaxHeight * 100}×
-                                    {q.Service.MaxWidth * 100}×
-                                    {q.Service.MaxLength * 100}cm
+                                    <div className={styles.subInfo}>
+                                    <div>
+                                      <strong>Est. Delivery:</strong> {new Date(q.EstimatedDeliveryDate).toLocaleDateString()}
+                                    </div>
+                                    <div>
+                                      <strong>Max:</strong> {q.Service.MaxWeight}kg — {q.Service.MaxHeight * 100}×{q.Service.MaxWidth * 100}×{q.Service.MaxLength * 100}cm
+                                    </div>
                                   </div>
                                 </div>
                               </td>
