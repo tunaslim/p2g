@@ -374,14 +374,15 @@ table .serviceQuoteRow td {
 
 .buttonGroup {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
+  justify-content: flex-end; /* right-align the group */
   padding-top: 8px;
+  margin-top: 4px;
+  margin-bottom: 8px;
 }
 
 .buttonOption {
-  flex: 1;
-  min-width: 180px;
+  width: 250px; /* fixed width */
   background: #fff;
   border: 1px solid #d0d5dd;
   border-radius: 12px;
@@ -409,6 +410,7 @@ table .serviceQuoteRow td {
   font-size: 0.9rem;
   cursor: pointer;
   color: #333;
+  width: 100%;
 }
 
 .solidButton {
@@ -420,6 +422,7 @@ table .serviceQuoteRow td {
   font-weight: 500;
   font-size: 0.9rem;
   cursor: pointer;
+  width: 100%;
 }
 
 .solidButton:hover {
