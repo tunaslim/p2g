@@ -467,7 +467,7 @@ table .serviceQuoteRow td {
 }
 
 .priceInput {
-  width: 60px;          /* tweak as you like */
+  width: 30px;          /* tweak as you like */
   padding: 4px 6px;
   border: none;
   background: #f5f5f5;
