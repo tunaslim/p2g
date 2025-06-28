@@ -68,7 +68,6 @@ interface Order {
 }
 
 export default function DespatchReadyOrders() {
-  const router = useRouter();
   const { token } = useToken();
   const [orders, setOrders] = useState<Order[]>([]);
   const [total, setTotal] = useState<number>(0);
@@ -196,7 +195,6 @@ export default function DespatchReadyOrders() {
 
                 return (
                   <Fragment key={order.id}>
-                    {/* Order Row */}
                     <tr className={styles.quotesRow}>
                       <td className={styles.expandCell} onClick={() => setExpanded((prev) => {
                         const next = new Set(prev);
@@ -209,14 +207,13 @@ export default function DespatchReadyOrders() {
                       <td>£{totalPaid.toFixed(2)}</td>
                       <td><a href={order.access_url} target="_blank" rel="noopener noreferrer" className={styles.selectButton}>↗</a></td>
                     </tr>
-
                     {expanded.has(order.id) && (
                       <>
                         <tr>
                           <td />
                           <td colSpan={5}>
                             <div className={styles.inlineFields}>
-                              {['weight', 'length', 'width', 'height'].map((key) => (
+                              {["weight", "length", "width", "height"].map((key) => (
                                 <div key={key}>
                                   <label>{key.charAt(0).toUpperCase() + key.slice(1)} (cm):</label>
                                   <input
