@@ -382,7 +382,7 @@ table .serviceQuoteRow td {
 }
 
 .buttonOption {
-  width: 250px; /* fixed width */
+  width: 240px; /* fixed width */
   background: #fff;
   border: 1px solid #d0d5dd;
   border-radius: 12px;
