@@ -271,6 +271,7 @@ export default function DespatchReadyOrders() {
                   width: "",
                   height: "",
                 };
+                const sortedQuotes=sortQuotes(order.id,quotesMap[order.id]||[]);
 
                 return (
                   <Fragment key={order.id}>
