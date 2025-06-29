@@ -451,7 +451,31 @@ export default function DespatchReadyOrders() {
     </div>
   </td>
 </tr>
-
+                        {/* Sorting bar */}
+                        <tr className={styles.serviceQuoteRow}>
+                          <td colSpan={6} style={{ padding: '4px 16px', background: '#f0f0f0' }}>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button
+                                className={sortMap[order.id] === 'noProtection' ? styles.solidButton : styles.outlineButton}
+                                onClick={() => setSortMap(prev => ({ ...prev, [order.id]: 'noProtection' }))}
+                              >
+                                Without Protection from Cheapest
+                              </button>
+                              <button
+                                className={sortMap[order.id] === 'extended' ? styles.solidButton : styles.outlineButton}
+                                onClick={() => setSortMap(prev => ({ ...prev, [order.id]: 'extended' }))}
+                              >
+                                With Extended Protection from Cheapest
+                              </button>
+                              <button
+                                className={sortMap[order.id] === 'full' ? styles.solidButton : styles.outlineButton}
+                                onClick={() => setSortMap(prev => ({ ...prev, [order.id]: 'full' }))}
+                              >
+                                With Full Protection from Cheapest
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
                         {loadingMap[order.id] && (
                           <tr className={styles.quotesRow}>
                             <td />
@@ -473,6 +497,8 @@ export default function DespatchReadyOrders() {
                           const coverTotal = coverExtra ? coverExtra.Total : 0;
 
                           return (
+                            {/* Quotes rows */}
+                          {sorted.map((q, idx) => (
                             <tr key={`quote-${order.id}-${idx}`} className={styles.serviceQuoteRow}>
                               <td />
                               <td>
