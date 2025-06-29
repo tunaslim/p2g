@@ -496,7 +496,7 @@ export default function DespatchReadyOrders() {
                         )}
 
                          {/* Combined Quote + Info row */}
-                        {sortedQuotes[order.id]?.map((q, idx) => {
+                        {sortedQuotes.map((q, idx) => {
                           const currentProtection = q.IncludedCover;
                           const extCover = q.AvailableExtras.find(
                             (e) => e.Details?.IncludedCover && /\d/.test(e.Details.IncludedCover)
