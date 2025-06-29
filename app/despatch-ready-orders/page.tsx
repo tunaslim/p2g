@@ -480,10 +480,10 @@ export default function DespatchReadyOrders() {
                                   onClick={() => setSortMap(prev => ({ ...prev, [order.id]: mode }))}
                                 >
                                   {mode === 'noProtection'
-                                    ? 'Without Protection'
+                                    ? 'Sort by Without Protection Quotes'
                                     : mode === 'extended'
-                                    ? 'With Extended Protection'
-                                    : 'With Full Protection'}
+                                    ? 'Sort by With Extended Protection Quotes'
+                                    : 'Sort by With Full Protection Quotes'}
                                 </button>
                               ))}
                             </div>
