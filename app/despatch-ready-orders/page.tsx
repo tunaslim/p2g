@@ -67,6 +67,8 @@ interface Order {
   date_received: string;
 }
 
+type SortType = 'noProtection' | 'extended' | 'full';
+
 export default function DespatchReadyOrders() {
   const router = useRouter();
   const { token } = useToken();
@@ -84,6 +86,7 @@ export default function DespatchReadyOrders() {
 
   const [quotesMap, setQuotesMap] = useState<Record<number, Quote[]>>({});
   const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({});
+  const [sortMap, setSortMap] = useState<Record<number, SortType>>({});
 
   const iso2to3: Record<string, string> = {
     GB: "GBR",
@@ -216,6 +219,21 @@ export default function DespatchReadyOrders() {
       }
     })();
   }, [token]);
+
+  function sortQuotes(orderId: number, quotes: Quote[]): Quote[] {
+    const mode = sortMap[orderId] || 'noProtection';
+    return [...quotes].sort((a,b) => {
+      if (mode==='noProtection') return a.TotalPrice - b.TotalPrice;
+      if (mode==='extended') {
+        const extA = a.AvailableExtras.find(e=>e.Type==='ExtendedBaseCover')?.Total||0;
+        const extB = b.AvailableExtras.find(e=>e.Type==='ExtendedBaseCover')?.Total||0;
+        return (a.TotalPrice+extA)-(b.TotalPrice+extB);
+      }
+      const covA = a.AvailableExtras.find(e=>e.Type==='Cover')?.Total||0;
+      const covB = b.AvailableExtras.find(e=>e.Type==='Cover')?.Total||0;
+      return (a.TotalPrice+covA)-(b.TotalPrice+covB);
+    });
+  }
 
   return (
     <div className={styles.main}>
@@ -451,28 +469,22 @@ export default function DespatchReadyOrders() {
     </div>
   </td>
 </tr>
-                        {/* Sorting bar */}
                         <tr className={styles.serviceQuoteRow}>
                           <td colSpan={6} style={{ padding: '4px 16px', background: '#f0f0f0' }}>
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                              <button
-                                className={sortMap[order.id] === 'noProtection' ? styles.solidButton : styles.outlineButton}
-                                onClick={() => setSortMap(prev => ({ ...prev, [order.id]: 'noProtection' }))}
-                              >
-                                Without Protection from Cheapest
-                              </button>
-                              <button
-                                className={sortMap[order.id] === 'extended' ? styles.solidButton : styles.outlineButton}
-                                onClick={() => setSortMap(prev => ({ ...prev, [order.id]: 'extended' }))}
-                              >
-                                With Extended Protection from Cheapest
-                              </button>
-                              <button
-                                className={sortMap[order.id] === 'full' ? styles.solidButton : styles.outlineButton}
-                                onClick={() => setSortMap(prev => ({ ...prev, [order.id]: 'full' }))}
-                              >
-                                With Full Protection from Cheapest
-                              </button>
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              {(['noProtection','extended','full'] as SortType[]).map(mode => (
+                                <button
+                                  key={mode}
+                                  className={sortMap[order.id] === mode ? styles.solidButton : styles.outlineButton}
+                                  onClick={() => setSortMap(prev => ({ ...prev, [order.id]: mode }))}
+                                >
+                                  {mode === 'noProtection'
+                                    ? 'Without Protection'
+                                    : mode === 'extended'
+                                    ? 'With Extended Protection'
+                                    : 'With Full Protection'}
+                                </button>
+                              ))}
                             </div>
                           </td>
                         </tr>
@@ -484,7 +496,7 @@ export default function DespatchReadyOrders() {
                         )}
 
                          {/* Combined Quote + Info row */}
-                        {quotesMap[order.id]?.map((q, idx) => {
+                        {sortedQuotes[order.id]?.map((q, idx) => {
                           const currentProtection = q.IncludedCover;
                           const extCover = q.AvailableExtras.find(
                             (e) => e.Details?.IncludedCover && /\d/.test(e.Details.IncludedCover)
@@ -497,8 +509,6 @@ export default function DespatchReadyOrders() {
                           const coverTotal = coverExtra ? coverExtra.Total : 0;
 
                           return (
-                            {/* Quotes rows */}
-                          {sorted.map((q, idx) => (
                             <tr key={`quote-${order.id}-${idx}`} className={styles.serviceQuoteRow}>
                               <td />
                               <td>
