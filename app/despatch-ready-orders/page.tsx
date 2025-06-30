@@ -561,6 +561,7 @@ export default function DespatchReadyOrders() {
                                     </div>
                                     <div className={styles.buttonOption}>
                                     </div>
+                                    </>
                                   )}
                                   {currentProtection > 0 && coverTotal > 0 && (
                                     <>
