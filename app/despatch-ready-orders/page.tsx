@@ -126,6 +126,8 @@ export default function DespatchReadyOrders() {
   const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({});
   const [sortMap, setSortMap] = useState<Record<number, SortType>>({});
 
+  const [selectedQuoteMap, setSelectedQuoteMap] = useState<Record<number, Quote | null>>({});
+
   const iso2to3: Record<string, string> = {
     GB: "GBR",
     US: "USA",
@@ -274,47 +276,36 @@ export default function DespatchReadyOrders() {
     });
   }
 
-const buildOrderPayload = (includeProtection: boolean) => {
-  // map each Order to an Item
-  const items = orders.map(order => {
-    // grab the *first* quote for this order (or blank slug if none)
-    const serviceSlug = q.Service.Slug;
-
-    return {
-      Id: order.id.toString(),
-      CollectionDate: new Date().toISOString(),
-      OriginCountry: 'GBR',
-      VatStatus: 'Individual',
-      RecipientVatStatus: 'Individual',
-      ...(includeProtection && {
-        Upsells: [{ Type: 'ExtendedBaseCover', Values: {} }]
-      }),
-      Parcels: order.Parcels,
-      Service: serviceSlug,
-      Reference: order.channel_order_id,
-      CollectionAddress: order.CollectionAddress,
-    };
-  });
-
-  const first = orders[0];
-  const customer: { Email: string; Forename: string; Surname: string } = first
-    ? {
-        Email: first.email,
-        Forename: first.shipping_name.split(' ')[0],
-        Surname: first.shipping_name.split(' ')[1] || '',
-      }
-    : { Email: '', Forename: '', Surname: '' };
-
-  return {
-    Items: items,
-    CustomerDetails: customer,
-  };
-};
-
-const handlePreview = () => {
-  const payload = buildOrderPayload(false);  // no protection
+const handlePreview = (order: Order, quote: Quote, includeProtection: boolean) => {
+  const payload = buildOrderPayload(order, quote, includeProtection);
   const encoded = encodeURIComponent(JSON.stringify(payload));
   window.open(`/book-order?order=${encoded}`, '_blank');
+};
+
+const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolean) => {
+  return {
+    Items: [
+      {
+        Id: order.id.toString(),
+        CollectionDate: new Date().toISOString(),
+        OriginCountry: 'GBR',
+        VatStatus: 'Individual',
+        RecipientVatStatus: 'Individual',
+        ...(includeProtection && {
+          Upsells: [{ Type: 'ExtendedBaseCover', Values: {} }]
+        }),
+        Parcels: order.Parcels,
+        Service: quote.Service.Slug, // <-- correct quote used!
+        Reference: order.channel_order_id,
+        CollectionAddress: order.CollectionAddress,
+      }
+    ],
+    CustomerDetails: {
+      Email: order.email,
+      Forename: order.shipping_name.split(' ')[0],
+      Surname: order.shipping_name.split(' ')[1] || '',
+    }
+  };
 };
 
   return (
@@ -622,7 +613,18 @@ const handlePreview = () => {
                                     <>
                                       <div className={styles.buttonOption}>
                                         <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
-                                        <button onClick={handlePreview} className={styles.outlineButton}>Book without Protection</button>
+                                        <button
+                                          className={styles.outlineButton}
+                                          onClick={() => {
+                                            setSelectedQuoteMap(prev => ({
+                                              ...prev,
+                                              [order.id]: q
+                                            }));
+                                            handlePreview(order, q, false); // pass in the order and the specific quote
+                                          }}
+                                        >
+                                          Book without Protection
+                                        </button>
                                       </div>
                                       <div className={styles.buttonOption}>
                                         <div className={styles.price}>(+ £{(totalWithExtended - q.TotalPrice).toFixed(2)}) £{totalWithExtended.toFixed(2)}</div>
