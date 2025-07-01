@@ -274,35 +274,48 @@ export default function DespatchReadyOrders() {
     });
   }
 
-  // helper to build the exact order you’ll POST
-  const buildOrderPayload = (includeProtection: boolean) => ({
-    Items: orders.map(order => ({
+const buildOrderPayload = (includeProtection: boolean) => {
+  // map each Order to an Item
+  const items = orders.map(order => {
+    // grab the *first* quote for this order (or blank slug if none)
+    const serviceSlug = quotesMap[order.id]?.[0]?.Service.Slug || '';
+
+    return {
       Id: order.id.toString(),
       CollectionDate: new Date().toISOString(),
       OriginCountry: order.shipping_address_iso,
       VatStatus: 'Individual',
       RecipientVatStatus: 'Individual',
-      // only include upsell if includeProtection===true
       ...(includeProtection && {
         Upsells: [{ Type: 'ExtendedBaseCover', Values: {} }]
       }),
       Parcels: order.Parcels,
-      Service: quotes[idx].Service.Slug,
+      Service: serviceSlug,
       Reference: order.channel_order_id,
       CollectionAddress: order.CollectionAddress,
-    })),
-    CustomerDetails: {
-      Email: order.email,
-      Forename: order.shipping_name.split(' ')[0],
-      Surname: order.shipping_name.split(' ')[1] || '',
-    }
+    };
   });
 
-  const handlePreview = () => {
-    const payload = buildOrderPayload(false);
-    const url = `/book-order?order=${encodeURIComponent(JSON.stringify(payload))}`;
-    window.open(url, '_blank');
+  const first = orders[0];
+  const customer: { Email: string; Forename: string; Surname: string } = first
+    ? {
+        Email: first.email,
+        Forename: first.shipping_name.split(' ')[0],
+        Surname: first.shipping_name.split(' ')[1] || '',
+      }
+    : { Email: '', Forename: '', Surname: '' };
+
+  return {
+    Items: items,
+    CustomerDetails: customer,
   };
+};
+
+const handlePreview = () => {
+  const payload = buildOrderPayload(false);  // no protection
+  const encoded = encodeURIComponent(JSON.stringify(payload));
+  window.open(`/book-order?order=${encoded}`, '_blank');
+};
 
   return (
     <div className={styles.main}>
