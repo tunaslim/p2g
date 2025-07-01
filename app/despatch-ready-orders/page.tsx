@@ -282,13 +282,9 @@ const handlePreview = (order: Order, quote: Quote, includeProtection: boolean) =
   window.open(`/book-order?order=${encoded}`, '_blank');
 };
 
-const buildOrderPayload = (includeProtection: boolean) => {
-  const items = orders.map(order => {
-    // Get the selected quote for this order
-    const selectedQuote = selectedQuoteMap[order.id];
-    const serviceSlug = selectedQuote ? selectedQuote.Service.Slug : "";
-
-    return {
+const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolean) => ({
+  Items: [
+    {
       Id: order.id.toString(),
       CollectionDate: new Date().toISOString(),
       OriginCountry: 'GBR',
@@ -298,11 +294,17 @@ const buildOrderPayload = (includeProtection: boolean) => {
         Upsells: [{ Type: 'ExtendedBaseCover', Values: {} }]
       }),
       Parcels: order.Parcels,
-      Service: serviceSlug,
+      Service: quote.Service.Slug,
       Reference: order.channel_order_id,
       CollectionAddress: order.CollectionAddress,
-    };
-  });
+    }
+  ],
+  CustomerDetails: {
+    Email: order.email,
+    Forename: order.shipping_name.split(' ')[0],
+    Surname: order.shipping_name.split(' ')[1] || '',
+  }
+});
 
   const first = orders[0];
   const customer = first
