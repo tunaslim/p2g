@@ -47,18 +47,15 @@ export default function BookOrderPreviewClient() {
   return (
     <div className={styles.preview}>
       <h1>Preview Order</h1>
-
       <section>
         <h2>Full JSON Payload</h2>
         <pre style={{ whiteSpace: 'pre-wrap', maxHeight: '300px', overflow: 'auto' }}>
           {JSON.stringify(order, null, 2)}
         </pre>
       </section>
-
       <button onClick={handleCreate} disabled={loading} className={styles.button}>
         {loading ? 'Creating…' : 'Create Order on P2G'}
       </button>
-
       {response && (
         <section>
           <h2>Response</h2>
