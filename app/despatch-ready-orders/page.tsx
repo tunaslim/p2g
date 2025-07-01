@@ -101,6 +101,8 @@ interface Order {
   order_discount: string;
   total_paid: string;
   date_received: string;
+  CollectionAddress: Address;
+  Parcels: Parcel[];
 }
 
 type SortType = 'noProtection' | 'extended' | 'full';
