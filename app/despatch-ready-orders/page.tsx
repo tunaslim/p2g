@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useEffect, useState, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import styles from "../page.module.css";
@@ -104,6 +104,7 @@ export default function DespatchReadyOrders() {
     CH: "CHE",
     CL: "CHL",
     AT: "AUT",
+    TH: "THA",
   };
 
   const getChannelLogo = (id: number) => {
