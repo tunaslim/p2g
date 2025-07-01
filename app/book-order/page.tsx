@@ -1,10 +1,6 @@
-import dynamic from 'next/dynamic';
+"use client";
 
-// Dynamically load the client component without SSR
-const BookOrderPreviewClient = dynamic(
-  () => import('./BookOrderPreviewClient'),
-  { ssr: false }
-);
+import BookOrderPreviewClient from './BookOrderPreviewClient';
 
 export default function Page() {
   return <BookOrderPreviewClient />;
