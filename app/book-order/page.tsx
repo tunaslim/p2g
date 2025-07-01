@@ -6,12 +6,12 @@ import styles from './page.module.css';
 export default function BookOrderPreview() {
   const params = useSearchParams();
   const raw = params.get('order') || '';
+
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<any>(null);
-  const [error, setError] = useState<string|null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // parse once
   useEffect(() => {
     try {
       setOrder(JSON.parse(decodeURIComponent(raw)));
@@ -55,7 +55,7 @@ export default function BookOrderPreview() {
         </pre>
       </section>
 
-      <button onClick={handleCreate} disabled={loading}>
+      <button onClick={handleCreate} disabled={loading} className={styles.button}>
         {loading ? 'Creating…' : 'Create Order on P2G'}
       </button>
 
