@@ -236,6 +236,36 @@ export default function DespatchReadyOrders() {
     });
   }
 
+  // helper to build the exact order you’ll POST
+  const buildOrderPayload = (includeProtection: boolean) => ({
+    Items: orders.map(order => ({
+      Id: order.id.toString(),
+      CollectionDate: new Date().toISOString(),
+      OriginCountry: order.shipping_address_iso,
+      VatStatus: 'Individual',
+      RecipientVatStatus: 'Individual',
+      // only include upsell if includeProtection===true
+      ...(includeProtection && {
+        Upsells: [{ Type: 'ExtendedBaseCover', Values: {} }]
+      }),
+      Parcels: order.Parcels,
+      Service: selectedServiceSlug,
+      Reference: order.channel_order_id,
+      CollectionAddress: order.CollectionAddress,
+    })),
+    CustomerDetails: {
+      Email: order.email,
+      Forename: order.shipping_name.split(' ')[0],
+      Surname: order.shipping_name.split(' ')[1] || '',
+    }
+  });
+
+  const handlePreview = () => {
+    const payload = buildOrderPayload(false);
+    const url = `/book-order?order=${encodeURIComponent(JSON.stringify(payload))}`;
+    window.open(url, '_blank');
+  };
+
   return (
     <div className={styles.main}>
       <h1 className={styles.title}>Despatch Ready Orders ({total})</h1>
@@ -541,7 +571,7 @@ export default function DespatchReadyOrders() {
                                     <>
                                       <div className={styles.buttonOption}>
                                         <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
-                                        <button className={styles.outlineButton}>Book without Protection</button>
+                                        <button onClick={handlePreview} className={styles.outlineButton}>Book without Protection</button>
                                       </div>
                                       <div className={styles.buttonOption}>
                                         <div className={styles.price}>(+ £{(totalWithExtended - q.TotalPrice).toFixed(2)}) £{totalWithExtended.toFixed(2)}</div>
