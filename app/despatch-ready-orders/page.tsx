@@ -145,6 +145,7 @@ export default function DespatchReadyOrders() {
     CL: "CHL",
     AT: "AUT",
     TH: "THA",
+    PL: "POL",
   };
 
   const getChannelLogo = (id: number) => {
@@ -307,7 +308,7 @@ const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolea
           Town: 'Newhaven',
           County: 'East Sussex',
           Postcode: 'BN9 9BA',
-          CountryIsoCode: 'GBR'
+          CountryIsoCode: 'GBR',
         },
       }
     ],
