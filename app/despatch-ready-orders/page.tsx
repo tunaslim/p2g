@@ -282,29 +282,40 @@ const handlePreview = (order: Order, quote: Quote, includeProtection: boolean) =
   window.open(`/book-order?order=${encoded}`, '_blank');
 };
 
-const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolean) => {
-  return {
-    Items: [
-      {
-        Id: order.id.toString(),
-        CollectionDate: new Date().toISOString(),
-        OriginCountry: 'GBR',
-        VatStatus: 'Individual',
-        RecipientVatStatus: 'Individual',
-        ...(includeProtection && {
-          Upsells: [{ Type: 'ExtendedBaseCover', Values: {} }]
-        }),
-        Parcels: order.Parcels,
-        Service: quote.Service.Slug, // <-- correct quote used!
-        Reference: order.channel_order_id,
-        CollectionAddress: order.CollectionAddress,
+const buildOrderPayload = (includeProtection: boolean) => {
+  const items = orders.map(order => {
+    // Get the selected quote for this order
+    const selectedQuote = selectedQuoteMap[order.id];
+    const serviceSlug = selectedQuote ? selectedQuote.Service.Slug : "";
+
+    return {
+      Id: order.id.toString(),
+      CollectionDate: new Date().toISOString(),
+      OriginCountry: 'GBR',
+      VatStatus: 'Individual',
+      RecipientVatStatus: 'Individual',
+      ...(includeProtection && {
+        Upsells: [{ Type: 'ExtendedBaseCover', Values: {} }]
+      }),
+      Parcels: order.Parcels,
+      Service: serviceSlug,
+      Reference: order.channel_order_id,
+      CollectionAddress: order.CollectionAddress,
+    };
+  });
+
+  const first = orders[0];
+  const customer = first
+    ? {
+        Email: first.email,
+        Forename: first.shipping_name.split(' ')[0],
+        Surname: first.shipping_name.split(' ')[1] || '',
       }
-    ],
-    CustomerDetails: {
-      Email: order.email,
-      Forename: order.shipping_name.split(' ')[0],
-      Surname: order.shipping_name.split(' ')[1] || '',
-    }
+    : { Email: '', Forename: '', Surname: '' };
+
+  return {
+    Items: items,
+    CustomerDetails: customer,
   };
 };
 
