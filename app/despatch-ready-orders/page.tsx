@@ -278,12 +278,12 @@ const buildOrderPayload = (includeProtection: boolean) => {
   // map each Order to an Item
   const items = orders.map(order => {
     // grab the *first* quote for this order (or blank slug if none)
-    const serviceSlug = quotesMap[order.id]?.[0]?.Service.Slug || '';
+    const serviceSlug = q.Service.Slug;
 
     return {
       Id: order.id.toString(),
       CollectionDate: new Date().toISOString(),
-      OriginCountry: order.shipping_address_iso,
+      OriginCountry: 'GBR',
       VatStatus: 'Individual',
       RecipientVatStatus: 'Individual',
       ...(includeProtection && {
