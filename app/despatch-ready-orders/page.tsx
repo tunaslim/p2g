@@ -306,7 +306,7 @@ const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolea
           Street: 'Denton Island',
           Town: 'Newhaven',
           County: 'East Sussex',
-          Postcode: 'BN9 9BA,
+          Postcode: 'BN9 9BA',
           CountryIsoCode: 'GBR'
         },
       }
