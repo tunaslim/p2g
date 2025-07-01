@@ -294,10 +294,21 @@ const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolea
         ...(includeProtection && {
           Upsells: [{ Type: 'ExtendedBaseCover', Values: {} }]
         }),
-        Parcels: order.Parcels,
-        Service: quote.Service.Slug, // <-- correct quote used!
+        Service: quote.Service.Slug,
         Reference: order.channel_order_id,
-        CollectionAddress: order.CollectionAddress,
+        Parcels: order.Parcels,
+        CollectionAddress: {
+          ContactName: 'Jeremy Dredge',
+          Organisation: 'Good Life Innovations Ltd',
+          Email: 'sales@sfxc.co.uk',
+          Phone: '02071183123',
+          Property: 'Unit 45B Basepoint',
+          Street: 'Denton Island',
+          Town: 'Newhaven',
+          County: 'East Sussex',
+          Postcode: 'BN9 9BA,
+          CountryIsoCode: 'GBR'
+        },
       }
     ],
     CustomerDetails: {
