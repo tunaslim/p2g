@@ -23,7 +23,6 @@ async function getParcel2GoToken() {
 
     const tokenUrl = 'https://www.parcel2go.com/auth/connect/token';
 
-    // Log request details
     console.log('Sending token request to:', tokenUrl);
     console.log('Request payload:', payload.toString());
     console.log('Request headers:', {
@@ -41,7 +40,6 @@ async function getParcel2GoToken() {
     });
 
     console.log('Token response:', response.data);
-
     return response.data.access_token;
   } catch (error) {
     console.error('Failed to get Parcel2Go token:', error.response?.data || error.message);
@@ -49,15 +47,13 @@ async function getParcel2GoToken() {
   }
 }
 
+// Quote endpoint
 app.post('/get-quote', async (req, res) => {
   try {
     const { order } = req.body;
-
-    // Get access token
     const token = await getParcel2GoToken();
 
     const quoteUrl = 'https://www.parcel2go.com/api/quotes';
-
     console.log('Sending quote request to:', quoteUrl);
     console.log('Quote request payload:', JSON.stringify(order, null, 2));
 
@@ -69,7 +65,6 @@ app.post('/get-quote', async (req, res) => {
     });
 
     console.log('Quote response:', response.data);
-
     res.json(response.data);
   } catch (error) {
     console.error('Parcel2Go API Error:', error.response?.data || error.message);
@@ -77,23 +72,28 @@ app.post('/get-quote', async (req, res) => {
   }
 });
 
-app.post('/create-label', async (req, res) => {
+// **New**: Create Order endpoint
+app.post('/create-order', async (req, res) => {
   try {
-    const { labelData } = req.body;
-
+    const { order } = req.body;
     const token = await getParcel2GoToken();
 
-    const response = await axios.post('https://www.parcel2go.com/api/shipments', labelData, {
+    const orderUrl = 'https://www.parcel2go.com/api/orders';
+    console.log('Sending order request to:', orderUrl);
+    console.log('Order request payload:', JSON.stringify(order, null, 2));
+
+    const response = await axios.post(orderUrl, order, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     });
 
+    console.log('Order response:', response.data);
     res.json(response.data);
   } catch (error) {
     console.error('Parcel2Go API Error:', error.response?.data || error.message);
-    res.status(500).json({ error: 'Failed to create label', details: error.response?.data || error.message });
+    res.status(500).json({ error: 'Failed to create order', details: error.response?.data || error.message });
   }
 });
 
