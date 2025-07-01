@@ -5,7 +5,43 @@ import styles from "../page.module.css";
 import axios from "axios";
 import { useToken } from "../context/TokenContext";
 
-// Types for Parcel2Go quotes
+interface Address {
+  ContactName: string;
+  Organisation: string;
+  Email: string;
+  Phone: string;
+  Property: string;
+  Street: string;
+  Town: string;
+  County: string;
+  Postcode: string;
+  CountryIsoCode: string;
+  CountryId: number;
+  SpecialInstructions?: string;
+}
+
+interface Content {
+  Description: string;
+  Quantity: number;
+  EstimatedValue: number;
+  TariffCode: string;
+  CustomsDutyPaid: number;
+  CustomsVatPaid: number;
+  OriginCountry: string;
+}
+
+interface Parcel {
+  Id: string;
+  Height: number;
+  Length: number;
+  Width: number;
+  Weight: number;
+  EstimatedValue: number;
+  DeliveryAddress: Address;
+  Contents: Content[];
+  ContentsSummary: string;
+}
+
 interface Service {
   CourierName: string;
   Name: string;
