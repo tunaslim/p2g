@@ -282,42 +282,29 @@ const handlePreview = (order: Order, quote: Quote, includeProtection: boolean) =
   window.open(`/book-order?order=${encoded}`, '_blank');
 };
 
-const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolean) => ({
-  Items: [
-    {
-      Id: order.id.toString(),
-      CollectionDate: new Date().toISOString(),
-      OriginCountry: 'GBR',
-      VatStatus: 'Individual',
-      RecipientVatStatus: 'Individual',
-      ...(includeProtection && {
-        Upsells: [{ Type: 'ExtendedBaseCover', Values: {} }]
-      }),
-      Parcels: order.Parcels,
-      Service: quote.Service.Slug,
-      Reference: order.channel_order_id,
-      CollectionAddress: order.CollectionAddress,
-    }
-  ],
-  CustomerDetails: {
-    Email: order.email,
-    Forename: order.shipping_name.split(' ')[0],
-    Surname: order.shipping_name.split(' ')[1] || '',
-  }
-});
-
-  const first = orders[0];
-  const customer = first
-    ? {
-        Email: first.email,
-        Forename: first.shipping_name.split(' ')[0],
-        Surname: first.shipping_name.split(' ')[1] || '',
-      }
-    : { Email: '', Forename: '', Surname: '' };
-
+const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolean) => {
   return {
-    Items: items,
-    CustomerDetails: customer,
+    Items: [
+      {
+        Id: order.id.toString(),
+        CollectionDate: new Date().toISOString(),
+        OriginCountry: 'GBR',
+        VatStatus: 'Individual',
+        RecipientVatStatus: 'Individual',
+        ...(includeProtection && {
+          Upsells: [{ Type: 'ExtendedBaseCover', Values: {} }]
+        }),
+        Parcels: order.Parcels,
+        Service: quote.Service.Slug, // <-- correct quote used!
+        Reference: order.channel_order_id,
+        CollectionAddress: order.CollectionAddress,
+      }
+    ],
+    CustomerDetails: {
+      Email: order.email,
+      Forename: order.shipping_name.split(' ')[0],
+      Surname: order.shipping_name.split(' ')[1] || '',
+    }
   };
 };
 
