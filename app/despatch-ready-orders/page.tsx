@@ -287,7 +287,7 @@ export default function DespatchReadyOrders() {
         Upsells: [{ Type: 'ExtendedBaseCover', Values: {} }]
       }),
       Parcels: order.Parcels,
-      Service: selectedServiceSlug,
+      Service: order.quotes[0].Service.Slug,
       Reference: order.channel_order_id,
       CollectionAddress: order.CollectionAddress,
     })),
