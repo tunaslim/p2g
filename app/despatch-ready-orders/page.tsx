@@ -558,7 +558,6 @@ export default function DespatchReadyOrders() {
                                       <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
                                       <button className={styles.outlineButton}>Book with £{currentProtection.toFixed(0)} Protection</button>
                                     </div>
-                                    </>
                                   )}
                                   {currentProtection > 0 && coverTotal > 0 && (
                                     <>
