@@ -305,7 +305,6 @@ const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolea
         }),
         Service: quote.Service.Slug,
         Reference: order.channel_order_id,
-        Parcels: order.Parcels,
         CollectionAddress: {
           ContactName: 'Jeremy Dredge',
           Organisation: 'Good Life Innovations Ltd',
