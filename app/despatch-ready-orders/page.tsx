@@ -355,7 +355,7 @@ const buildOrderPayload = (
             Contents: order.inventory.map(item => ({
               Description: item.name,
               Quantity: item.quantity,
-              EstimatedValue: Number(item.price), // Or another value as needed
+              EstimatedValue: Math.round((Number(item.price) / 1.2) * 100) / 100, // Or another value as needed
               TariffCode: '8516',
               OriginCountry: 'United Kingdom',
             })),
