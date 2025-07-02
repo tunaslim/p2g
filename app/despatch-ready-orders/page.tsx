@@ -283,11 +283,19 @@ const handlePreview = (order: Order, quote: Quote, includeProtection: boolean) =
   window.open(`/book-order?order=${encoded}`, '_blank');
 };
 
+function generateGuid() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0,
+      v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolean) => {
   return {
     Items: [
       {
-        Id: order.id.toString(),
+        Id: generateGuid(),
         CollectionDate: new Date().toISOString(),
         OriginCountry: 'GBR',
         VatStatus: 'Individual',
@@ -310,12 +318,41 @@ const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolea
           Postcode: 'BN9 9BA',
           CountryIsoCode: 'GBR',
         },
+        Parcels: [
+          {
+            Id: order.id.toString(),
+            Height: info.height,
+            Length: info.length,
+            Width: info.width,
+            Weight: info.weight,
+            EstimatedValue: parcelValue.toFixed(2),
+            DeliveryAddress: {
+              ContactName: order.shipping_name,
+              Organisation: order.shipping_name_company,
+              Email: order.email,
+              Phone: order.phone_one,
+              Property: order.shipping_address_line_one,
+              Street: order.shipping_address_line_two,
+              Town: order.shipping_address_city,
+              Postcode: order.shipping_address_postcode,
+              CountryIsoCode: country3,
+            },
+            Contents: [
+              {
+                Description: item.name,
+                Quantity: item.quantity,
+                EstimatedValue: '1',
+                TariffCode: '8516',
+                OriginCountry: 'United Kingdom',
+              }
+            ],
+            ContentsSummary: 'Sale of goods'
       }
     ],
     CustomerDetails: {
-      Email: order.email,
-      Forename: order.shipping_name.split(' ')[0],
-      Surname: order.shipping_name.split(' ')[1] || '',
+      Email: 'sales@sfxc.co.uk',
+      Forename: 'Oliver',
+      Surname: 'Dredge',
     }
   };
 };
