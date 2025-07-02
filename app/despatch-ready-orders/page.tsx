@@ -77,6 +77,7 @@ interface Order {
     name: string;
     options: string;
     price: string;
+    hs_code: string;
     unit_tax: string;
   }[];
   shipping_name_company: string | null;
@@ -355,8 +356,8 @@ const buildOrderPayload = (
             Contents: order.inventory.map(item => ({
               Description: item.name,
               Quantity: item.quantity,
-              EstimatedValue: Math.round((Number(item.price) / 1.2) * 100) / 100, // Or another value as needed
-              TariffCode: '8516',
+              EstimatedValue: Math.round((Number(item.price) / 1.2) * 100) / 100,
+              TariffCode: item.hs_code || '00000000',
               OriginCountry: 'United Kingdom',
             })),
             ContentsSummary: 'Sale of goods'
