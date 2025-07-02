@@ -340,7 +340,7 @@ const buildOrderPayload = (
             Length: parseFloat(info.length) || 0,
             Width: parseFloat(info.width) || 0,
             Weight: parseFloat(info.weight) || 0,
-            EstimatedValue: Number(parcelValue.toFixed(2),
+            EstimatedValue: Number(parcelValue.toFixed(2)),
             DeliveryAddress: {
               ContactName: order.shipping_name,
               Organisation: order.shipping_name_company,
