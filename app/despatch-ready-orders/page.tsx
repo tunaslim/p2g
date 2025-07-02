@@ -309,6 +309,10 @@ const buildOrderPayload = (
   country3: string,
   includeProtection: boolean
 ) => {
+  
+  const extCover = quote.AvailableExtras.find(e => e.Type === 'ExtendedBaseCover');
+  const totalWithExtended = quote.TotalPrice + (extCover?.Total || 0);
+  
   return {
     Items: [
       {
