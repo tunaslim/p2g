@@ -318,7 +318,7 @@ const buildOrderPayload = (
         VatStatus: 'Individual',
         RecipientVatStatus: 'Individual',
         ...(includeProtection && {
-          Upsells: [{ Type: 'ExtendedBaseCover', Values: {} }]
+          Upsells: [{ Type: 'ExtendedBaseCover', Values: {(totalWithExtended - q.TotalPrice).toFixed(2)} }]
         }),
         Service: quote.Service.Slug,
         Reference: order.channel_order_id,
