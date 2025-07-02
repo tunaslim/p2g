@@ -277,12 +277,20 @@ export default function DespatchReadyOrders() {
     });
   }
 
-const handlePreview = (order: Order, quote: Quote, includeProtection: boolean) => {
-  const payload = buildOrderPayload(order, quote, includeProtection);
+const handlePreview = (
+  order: Order,
+  quote: Quote,
+  info: { weight: string; length: string; width: string; height: string },
+  parcelValue: number,
+  country3: string,
+  includeProtection: boolean
+) => {
+  const payload = buildOrderPayload(order, quote, info, parcelValue, country3, includeProtection);
   const encoded = encodeURIComponent(JSON.stringify(payload));
   window.open(`/book-order?order=${encoded}`, '_blank');
 };
 
+// Helper for guid
 function generateGuid() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
     const r = Math.random() * 16 | 0,
@@ -291,7 +299,15 @@ function generateGuid() {
   });
 }
 
-const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolean) => {
+// Clean payload builder
+const buildOrderPayload = (
+  order: Order,
+  quote: Quote,
+  info: { weight: string; length: string; width: string; height: string },
+  parcelValue: number,
+  country3: string,
+  includeProtection: boolean
+) => {
   return {
     Items: [
       {
@@ -319,33 +335,33 @@ const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolea
         },
         Parcels: [
           {
-            Id: order.id.toString(),
-            Height: info.height,
-            Length: info.length,
-            Width: info.width,
-            Weight: info.weight,
-            EstimatedValue: parcelValue.toFixed(2),
+            Id: generateGuid(),
+            Height: parseFloat(info.height) || 0,
+            Length: parseFloat(info.length) || 0,
+            Width: parseFloat(info.width) || 0,
+            Weight: parseFloat(info.weight) || 0,
+            EstimatedValue: Number(parcelValue.toFixed(2)),
             DeliveryAddress: {
               ContactName: order.shipping_name,
               Organisation: order.shipping_name_company,
               Email: order.email,
               Phone: order.phone_one,
               Property: order.shipping_address_line_one,
-              Street: order.shipping_address_line_two,
+              Street: order.shipping_address_line_two || '',
               Town: order.shipping_address_city,
               Postcode: order.shipping_address_postcode,
               CountryIsoCode: country3,
             },
-            Contents: [
-              {
-                Description: item.name,
-                Quantity: item.quantity,
-                EstimatedValue: '1',
-                TariffCode: '8516',
-                OriginCountry: 'United Kingdom',
-              }
-            ],
+            Contents: order.inventory.map(item => ({
+              Description: item.name,
+              Quantity: item.quantity,
+              EstimatedValue: Number(item.price), // Or another value as needed
+              TariffCode: '8516',
+              OriginCountry: 'United Kingdom',
+            })),
             ContentsSummary: 'Sale of goods'
+          }
+        ],
       }
     ],
     CustomerDetails: {
@@ -668,7 +684,7 @@ const buildOrderPayload = (order: Order, quote: Quote, includeProtection: boolea
                                               ...prev,
                                               [order.id]: q
                                             }));
-                                            handlePreview(order, q, false); // pass in the order and the specific quote
+                                            handlePreview(order, q, info, parcelValue, country3, false);
                                           }}
                                         >
                                           Book without Protection
