@@ -704,14 +704,36 @@ const buildOrderPayload = (
                                   {currentProtection > 0 && coverTotal === 0 && (
                                     <div className={styles.buttonOption}>
                                       <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
-                                      <button className={styles.outlineButton}>Book with £{currentProtection.toFixed(0)} Protection</button>
+                                      <button
+                                          className={styles.outlineButton}
+                                          onClick={() => {
+                                            setSelectedQuoteMap(prev => ({
+                                              ...prev,
+                                              [order.id]: q
+                                            }));
+                                            handlePreview(order, q, info, parcelValue, country3, false);
+                                          }}
+                                        >
+                                          Book with £{currentProtection.toFixed(0)} Protection
+                                        </button>
                                     </div>
                                   )}
                                   {currentProtection > 0 && coverTotal > 0 && (
                                     <>
                                       <div className={styles.buttonOption}>
                                         <div className={styles.price}>£{q.TotalPrice.toFixed(2)}</div>
-                                        <button className={styles.outlineButton}>Book with £{currentProtection.toFixed(0)} Protection</button>
+                                        <button
+                                          className={styles.outlineButton}
+                                          onClick={() => {
+                                            setSelectedQuoteMap(prev => ({
+                                              ...prev,
+                                              [order.id]: q
+                                            }));
+                                            handlePreview(order, q, info, parcelValue, country3, false);
+                                          }}
+                                        >
+                                          Book with £{currentProtection.toFixed(0)} Protection
+                                        </button>
                                       </div>
                                       <div className={styles.buttonOption}>
                                         <div className={styles.price}>(+ £{coverTotal}) £{(coverTotal + q.TotalPrice).toFixed(2)}</div>
