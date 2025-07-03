@@ -364,6 +364,7 @@ const buildOrderPayload = (
               Property: order.shipping_address_line_one,
               Street: order.shipping_address_line_two || 'Street',
               Town: order.shipping_address_city,
+              County: order.shipping_address_city,
               Postcode: order.shipping_address_postcode,
               CountryIsoCode: country3,
             },
