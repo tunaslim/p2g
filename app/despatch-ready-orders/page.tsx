@@ -711,7 +711,7 @@ const buildOrderPayload = (
                                               ...prev,
                                               [order.id]: q
                                             }));
-                                            handlePreview(order, q, info, parcelValue, country3, true);
+                                            handlePreview(order, q, info, parcelValue, country3, 'extended');
                                           }}
                                         >
                                           Book with £{extendedProtection.toFixed(0)} Protection
