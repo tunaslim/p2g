@@ -582,7 +582,7 @@ const buildOrderPayload = (
                                     {details.hs_code && (
                                       <span> | HS: {details.hs_code}</span>
                                     )}
-                                    {" | Price: £" + item.price}
+                                    {" | Price: £" + item.price.toFixed(2)}
                                   </div>
                                 );
                               })}
