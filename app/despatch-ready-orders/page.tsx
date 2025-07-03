@@ -696,7 +696,7 @@ const buildOrderPayload = (
                                               ...prev,
                                               [order.id]: q
                                             }));
-                                            handlePreview(order, q, info, parcelValue, country3, false);
+                                            handlePreview(order, q, info, parcelValue, country3, 'none');
                                           }}
                                         >
                                           Book without Protection
@@ -744,7 +744,7 @@ const buildOrderPayload = (
                                               ...prev,
                                               [order.id]: q
                                             }));
-                                            handlePreview(order, q, info, parcelValue, country3, false);
+                                            handlePreview(order, q, info, parcelValue, country3, 'none');
                                           }}
                                         >
                                           Book with £{currentProtection.toFixed(0)} Protection
@@ -762,7 +762,7 @@ const buildOrderPayload = (
                                               ...prev,
                                               [order.id]: q
                                             }));
-                                            handlePreview(order, q, info, parcelValue, country3, false);
+                                            handlePreview(order, q, info, parcelValue, country3, 'none');
                                           }}
                                         >
                                           Book with £{currentProtection.toFixed(0)} Protection
