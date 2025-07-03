@@ -72,6 +72,7 @@ interface Quote {
 
 interface Order {
   inventory: {
+    inventory_id: string;
     sku: string;
     quantity: number;
     name: string;
