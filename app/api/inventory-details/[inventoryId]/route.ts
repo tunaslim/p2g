@@ -1,13 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
+  // Get the inventoryId from the URL path
   const url = new URL(req.url);
   const segments = url.pathname.split('/');
   const inventoryId = segments[segments.length - 1];
 
-  const resp = await fetch(`https://goodlife.myhelm.app/public-api/inventory/${inventoryId}`);
+  // Read token from the Authorization header
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader) {
+    return NextResponse.json({ error: 'Missing token' }, { status: 401 });
+  }
+
+  // Fetch the inventory details with the token
+  const resp = await fetch(`https://goodlife.myhelm.app/public-api/inventory/${inventoryId}`, {
+    headers: {
+      Authorization: authHeader
+    }
+  });
+
+  // Handle permission error from the upstream API
+  if (!resp.ok) {
+    const err = await resp.json();
+    return NextResponse.json({ error: err.error || 'Failed to fetch inventory details' }, { status: resp.status });
+  }
+
   const data = await resp.json();
 
-  // TEMP: Return the entire object for debugging
-  return NextResponse.json(data);
+  return NextResponse.json({
+    hs_code: data.hs_code ?? "",
+    customs_description: data.customs_description ?? "",
+  });
 }
