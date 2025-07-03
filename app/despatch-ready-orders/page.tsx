@@ -312,12 +312,11 @@ async function fetchAllInventoryDetails(ids: string[]) {
 
 // Fetch inventory details whenever orders change
 useEffect(() => {
-  if (orders.length === 0) return;
+  if (orders.length === 0 || !token) return;
   const ids = getAllUniqueInventoryIds(orders);
   fetchAllInventoryDetails(ids);
-  // Only run when orders load
   // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [orders]);
+}, [orders, token]);
 
   function sortQuotes(orderId: number, quotes: Quote[]): Quote[] {
     const mode = sortMap[orderId] || 'noProtection';
