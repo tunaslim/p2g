@@ -123,6 +123,11 @@ export default function DespatchReadyOrders() {
     >
   >({});
 
+  const [inventoryDetailsMap, setInventoryDetailsMap] = useState<Record<
+  string,
+  { hs_code: string; customs_description: string }
+  >>({});
+
   const [quotesMap, setQuotesMap] = useState<Record<number, Quote[]>>({});
   const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({});
   const [sortMap, setSortMap] = useState<Record<number, SortType>>({});
@@ -263,6 +268,51 @@ export default function DespatchReadyOrders() {
     })();
   }, [token]);
 
+  // Helper to get all unique inventory_ids from all orders
+function getAllUniqueInventoryIds(orders: Order[]): string[] {
+  const ids = new Set<string>();
+  for (const order of orders) {
+    for (const item of order.inventory) {
+      if (item.inventory_id && item.inventory_id !== "") {
+        ids.add(item.inventory_id); // or use item.inventory_id if present
+      }
+    }
+  }
+  return Array.from(ids);
+}
+
+// Fetch details for an array of inventory_ids and update the map
+async function fetchAllInventoryDetails(ids: string[]) {
+  const newMap: Record<string, { hs_code: string; customs_description: string }> = {};
+  await Promise.all(
+    ids.map(async (id) => {
+      if (!id) return;
+      try {
+        const resp = await fetch(`/api/inventory-details/${id}`);
+        if (resp.ok) {
+          const data = await resp.json();
+          newMap[id] = {
+            hs_code: data.hs_code || "",
+            customs_description: data.customs_description || "",
+          };
+        }
+      } catch {
+        // Ignore individual errors
+      }
+    })
+  );
+  setInventoryDetailsMap((prev) => ({ ...prev, ...newMap }));
+}
+
+// Fetch inventory details whenever orders change
+useEffect(() => {
+  if (orders.length === 0) return;
+  const ids = getAllUniqueInventoryIds(orders);
+  fetchAllInventoryDetails(ids);
+  // Only run when orders load
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [orders]);
+
   function sortQuotes(orderId: number, quotes: Quote[]): Quote[] {
     const mode = sortMap[orderId] || 'noProtection';
     return [...quotes].sort((a,b) => {
@@ -368,13 +418,16 @@ const buildOrderPayload = (
               Postcode: order.shipping_address_postcode,
               CountryIsoCode: country3,
             },
-            Contents: order.inventory.map(item => ({
-            Description: item.name,
-            Quantity: item.quantity,
-            EstimatedValue: (Number(item.price) * Number(item.quantity)).toFixed(2),
-            TariffCode: item.hs_code || '00000000',
-            OriginCountry: 'United Kingdom',
-          })),
+            Contents: order.inventory.map(item => {
+            const details = inventoryDetailsMap[item.inventory_id] || {}; // or item.inventory_id if present
+            return {
+              Description: details.customs_description || item.name,
+              Quantity: item.quantity,
+              EstimatedValue: Number((parcelValue / order.inventory.length).toFixed(2)),
+              TariffCode: details.hs_code || "00000000",
+              OriginCountry: "United Kingdom",
+            };
+          }),
             ContentsSummary: 'Sale of goods'
           }
         ],
@@ -515,11 +568,19 @@ const buildOrderPayload = (
                           </td>
                           <td>
                             <div className={styles.orderCell}>
-                              {order.inventory.map((item, i) => (
-                                <div key={i}>
-                                  <strong>{item.name}</strong> (x{item.quantity}) — £{(Number(item.price) * Number(item.quantity)).toFixed(2)}
-                                </div>
-                              ))}
+                              {order.inventory.map((item, i) => {
+                                const details = inventoryDetailsMap[item.inventory_id] || {};
+                                return (
+                                  <div key={i}>
+                                    <strong>{item.name || details.customs_description}</strong>
+                                    {" (x" + item.quantity + ")"}
+                                    {details.hs_code && (
+                                      <span> | HS: {details.hs_code}</span>
+                                    )}
+                                    {" | Price: £" + item.price}
+                                  </div>
+                                );
+                              })}
                             </div>
                           </td>
                           <td className={styles.totalColumn}>
