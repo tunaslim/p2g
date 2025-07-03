@@ -7,15 +7,15 @@ export async function GET(req: NextRequest) {
   const inventoryId = segments[segments.length - 1];
 
   // Read token from the Authorization header
-  const authHeader = req.headers.get('authorization');
-  if (!authHeader) {
+  const token = req.headers.get('authorization');
+  if (!token) {
     return NextResponse.json({ error: 'Missing token' }, { status: 401 });
   }
 
   // Fetch the inventory details with the token
   const resp = await fetch(`https://goodlife.myhelm.app/public-api/inventory/${inventoryId}`, {
     headers: {
-      Authorization: authHeader
+      Authorization: token
     }
   });
 
