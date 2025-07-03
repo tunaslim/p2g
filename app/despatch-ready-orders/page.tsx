@@ -328,6 +328,7 @@ const buildOrderPayload = (
         Id: generateGuid(),
         CollectionDate: new Date().toISOString(),
         OriginCountry: 'GBR',
+        ExportReason: 'Sale',
         VatStatus: 'Individual',
         RecipientVatStatus: 'Individual',
         ...(upsells && { Upsells: upsells }),
