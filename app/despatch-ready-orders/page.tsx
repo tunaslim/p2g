@@ -519,8 +519,7 @@ const buildOrderPayload = (
                             <div className={styles.orderCell}>
                               {order.inventory.map((item, i) => (
                                 <div key={i}>
-                                  <strong>{item.name}</strong> (x{item.quantity}
-                                  )
+                                  <strong>{item.name}</strong> (x{item.quantity}) — £{(Number(item.price) * Number(item.quantity)).toFixed(2)}
                                 </div>
                               ))}
                             </div>
