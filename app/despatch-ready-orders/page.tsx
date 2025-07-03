@@ -284,12 +284,17 @@ function getAllUniqueInventoryIds(orders: Order[]): string[] {
 
 // Fetch details for an array of inventory_ids and update the map
 async function fetchAllInventoryDetails(ids: string[]) {
+  if (!token) return; // Do nothing if not authenticated
   const newMap: Record<string, { hs_code: string; customs_description: string }> = {};
   await Promise.all(
     ids.map(async (id) => {
       if (!id) return;
       try {
-        const resp = await fetch(`/api/inventory-details/${id}`);
+        const resp = await fetch(`/api/inventory-details/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (resp.ok) {
           const data = await resp.json();
           newMap[id] = {
