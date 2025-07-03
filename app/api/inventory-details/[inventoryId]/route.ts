@@ -1,30 +1,18 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  request: Request,
-  { params }: { params: { inventoryId: string } }
+  request: NextRequest,
+  context: { params: { inventoryId: string } }
 ) {
-  const { inventoryId } = params;
-  // Replace with your backend/api URL
-  const apiUrl = `https://goodlife.myhelm.app/public-api/inventory/${inventoryId}`;
+  const { inventoryId } = context.params;
+  // Example external fetch (you may want to handle errors and add real logic)
+  const resp = await fetch(
+    `https://goodlife.myhelm.app/public-api/inventory/${inventoryId}`
+  );
+  const data = await resp.json();
 
-  try {
-    const resp = await fetch(apiUrl, { next: { revalidate: 60 } });
-    if (!resp.ok) {
-      return NextResponse.json(
-        { error: 'Not found', hs_code: '', customs_description: '' },
-        { status: 404 }
-      );
-    }
-    const data = await resp.json();
-    return NextResponse.json({
-      hs_code: data.hs_code || '',
-      customs_description: data.customs_description || '',
-    });
-  } catch (err) {
-    return NextResponse.json(
-      { error: 'Failed to fetch', hs_code: '', customs_description: '' },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({
+    hs_code: data.hs_code ?? "",
+    customs_description: data.customs_description ?? "",
+  });
 }
