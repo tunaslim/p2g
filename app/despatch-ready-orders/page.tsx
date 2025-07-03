@@ -284,9 +284,9 @@ const handlePreview = (
   info: { weight: string; length: string; width: string; height: string },
   parcelValue: number,
   country3: string,
-  includeProtection: boolean
+  protectionType: 'none' | 'extended' | 'cover'
 ) => {
-  const payload = buildOrderPayload(order, quote, info, parcelValue, country3, includeProtection);
+  const payload = buildOrderPayload(order, quote, info, parcelValue, country3, protectionType);
   const encoded = encodeURIComponent(JSON.stringify(payload));
   window.open(`/book-order?order=${encoded}`, '_blank');
 };
@@ -300,19 +300,28 @@ function generateGuid() {
   });
 }
 
-// Clean payload builder
 const buildOrderPayload = (
   order: Order,
   quote: Quote,
   info: { weight: string; length: string; width: string; height: string },
   parcelValue: number,
   country3: string,
-  includeProtection: boolean
+  protectionType: 'none' | 'extended' | 'cover'
 ) => {
-  
   const extCover = quote.AvailableExtras.find(e => e.Type === 'ExtendedBaseCover');
   const totalWithExtended = quote.TotalPrice + (extCover?.Total || 0);
-  
+
+  const coverExtra = quote.AvailableExtras.find(e => e.Type === 'Cover');
+  const totalWithCover = quote.TotalPrice + (coverExtra?.Total || 0);
+
+  // Build the upsell array depending on which protection was selected
+  let upsells = undefined;
+  if (protectionType === 'extended' && extCover) {
+    upsells = [{ Type: 'ExtendedBaseCover', Values: { Total: (totalWithExtended - quote.TotalPrice).toFixed(2) } }];
+  } else if (protectionType === 'cover' && coverExtra) {
+    upsells = [{ Type: 'Cover', Values: { Total: (totalWithCover - quote.TotalPrice).toFixed(2) } }];
+  }
+
   return {
     Items: [
       {
@@ -321,9 +330,7 @@ const buildOrderPayload = (
         OriginCountry: 'GBR',
         VatStatus: 'Individual',
         RecipientVatStatus: 'Individual',
-        ...(includeProtection && {
-          Upsells: [{ Type: 'ExtendedBaseCover', Values: (totalWithExtended - quote.TotalPrice).toFixed(2) }]
-        }),
+        ...(upsells && { Upsells: upsells }),
         Service: quote.Service.Slug,
         Reference: order.channel_order_id,
         CollectionAddress: {
@@ -712,7 +719,18 @@ const buildOrderPayload = (
                                       </div>
                                       <div className={styles.buttonOption}>
                                         <div className={styles.price}>(+ £{coverTotal}) £{(coverTotal + q.TotalPrice).toFixed(2)}</div>
-                                        <button className={styles.solidButton}>Book with £{parcelValue.toFixed(2)} Protection</button>
+                                        <button
+                                          className={styles.solidButton}
+                                          onClick={() => {
+                                            setSelectedQuoteMap(prev => ({
+                                              ...prev,
+                                              [order.id]: q
+                                            }));
+                                            handlePreview(order, q, info, parcelValue, country3, 'cover'); // use a string flag for type
+                                          }}
+                                        >
+                                          Book with £{parcelValue.toFixed(2)} Protection
+                                        </button>
                                       </div>
                                     </>
                                   )}
@@ -752,7 +770,18 @@ const buildOrderPayload = (
                                       </div>
                                       <div className={styles.buttonOption}>
                                         <div className={styles.price}>(+ £{coverTotal}) £{(coverTotal + q.TotalPrice).toFixed(2)}</div>
-                                        <button className={styles.solidButton}>Book with £{parcelValue.toFixed(2)} Protection</button>
+                                        <button
+                                          className={styles.solidButton}
+                                          onClick={() => {
+                                            setSelectedQuoteMap(prev => ({
+                                              ...prev,
+                                              [order.id]: q
+                                            }));
+                                            handlePreview(order, q, info, parcelValue, country3, 'cover'); // use a string flag for type
+                                          }}
+                                        >
+                                          Book with £{parcelValue.toFixed(2)} Protection
+                                        </button>
                                       </div>
                                     </>
                                   )}
