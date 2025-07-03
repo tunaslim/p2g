@@ -1,17 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
+// app/api/inventory-details/[inventoryId]/route.ts
 
 export async function GET(
-  request: NextRequest,
-  context: { params: { inventoryId: string } }
+  request: Request,
+  { params }: { params: { inventoryId: string } }
 ) {
-  const { inventoryId } = context.params;
-  // Example external fetch (you may want to handle errors and add real logic)
-  const resp = await fetch(
-    `https://goodlife.myhelm.app/public-api/inventory/${inventoryId}`
-  );
+  const { inventoryId } = params;
+
+  // Replace this with your actual API call:
+  const resp = await fetch(`https://goodlife.myhelm.app/public-api/inventory/${inventoryId}`);
   const data = await resp.json();
 
-  return NextResponse.json({
+  return Response.json({
     hs_code: data.hs_code ?? "",
     customs_description: data.customs_description ?? "",
   });
