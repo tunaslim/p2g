@@ -1,24 +1,30 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
 export async function GET(
-  req: NextRequest,
+  request: Request,
   { params }: { params: { inventoryId: string } }
 ) {
   const { inventoryId } = params;
-  if (!inventoryId) {
-    return NextResponse.json({ error: "Missing inventoryId" }, { status: 400 });
-  }
+  // Replace with your backend/api URL
+  const apiUrl = `https://goodlife.myhelm.app/public-api/inventory/${inventoryId}`;
 
   try {
-    // Forward the request to the HELM API
-    const helmResp = await fetch(`https://goodlife.myhelm.app/public-api/inventory/${inventoryId}`);
-    if (!helmResp.ok) {
-      return NextResponse.json({ error: "HELM API error" }, { status: helmResp.status });
+    const resp = await fetch(apiUrl, { next: { revalidate: 60 } });
+    if (!resp.ok) {
+      return NextResponse.json(
+        { error: 'Not found', hs_code: '', customs_description: '' },
+        { status: 404 }
+      );
     }
-    const data = await helmResp.json();
-    // You may want to transform or filter the data here if needed
-    return NextResponse.json(data);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    const data = await resp.json();
+    return NextResponse.json({
+      hs_code: data.hs_code || '',
+      customs_description: data.customs_description || '',
+    });
+  } catch (err) {
+    return NextResponse.json(
+      { error: 'Failed to fetch', hs_code: '', customs_description: '' },
+      { status: 500 }
+    );
   }
 }
