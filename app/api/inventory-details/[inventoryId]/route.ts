@@ -1,7 +1,12 @@
 // app/api/inventory-details/[inventoryId]/route.ts
 
-export async function GET(request: Request, { params }: { params: { inventoryId: string } })
+export async function GET(
+  request: Request,
+  { params }: { params: { inventoryId: string } }
+) {
   const { inventoryId } = params;
+
+  // External API call
   const resp = await fetch(`https://goodlife.myhelm.app/public-api/inventory/${inventoryId}`);
   const data = await resp.json();
 
