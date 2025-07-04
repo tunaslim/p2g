@@ -269,6 +269,13 @@ export default function DespatchReadyOrders() {
     })();
   }, [token]);
 
+function getIOSScode(channelId: number): string {
+  if ([2, 3, 4, 5, 6, 25, 27].includes(channelId)) return "IM4420001201";
+  if (channelId === 11) return "IM3720000224";
+  if ([15, 24].includes(channelId)) return "IM2760000742";
+  return "";
+}
+
   // Helper to get all unique inventory_ids from all orders
 function getAllUniqueInventoryIds(orders: Order[]): string[] {
   const ids = new Set<string>();
@@ -365,7 +372,7 @@ const buildOrderPayload = (
 ) => {
   const extCover = quote.AvailableExtras.find(e => e.Type === 'ExtendedBaseCover');
   const totalWithExtended = quote.TotalPrice + (extCover?.Total || 0);
-
+  const iosscode = getIOSScode(order.channel_id);
   const coverExtra = quote.AvailableExtras.find(e => e.Type === 'Cover');
   const totalWithCover = quote.TotalPrice + (coverExtra?.Total || 0);
   
@@ -386,6 +393,7 @@ const buildOrderPayload = (
         CollectionDate: new Date().toISOString(),
         OriginCountry: 'GBR',
         ExportReason: 'Sale',
+        IOSSCode: iosscode,
         VatStatus: 'Individual',
         RecipientVatStatus: 'Individual',
         ...(upsells && { Upsells: upsells }),
