@@ -138,18 +138,18 @@ app.post('/api/paywithprepay', async (req, res) => {
       return res.status(500).json({ error: 'No PayWithPrePay URL returned from Parcel2Go' });
     }
   } catch (error) {
-    if (error.response && error.response.status === 302) {
-      // Manual redirect catch (shouldn't be needed, but just in case)
-      const redirectUrl = error.response.headers.location || error.response.headers.Location;
-      if (redirectUrl) {
-        return res.json({ payWithPrePayUrl: redirectUrl });
-      }
+    if (error.response) {
+      // Detailed HTTP response
+      console.error('Failed to get Parcel2Go token:');
+      console.error('Status:', error.response.status);
+      console.error('Headers:', error.response.headers);
+      console.error('Data:', error.response.data);
+    } else {
+      // Other errors (network, etc.)
+      console.error('Failed to get Parcel2Go token:', error.message);
+      console.error(error.stack);
     }
-    console.error('PayWithPrePay error:', error.response?.data || error.message);
-    res.status(500).json({
-      error: 'Failed to create prepay link',
-      details: error.response?.data || error.message,
-    });
+    throw new Error('Failed to authenticate with Parcel2Go');
   }
 });
 
