@@ -58,13 +58,16 @@ export default function BookOrderPreviewClient() {
           {loading ? 'Creating…' : 'Create Order on P2G'}
         </button>
         {response?.Links?.PayWithPrePay && (
-          <button
-            className={styles.button}
-            onClick={() => window.open(response.Links.PayWithPrePay, "_blank")}
-            type="button"
+          <form
+            action={response.Links.PayWithPrePay}
+            method="post"
+            target="_blank"
+            style={{ display: 'inline' }}
           >
-            Pay Shipment with PrePay
-          </button>
+            <button type="submit" className={styles.button}>
+              Pay Shipment with PrePay
+            </button>
+          </form>
         )}
       </div>
       {response && (
