@@ -476,7 +476,7 @@ const buildOrderPayload = (
             </thead>
             <tbody>
               {orders.map((order) => {
-                const totalPaid = parseFloat(order.total_paid) || 0;
+                const totalPaid = parseFloat(order.total_paid.replace(/,/g, "")) || 0;
                 const shippingCost = parseFloat(order.shipping_paid) || 0;
                 const country3 =
                   iso2to3[order.shipping_address_iso] ||
