@@ -53,9 +53,21 @@ export default function BookOrderPreviewClient() {
           {JSON.stringify(order, null, 2)}
         </pre>
       </section>
-      <button onClick={handleCreate} disabled={loading} className={styles.button}>
-        {loading ? 'Creating…' : 'Create Order on P2G'}
-      </button>
+      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+        <button onClick={handleCreate} disabled={loading} className={styles.button}>
+          {loading ? 'Creating…' : 'Create Order on P2G'}
+        </button>
+        {response?.Links?.PayWithPrePay && (
+          <a
+            href={response.Links.PayWithPrePay}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.button}
+          >
+            Pay Shipment with PrePay
+          </a>
+        )}
+      </div>
       {response && (
         <section>
           <h2>Response</h2>
