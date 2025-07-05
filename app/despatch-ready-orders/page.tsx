@@ -378,7 +378,10 @@ const buildOrderPayload = (
   }
   const extCover = quote.AvailableExtras.find(e => e.Type === 'ExtendedBaseCover');
   const totalWithExtended = quote.TotalPrice + (extCover?.Total || 0);
-  const iosscode = getIOSSCode(order.channel_id);
+  let iosscode = "";
+  if ([2, 3, 4, 5, 6, 25, 27].includes(order.channel_id)) iosscode = "IM4420001201";
+  else if (order.channel_id === 11) iosscode = "IM3720000224";
+  else if ([15, 24].includes(order.channel_id)) iosscode = "IM2760000742";
   const coverExtra = quote.AvailableExtras.find(e => e.Type === 'Cover');
   const totalWithCover = quote.TotalPrice + (coverExtra?.Total || 0);
   
