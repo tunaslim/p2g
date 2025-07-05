@@ -13,32 +13,28 @@ export default function BookOrderPreviewClient() {
   const [error, setError] = useState<string | null>(null);
 
   const handlePrePay = async () => {
-  if (!response?.Links?.PayWithPrePay) return;
-  setLoading(true);
-  setError(null);
-
-  try {
-    // Get the user token from context/local storage
-    const token = localStorage.getItem('p2g_token') || ""; // Update to how you store the token
-
-    const res = await fetch('/api/paywithprepay', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: response.Links.PayWithPrePay, token })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || res.statusText);
-
-    // Handle result: you may get a redirect url or confirmation
-    alert('Payment successful!');
-    // Or, if there's a new URL to visit:
-    // window.open(data.redirectUrl, '_blank');
-  } catch (err: any) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
+    setError(null);
+  
+    try {
+      const res = await fetch('https://p2g-api.up.railway.app/paywithprepay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payWithPrePayUrl: response.Links.PayWithPrePay }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || res.statusText);
+  
+      // Success! You can alert, show result, or redirect.
+      alert('Payment successful!');
+      // Or if response has a redirect/payment link:
+      // window.open(data.someLink, '_blank');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     try {
@@ -85,18 +81,15 @@ export default function BookOrderPreviewClient() {
         <button onClick={handleCreate} disabled={loading} className={styles.button}>
           {loading ? 'Creating…' : 'Create Order on P2G'}
         </button>
-        {response?.Links?.PayWithPrePay && (
-          <form
-            action={response.Links.PayWithPrePay}
-            method="post"
-            target="_blank"
-            style={{ display: 'inline' }}
-          >
-            <button onClick={handlePrePay} disabled={loading} className={styles.button}>
-              Pay Shipment with PrePay
+          {response?.Links?.PayWithPrePay && (
+            <button
+              onClick={handlePrePay}
+              className={styles.button}
+              disabled={loading}
+            >
+              {loading ? "Paying…" : "Pay Shipment with PrePay"}
             </button>
-          </form>
-        )}
+          )}
       </div>
       {response && (
         <section>
