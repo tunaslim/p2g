@@ -41,14 +41,37 @@ export default function BookOrderPreviewClient() {
     }
   };
 
-  const handlePrePay = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    // The rest is not needed unless you want to do something before redirect
-    // setLoading(true);
-    // setError(null);
-    // Optionally, add analytics/tracking here
-    // setLoading(false);
-    // The form submit will open the prepay link in a new tab
+  const handlePrePay = async () => {
+    if (!response?.OrderId || !response?.Hash) {
+      setError("Missing OrderId or Hash for prepay.");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/paywithprepay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: response.OrderId,
+          hash: response.Hash,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || res.statusText);
+
+      // The backend should return { payWithPrePayUrl: "https://..." }
+      if (data.payWithPrePayUrl) {
+        window.open(data.payWithPrePayUrl, "_blank");
+      } else {
+        setError("No PayWithPrePay URL returned from backend.");
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
@@ -67,21 +90,15 @@ export default function BookOrderPreviewClient() {
         <button onClick={handleCreate} disabled={loading} className={styles.button}>
           {loading ? "Creating…" : "Create Order on P2G"}
         </button>
-        {response?.Links?.PayWithPrePay && (
-          <form
-            action={response.Links.PayWithPrePay}
-            method="post"
-            target="_blank"
-            style={{ display: "inline" }}
+        {response?.OrderId && response?.Hash && (
+          <button
+            onClick={handlePrePay}
+            disabled={loading}
+            className={styles.button}
+            type="button"
           >
-            <button
-              type="submit"
-              onClick={handlePrePay}
-              className={styles.button}
-            >
-              Pay Shipment with PrePay
-            </button>
-          </form>
+            {loading ? "Processing…" : "Pay Shipment with PrePay"}
+          </button>
         )}
       </div>
       {response && (
