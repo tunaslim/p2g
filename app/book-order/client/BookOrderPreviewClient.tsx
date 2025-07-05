@@ -12,6 +12,34 @@ export default function BookOrderPreviewClient() {
   const [response, setResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const handlePrePay = async () => {
+  if (!response?.Links?.PayWithPrePay) return;
+  setLoading(true);
+  setError(null);
+
+  try {
+    // Get the user token from context/local storage
+    const token = localStorage.getItem('p2g_token') || ""; // Update to how you store the token
+
+    const res = await fetch('/api/paywithprepay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: response.Links.PayWithPrePay, token })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || res.statusText);
+
+    // Handle result: you may get a redirect url or confirmation
+    alert('Payment successful!');
+    // Or, if there's a new URL to visit:
+    // window.open(data.redirectUrl, '_blank');
+  } catch (err: any) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
   useEffect(() => {
     try {
       setOrder(JSON.parse(decodeURIComponent(raw)));
@@ -64,7 +92,7 @@ export default function BookOrderPreviewClient() {
             target="_blank"
             style={{ display: 'inline' }}
           >
-            <button type="submit" className={styles.button}>
+            <button onClick={handlePrePay} disabled={loading} className={styles.button}>
               Pay Shipment with PrePay
             </button>
           </form>
