@@ -97,5 +97,29 @@ app.post('/create-order', async (req, res) => {
   }
 });
 
+// PayWithPrePay endpoint
+app.post('/paywithprepay', async (req, res) => {
+  try {
+    const { payWithPrePayUrl } = req.body;
+    if (!payWithPrePayUrl) {
+      return res.status(400).json({ error: 'Missing PayWithPrePay URL' });
+    }
+    const token = await getParcel2GoToken();
+
+    // POST to PayWithPrePay URL with Bearer token
+    const response = await axios.post(payWithPrePayUrl, {}, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+      }
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error('Parcel2Go PrePay Error:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to pay shipment', details: error.response?.data || error.message });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
