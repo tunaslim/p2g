@@ -378,7 +378,7 @@ const buildOrderPayload = (
   }
   const extCover = quote.AvailableExtras.find(e => e.Type === 'ExtendedBaseCover');
   const totalWithExtended = quote.TotalPrice + (extCover?.Total || 0);
-  const iosscode = getIOSScode(order.channel_id);
+  const iosscode = getIOSSCode(order.channel_id);
   const coverExtra = quote.AvailableExtras.find(e => e.Type === 'Cover');
   const totalWithCover = quote.TotalPrice + (coverExtra?.Total || 0);
   
