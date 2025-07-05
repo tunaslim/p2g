@@ -97,27 +97,59 @@ app.post('/create-order', async (req, res) => {
   }
 });
 
-// PayWithPrePay endpoint
-app.post('/paywithprepay', async (req, res) => {
+app.post('/api/paywithprepay', async (req, res) => {
   try {
-    const { payWithPrePayUrl } = req.body;
-    if (!payWithPrePayUrl) {
-      return res.status(400).json({ error: 'Missing PayWithPrePay URL' });
+    const { orderId, hash } = req.body;
+    if (!orderId || !hash) {
+      return res.status(400).json({ error: 'Missing orderId or hash' });
     }
+
     const token = await getParcel2GoToken();
 
-    // POST to PayWithPrePay URL with Bearer token
-    const response = await axios.post(payWithPrePayUrl, {}, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
-      }
-    });
+    // Construct the endpoint
+    const payUrl = `https://www.parcel2go.com/api/orders/${orderId}/paywithprepay?hash=${encodeURIComponent(hash)}`;
 
-    res.json(response.data);
+    // Parcel2Go expects POST with Bearer
+    const response = await axios.post(
+      payUrl,
+      {}, // No body required
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        // Don’t follow redirects! We want the link, not the redirect
+        maxRedirects: 0,
+        validateStatus: (status) => status >= 200 && status < 400,
+      }
+    );
+
+    // Parcel2Go responds with 302 redirect (Location header)
+    const redirectUrl =
+      response.headers.location ||
+      response.headers.Location || // Some servers use capital-L
+      null;
+
+    if (redirectUrl) {
+      return res.json({ payWithPrePayUrl: redirectUrl });
+    } else {
+      // Some integrations may respond with the link in the body
+      return res.status(500).json({ error: 'No PayWithPrePay URL returned from Parcel2Go' });
+    }
   } catch (error) {
-    console.error('Parcel2Go PrePay Error:', error.response?.data || error.message);
-    res.status(500).json({ error: 'Failed to pay shipment', details: error.response?.data || error.message });
+    if (error.response && error.response.status === 302) {
+      // Manual redirect catch (shouldn't be needed, but just in case)
+      const redirectUrl = error.response.headers.location || error.response.headers.Location;
+      if (redirectUrl) {
+        return res.json({ payWithPrePayUrl: redirectUrl });
+      }
+    }
+    console.error('PayWithPrePay error:', error.response?.data || error.message);
+    res.status(500).json({
+      error: 'Failed to create prepay link',
+      details: error.response?.data || error.message,
+    });
   }
 });
 
