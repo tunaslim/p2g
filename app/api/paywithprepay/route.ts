@@ -4,7 +4,7 @@ async function getParcel2GoToken() {
   const tokenUrl = 'https://www.parcel2go.com/auth/connect/token';
   const payload = new URLSearchParams({
     grant_type: 'client_credentials',
-    scope: 'public-api',
+    scope: 'payment',
     client_id: process.env.PARCEL2GO_CLIENT_ID!,
     client_secret: process.env.PARCEL2GO_CLIENT_SECRET!,
   });
