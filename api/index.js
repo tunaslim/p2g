@@ -16,7 +16,7 @@ async function getParcel2GoToken() {
   try {
     const payload = new URLSearchParams({
       grant_type: 'client_credentials',
-      scope: 'public-api',
+      scope: 'public-api payment',
       client_id: process.env.PARCEL2GO_CLIENT_ID,
       client_secret: process.env.PARCEL2GO_CLIENT_SECRET,
     });
