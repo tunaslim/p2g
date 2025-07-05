@@ -269,13 +269,6 @@ export default function DespatchReadyOrders() {
     })();
   }, [token]);
 
-function getIOSScode(channelId: number): string {
-  if ([2, 3, 4, 5, 6, 25, 27].includes(channelId)) return "IM4420001201";
-  if (channelId === 11) return "IM3720000224";
-  if ([15, 24].includes(channelId)) return "IM2760000742";
-  return "";
-}
-
   // Helper to get all unique inventory_ids from all orders
 function getAllUniqueInventoryIds(orders: Order[]): string[] {
   const ids = new Set<string>();
@@ -370,6 +363,19 @@ const buildOrderPayload = (
   country3: string,
   protectionType: 'none' | 'extended' | 'cover'
 ) => {
+    // --- IOSSCode/EoriNumber logic ---
+  let IOSSCode = "";
+  let EoriNumber = "";
+  if ([2, 3, 4, 5, 6, 25, 27].includes(order.channel_id)) {
+    IOSSCode = "IM4420001201";
+  } else if (order.channel_id === 11) {
+    IOSSCode = "IM3720000224";
+  } else if ([15, 24].includes(order.channel_id)) {
+    IOSSCode = "IM2760000742";
+  } else if ([7, 8].includes(order.channel_id)) {
+    EoriNumber = "GB122703551000";
+    // IOSSCode intentionally left blank
+  }
   const extCover = quote.AvailableExtras.find(e => e.Type === 'ExtendedBaseCover');
   const totalWithExtended = quote.TotalPrice + (extCover?.Total || 0);
   const iosscode = getIOSScode(order.channel_id);
@@ -393,9 +399,10 @@ const buildOrderPayload = (
         CollectionDate: new Date().toISOString(),
         OriginCountry: 'GBR',
         ExportReason: 'Sale',
-        IOSSCode: iosscode,
         VatStatus: 'Individual',
         RecipientVatStatus: 'Individual',
+        ...(IOSSCode && { IOSSCode }),
+        ...(EoriNumber && { EoriNumber }),
         ...(upsells && { Upsells: upsells }),
         Service: quote.Service.Slug,
         Reference: order.channel_order_id,
