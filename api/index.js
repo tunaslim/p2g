@@ -99,9 +99,9 @@ app.post('/create-order', async (req, res) => {
 
 app.post('/paywithprepay', async (req, res) => {
   try {
-    const { orderId, hash } = req.body;
-    if (!orderId || !hash) {
-      return res.status(400).json({ error: 'Missing orderId or hash' });
+    const { payWithPrePayUrl } = req.body;
+    if (!payWithPrePayUrl) {
+      return res.status(400).json({ error: 'Missing payWithPrePayUrl' });
     }
 
     const token = await getParcel2GoToken();
