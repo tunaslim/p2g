@@ -97,7 +97,7 @@ app.post('/create-order', async (req, res) => {
   }
 });
 
-app.post('/api/paywithprepay', async (req, res) => {
+app.post('/paywithprepay', async (req, res) => {
   try {
     const { orderId, hash } = req.body;
     if (!orderId || !hash) {
