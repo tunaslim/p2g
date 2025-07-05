@@ -1,11 +1,11 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import styles from '../page.module.css';
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import styles from "../page.module.css";
 
 export default function BookOrderPreviewClient() {
   const params = useSearchParams();
-  const raw = params.get('order') || '';
+  const raw = params.get("order") || "";
 
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,7 @@ export default function BookOrderPreviewClient() {
     try {
       setOrder(JSON.parse(decodeURIComponent(raw)));
     } catch {
-      setError('Invalid order payload');
+      setError("Invalid order payload");
     }
   }, [raw]);
 
@@ -26,9 +26,9 @@ export default function BookOrderPreviewClient() {
     setError(null);
 
     try {
-      const res = await fetch('/api/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ order }),
       });
       const data = await res.json();
@@ -41,33 +41,17 @@ export default function BookOrderPreviewClient() {
     }
   };
 
-  const handlePrePay = async (e) => {
+  const handlePrePay = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("https://p2g-api.up.railway.app/paywithprepay", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ payWithPrePayUrl: response.Links.PayWithPrePay }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || res.statusText);
-  
-      // If Parcel2Go responds with a URL, open it in a new tab
-      if (data.redirectUrl) {
-        window.open(data.redirectUrl, "_blank");
-      } else {
-        alert("Payment successful!");
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    // The rest is not needed unless you want to do something before redirect
+    // setLoading(true);
+    // setError(null);
+    // Optionally, add analytics/tracking here
+    // setLoading(false);
+    // The form submit will open the prepay link in a new tab
   };
 
-  if (error) return <p style={{ color: 'red' }}>{error}</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!order) return <p>Loading payload…</p>;
 
   return (
@@ -75,28 +59,35 @@ export default function BookOrderPreviewClient() {
       <h1>Preview Order</h1>
       <section>
         <h2>Full JSON Payload</h2>
-        <pre style={{ whiteSpace: 'pre-wrap', maxHeight: '300px', overflow: 'auto' }}>
+        <pre style={{ whiteSpace: "pre-wrap", maxHeight: "300px", overflow: "auto" }}>
           {JSON.stringify(order, null, 2)}
         </pre>
       </section>
       <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
         <button onClick={handleCreate} disabled={loading} className={styles.button}>
-          {loading ? 'Creating…' : 'Create Order on P2G'}
+          {loading ? "Creating…" : "Create Order on P2G"}
         </button>
-          {response?.Links?.PayWithPrePay && (
+        {response?.Links?.PayWithPrePay && (
+          <form
+            action={response.Links.PayWithPrePay}
+            method="post"
+            target="_blank"
+            style={{ display: "inline" }}
+          >
             <button
+              type="submit"
               onClick={handlePrePay}
               className={styles.button}
-              disabled={loading}
             >
-              {loading ? "Paying…" : "Pay Shipment with PrePay"}
+              Pay Shipment with PrePay
             </button>
-          )}
+          </form>
+        )}
       </div>
       {response && (
         <section>
           <h2>Response</h2>
-          <pre style={{ whiteSpace: 'pre-wrap' }}>
+          <pre style={{ whiteSpace: "pre-wrap" }}>
             {JSON.stringify(response, null, 2)}
           </pre>
         </section>
