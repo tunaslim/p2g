@@ -23,29 +23,38 @@ async function getParcel2GoToken() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { orderId, hash } = await req.json();
-
-    if (!orderId || !hash) {
-      return NextResponse.json({ error: 'Missing orderId or hash' }, { status: 400 });
+    const { payWithPrePayUrl } = await req.json();
+    if (!payWithPrePayUrl) {
+      return NextResponse.json({ error: "Missing payWithPrePayUrl" }, { status: 400 });
     }
 
     const token = await getParcel2GoToken();
-
-    const payUrl = `https://www.parcel2go.com/api/orders/${orderId}/paywithprepay?hash=${encodeURIComponent(hash)}`;
-
-    const resp = await fetch(payUrl, {
+    const resp = await fetch(payWithPrePayUrl, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
       },
+      redirect: 'manual', // prevent following the redirect
     });
 
-    const data = await resp.json();
-    if (!resp.ok) {
-      return NextResponse.json({ error: data.Message || 'Failed to pay with prepay' }, { status: resp.status });
+    // The payment API will respond with a 302 and a Location header
+    const redirectUrl =
+      resp.headers.get('location') ||
+      resp.headers.get('Location');
+
+    if (redirectUrl) {
+      return NextResponse.json({ redirectUrl });
+    } else {
+      // Some integrations may respond with the link in the body
+      let data;
+      try {
+        data = await resp.json();
+      } catch {
+        data = {};
+      }
+      return NextResponse.json({ error: 'No redirect URL returned', data });
     }
-    return NextResponse.json(data);
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
   }
