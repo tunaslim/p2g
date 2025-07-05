@@ -3,10 +3,6 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import styles from "../page.module.css";
 
-// Get backend URL from environment, fallback to localhost
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
-
 export default function BookOrderPreviewClient() {
   const params = useSearchParams();
   const raw = params.get("order") || "";
@@ -24,14 +20,13 @@ export default function BookOrderPreviewClient() {
     }
   }, [raw]);
 
-  // Create order on Parcel2Go
   const handleCreate = async () => {
     if (!order) return;
     setLoading(true);
     setError(null);
 
     try {
-      const res = await fetch(`${API_BASE}/create-order`, {
+      const res = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ order }),
@@ -46,35 +41,31 @@ export default function BookOrderPreviewClient() {
     }
   };
 
-  // Pay with PrePay
   const handlePrePay = async () => {
-    if (!response?.OrderId || !response?.Hash) {
-      setError("Missing OrderId or Hash for prepay.");
+    if (!response?.Links?.PayWithPrePay) {
+      setError("No PayWithPrePay URL available.");
       return;
     }
     setLoading(true);
     setError(null);
 
     try {
-      const res = await fetch(`${API_BASE}/paywithprepay`, {
+      const res = await fetch("/api/paywithprepay", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId: response.OrderId,
-          hash: response.Hash,
-        }),
+        body: JSON.stringify({ payWithPrePayUrl: response.Links.PayWithPrePay }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || res.statusText);
 
-      // The backend should return { payWithPrePayUrl: "https://..." }
-      if (data.payWithPrePayUrl) {
-        window.open(data.payWithPrePayUrl, "_blank");
+      if (data.redirectUrl) {
+        window.open(data.redirectUrl, "_blank");
+      } else if (data.error) {
+        setError(data.error);
       } else {
-        setError("No PayWithPrePay URL returned from backend.");
+        setError("No redirect URL returned.");
       }
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Unknown error");
     } finally {
       setLoading(false);
     }
@@ -96,7 +87,7 @@ export default function BookOrderPreviewClient() {
         <button onClick={handleCreate} disabled={loading} className={styles.button}>
           {loading ? "Creating…" : "Create Order on P2G"}
         </button>
-        {response?.OrderId && response?.Hash && (
+        {response?.Links?.PayWithPrePay && (
           <button
             onClick={handlePrePay}
             disabled={loading}
