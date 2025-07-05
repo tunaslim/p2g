@@ -106,50 +106,37 @@ app.post('/paywithprepay', async (req, res) => {
 
     const token = await getParcel2GoToken();
 
-    // Construct the endpoint
-    const payUrl = `https://www.parcel2go.com/api/orders/${orderId}/paywithprepay?hash=${encodeURIComponent(hash)}`;
-
-    // Parcel2Go expects POST with Bearer
     const response = await axios.post(
-      payUrl,
-      {}, // No body required
+      payWithPrePayUrl,
+      {},
       {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        // Don’t follow redirects! We want the link, not the redirect
         maxRedirects: 0,
         validateStatus: (status) => status >= 200 && status < 400,
       }
     );
 
-    // Parcel2Go responds with 302 redirect (Location header)
     const redirectUrl =
       response.headers.location ||
-      response.headers.Location || // Some servers use capital-L
+      response.headers.Location ||
       null;
 
     if (redirectUrl) {
       return res.json({ payWithPrePayUrl: redirectUrl });
     } else {
-      // Some integrations may respond with the link in the body
       return res.status(500).json({ error: 'No PayWithPrePay URL returned from Parcel2Go' });
     }
   } catch (error) {
     if (error.response) {
-      // Detailed HTTP response
-      console.error('Failed to get Parcel2Go token:');
-      console.error('Status:', error.response.status);
-      console.error('Headers:', error.response.headers);
-      console.error('Data:', error.response.data);
+      console.error('PayWithPrePay error:', error.response.data);
     } else {
-      // Other errors (network, etc.)
-      console.error('Failed to get Parcel2Go token:', error.message);
-      console.error(error.stack);
+      console.error('PayWithPrePay error:', error.message);
     }
-    throw new Error('Failed to authenticate with Parcel2Go');
+    res.status(500).json({ error: 'Failed to create prepay link', details: error.message });
   }
 });
 
