@@ -191,7 +191,7 @@ export default function DespatchReadyOrders() {
   const apiBase = "https://p2g-api.up.railway.app";
 
   const fetchQuotesForOrder = async (order: Order) => {
-    const totalPaid = parseFloat(order.total_paid) || 0;
+    const totalPaid = parseFloat(order.total_paid.replace(/,/g, "")) || 0;
     const shippingCost = parseFloat(order.shipping_paid) || 0;
     const baseValue = totalPaid - shippingCost;
     const country3 =
