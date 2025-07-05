@@ -12,30 +12,6 @@ export default function BookOrderPreviewClient() {
   const [response, setResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handlePrePay = async () => {
-    setLoading(true);
-    setError(null);
-  
-    try {
-      const res = await fetch('https://p2g-api.up.railway.app/paywithprepay', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ payWithPrePayUrl: response.Links.PayWithPrePay }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || res.statusText);
-  
-      // Success! You can alert, show result, or redirect.
-      alert('Payment successful!');
-      // Or if response has a redirect/payment link:
-      // window.open(data.someLink, '_blank');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     try {
       setOrder(JSON.parse(decodeURIComponent(raw)));
@@ -59,6 +35,32 @@ export default function BookOrderPreviewClient() {
       if (!res.ok) throw new Error(data.error || res.statusText);
       setResponse(data);
     } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePrePay = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("https://p2g-api.up.railway.app/paywithprepay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ payWithPrePayUrl: response.Links.PayWithPrePay }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || res.statusText);
+  
+      // If Parcel2Go responds with a URL, open it in a new tab
+      if (data.redirectUrl) {
+        window.open(data.redirectUrl, "_blank");
+      } else {
+        alert("Payment successful!");
+      }
+    } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
