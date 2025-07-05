@@ -3,6 +3,10 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import styles from "../page.module.css";
 
+// Get backend URL from environment, fallback to localhost
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+
 export default function BookOrderPreviewClient() {
   const params = useSearchParams();
   const raw = params.get("order") || "";
@@ -20,13 +24,14 @@ export default function BookOrderPreviewClient() {
     }
   }, [raw]);
 
+  // Create order on Parcel2Go
   const handleCreate = async () => {
     if (!order) return;
     setLoading(true);
     setError(null);
 
     try {
-      const res = await fetch("/api/create-order", {
+      const res = await fetch(`${API_BASE}/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ order }),
@@ -41,6 +46,7 @@ export default function BookOrderPreviewClient() {
     }
   };
 
+  // Pay with PrePay
   const handlePrePay = async () => {
     if (!response?.OrderId || !response?.Hash) {
       setError("Missing OrderId or Hash for prepay.");
@@ -50,7 +56,7 @@ export default function BookOrderPreviewClient() {
     setError(null);
 
     try {
-      const res = await fetch("/api/paywithprepay", {
+      const res = await fetch(`${API_BASE}/paywithprepay`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
