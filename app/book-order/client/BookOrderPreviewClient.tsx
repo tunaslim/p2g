@@ -41,35 +41,41 @@ export default function BookOrderPreviewClient() {
     }
   };
 
-  const handlePrePay = async () => {
-    if (!response?.Links?.PayWithPrePay) {
-      setError("No PayWithPrePay URL available.");
-      return;
-    }
-    setLoading(true);
-    setError(null);
+const handlePrePay = async () => {
+  if (!response?.Links?.PayWithPrePay) {
+    setError("No PayWithPrePay URL available.");
+    return;
+  }
+  setLoading(true);
+  setError(null);
 
-    try {
-      const res = await fetch("/api/paywithprepay", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ payWithPrePayUrl: response.Links.PayWithPrePay }),
-      });
-      const data = await res.json();
+  try {
+    const res = await fetch("/api/paywithprepay", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ payWithPrePayUrl: response.Links.PayWithPrePay }),
+    });
+    const data = await res.json();
 
-      if (data.redirectUrl) {
-        window.open(data.redirectUrl, "_blank");
-      } else if (data.error) {
-        setError(data.error);
-      } else {
-        setError("No redirect URL returned.");
-      }
-    } catch (err: any) {
-      setError(err.message || "Unknown error");
-    } finally {
-      setLoading(false);
+    // Always show the response on screen
+    setResponse(data);
+
+    if (data.redirectUrl) {
+      window.open(data.redirectUrl, "_blank");
+    } else if (data.error) {
+      setError(data.error);
+    } else if (data.message) {
+      // Show info messages (like payment already made)
+      setError(data.message);
+    } else {
+      setError("No redirect URL returned, but payment request was sent. See response below.");
     }
-  };
+  } catch (err: any) {
+    setError(err.message || "Unknown error");
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!order) return <p>Loading payload…</p>;
