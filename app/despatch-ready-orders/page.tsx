@@ -422,31 +422,42 @@ const buildOrderPayload = (
           Postcode: 'BN9 9BA',
           CountryIsoCode: 'GBR',
         },
-        Parcels: [
-          {
-            Id: generateGuid(),
-            Height: parseFloat(info.height) || 0,
-            Length: parseFloat(info.length) || 0,
-            Width: parseFloat(info.width) || 0,
-            Weight: parseFloat(info.weight) || 0,
-            EstimatedValue: Number(parcelValue.toFixed(2)),
-            DeliveryAddress: { ... },
-            Contents: order.inventory.map(item => {
-              const details = inventoryDetailsMap[item.inventory_id] || {};
-              return {
-                Description: details.customs_description || item.name,
-                Quantity: item.quantity,
-                EstimatedValue: Number((parcelValue / order.inventory.length).toFixed(2)),
-                TariffCode: details.hs_code || "00000000",
-                OriginCountry: "United Kingdom",
-              };
-            }),
-            ContentsSummary:
-              order.inventory
-                .map(item => `${item.quantity}x ${inventoryDetailsMap[item.inventory_id]?.customs_description || item.name}`)
-                .join(", ") || "Sale of goods"
-          }
-        ],
+          Parcels: [
+            {
+              Id: generateGuid(),
+              Height: parseFloat(info.height) || 0,
+              Length: parseFloat(info.length) || 0,
+              Width: parseFloat(info.width) || 0,
+              Weight: parseFloat(info.weight) || 0,
+              EstimatedValue: Number(parcelValue.toFixed(2)),
+              DeliveryAddress: {
+                ContactName: order.shipping_name,
+                Organisation: order.shipping_name_company,
+                Email: order.email,
+                Phone: order.phone_one,
+                Property: order.shipping_address_line_one,
+                Street: order.shipping_address_line_two || 'Street',
+                Town: order.shipping_address_city,
+                County: order.shipping_address_city,
+                Postcode: order.shipping_address_postcode,
+                CountryIsoCode: country3,
+              },
+              Contents: order.inventory.map(item => {
+                const details = inventoryDetailsMap[item.inventory_id] || {};
+                return {
+                  Description: details.customs_description || item.name,
+                  Quantity: item.quantity,
+                  EstimatedValue: Number((parcelValue / order.inventory.length).toFixed(2)),
+                  TariffCode: details.hs_code || "00000000",
+                  OriginCountry: "United Kingdom",
+                };
+              }),
+              ContentsSummary:
+                order.inventory
+                  .map(item => `${item.quantity}x ${inventoryDetailsMap[item.inventory_id]?.customs_description || item.name}`)
+                  .join(", ") || "Sale of goods",
+            }
+          ],
       }
     ],
     CustomerDetails: {
