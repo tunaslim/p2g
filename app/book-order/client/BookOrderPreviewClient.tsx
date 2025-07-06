@@ -11,6 +11,7 @@ export default function BookOrderPreviewClient() {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [label4x6Url, setLabel4x6Url] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -57,7 +58,6 @@ const handlePrePay = async () => {
     });
     const data = await res.json();
 
-    // Look for the label link inside data.data.Links[]
     let label4x6 = null;
     if (data.data && Array.isArray(data.data.Links)) {
       const found = data.data.Links.find((l: any) => l.Name === "labels-4x6");
@@ -65,7 +65,7 @@ const handlePrePay = async () => {
     }
 
     if (label4x6) {
-      window.open(label4x6, "_blank");
+      setLabel4x6Url(label4x6); // store for later
     } else {
       setError(
         "No 4x6 label found in the response. Raw response: " +
@@ -105,15 +105,16 @@ const handlePrePay = async () => {
             {loading ? "Processing…" : "Pay Shipment with PrePay"}
           </button>
         )}
+        {label4x6Url && (
+          <button
+            className={styles.button}
+            onClick={() => window.open(label4x6Url, "_blank")}
+            type="button"
+            style={{ marginLeft: 12 }}
+          >
+            Download 4x6 Label
+          </button>
+        )}
       </div>
-      {response && (
-        <section>
-          <h2>Response</h2>
-          <pre style={{ whiteSpace: "pre-wrap" }}>
-            {JSON.stringify(response, null, 2)}
-          </pre>
-        </section>
-      )}
-    </div>
   );
 }
