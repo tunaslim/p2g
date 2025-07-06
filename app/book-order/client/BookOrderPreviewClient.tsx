@@ -57,18 +57,20 @@ const handlePrePay = async () => {
     });
     const data = await res.json();
 
-    // Always show the response on screen
-    setResponse(data);
+    // Look for the label link inside data.data.Links[]
+    let label4x6 = null;
+    if (data.data && Array.isArray(data.data.Links)) {
+      const found = data.data.Links.find((l: any) => l.Name === "labels-4x6");
+      if (found) label4x6 = found.Link;
+    }
 
-    if (data.redirectUrl) {
-      window.open(data.redirectUrl, "_blank");
-    } else if (data.error) {
-      setError(data.error);
-    } else if (data.message) {
-      // Show info messages (like payment already made)
-      setError(data.message);
+    if (label4x6) {
+      window.open(label4x6, "_blank");
     } else {
-      setError("No redirect URL returned, but payment request was sent. See response below.");
+      setError(
+        "No 4x6 label found in the response. Raw response: " +
+          JSON.stringify(data, null, 2)
+      );
     }
   } catch (err: any) {
     setError(err.message || "Unknown error");
