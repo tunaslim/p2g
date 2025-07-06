@@ -153,6 +153,7 @@ export default function DespatchReadyOrders() {
     AT: "AUT",
     TH: "THA",
     PL: "POL",
+    MU: "MUS",
   };
 
   const getChannelLogo = (id: number) => {
