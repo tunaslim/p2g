@@ -452,7 +452,7 @@ const buildOrderPayload = (
               OriginCountry: "United Kingdom",
             };
           }),
-            ContentsSummary: 'Sale of goods'
+            ContentsSummary: details.customs_description || item.name,
           }
         ],
       }
