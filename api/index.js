@@ -97,7 +97,6 @@ app.post('/create-order', async (req, res) => {
   }
 });
 
-// PayWithPrePay endpoint
 app.post('/paywithprepay', async (req, res) => {
   try {
     const { payWithPrePayUrl } = req.body;
@@ -121,40 +120,23 @@ app.post('/paywithprepay', async (req, res) => {
       }
     );
 
-    const redirectUrl =
-      response.headers.location ||
-      response.headers.Location ||
-      null;
+    // Just return the whole response object (headers, data, status, etc.)
+    return res.json({
+      status: response.status,
+      headers: response.headers,
+      data: response.data,
+    });
 
-    if (redirectUrl) {
-      return res.json({ payWithPrePayUrl: redirectUrl });
-    } else if (
-      response.data &&
-      (
-        (response.data.Message && response.data.Message.toLowerCase().includes('already paid')) ||
-        (response.data.Message && response.data.Message.toLowerCase().includes('success'))
-      )
-    ) {
-      // Inform the frontend that payment has already been made
-      return res.json({ message: response.data.Message || 'Payment already completed on Parcel2Go.' });
-    } else {
-      // Log for debugging
-      console.error('Parcel2Go paywithprepay response:', {
-        status: response.status,
-        headers: response.headers,
-        data: response.data,
-      });
-      return res.status(500).json({
-        error: 'No PayWithPrePay URL returned from Parcel2Go',
-        debug: {
-          status: response.status,
-          headers: response.headers,
-          data: response.data,
-        }
+  } catch (error) {
+    if (error.response) {
+      // If there was an HTTP error, return the details for debugging
+      return res.status(error.response.status).json({
+        status: error.response.status,
+        headers: error.response.headers,
+        data: error.response.data,
+        message: error.message,
       });
     }
-  } catch (error) {
-    console.error('Error in /paywithprepay:', error.response?.data || error.message);
     res.status(500).json({ error: error.message });
   }
 });
