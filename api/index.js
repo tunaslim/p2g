@@ -72,7 +72,7 @@ app.post('/get-quote', async (req, res) => {
   }
 });
 
-// **New**: Create Order endpoint
+// Create Order endpoint
 app.post('/create-order', async (req, res) => {
   try {
     const { order } = req.body;
@@ -97,6 +97,7 @@ app.post('/create-order', async (req, res) => {
   }
 });
 
+// PayWithPrePay endpoint
 app.post('/paywithprepay', async (req, res) => {
   try {
     const { payWithPrePayUrl } = req.body;
@@ -125,33 +126,38 @@ app.post('/paywithprepay', async (req, res) => {
       response.headers.Location ||
       null;
 
-if (redirectUrl) {
-  return res.json({ payWithPrePayUrl: redirectUrl });
-} else if (
-  response.data &&
-  (
-    (response.data.Message && response.data.Message.toLowerCase().includes('already paid')) ||
-    (response.data.Message && response.data.Message.toLowerCase().includes('success'))
-  )
-) {
-  // Inform the frontend that payment has already been made
-  return res.json({ message: response.data.Message || 'Payment already completed on Parcel2Go.' });
-} else {
-  // Log for debugging
-  console.error('Parcel2Go paywithprepay response:', {
-    status: response.status,
-    headers: response.headers,
-    data: response.data,
-  });
-  return res.status(500).json({
-    error: 'No PayWithPrePay URL returned from Parcel2Go',
-    debug: {
-      status: response.status,
-      headers: response.headers,
-      data: response.data,
+    if (redirectUrl) {
+      return res.json({ payWithPrePayUrl: redirectUrl });
+    } else if (
+      response.data &&
+      (
+        (response.data.Message && response.data.Message.toLowerCase().includes('already paid')) ||
+        (response.data.Message && response.data.Message.toLowerCase().includes('success'))
+      )
+    ) {
+      // Inform the frontend that payment has already been made
+      return res.json({ message: response.data.Message || 'Payment already completed on Parcel2Go.' });
+    } else {
+      // Log for debugging
+      console.error('Parcel2Go paywithprepay response:', {
+        status: response.status,
+        headers: response.headers,
+        data: response.data,
+      });
+      return res.status(500).json({
+        error: 'No PayWithPrePay URL returned from Parcel2Go',
+        debug: {
+          status: response.status,
+          headers: response.headers,
+          data: response.data,
+        }
+      });
     }
-  });
-}
+  } catch (error) {
+    console.error('Error in /paywithprepay:', error.response?.data || error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
