@@ -12,6 +12,8 @@ export default function BookOrderPreviewClient() {
   const [response, setResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [label4x6Url, setLabel4x6Url] = useState<string | null>(null);
+  const [trackingNumber, setTrackingNumber] = useState<string | null>(null);
+  const [trackingLoading, setTrackingLoading] = useState(false);
 
   useEffect(() => {
     try {
@@ -35,6 +37,7 @@ export default function BookOrderPreviewClient() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || res.statusText);
       setResponse(data);
+      setTrackingNumber(null); // Reset tracking number on new order
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -42,42 +45,71 @@ export default function BookOrderPreviewClient() {
     }
   };
 
-const handlePrePay = async () => {
-  if (!response?.Links?.PayWithPrePay) {
-    setError("No PayWithPrePay URL available.");
-    return;
-  }
-  setLoading(true);
-  setError(null);
-
-  try {
-    const res = await fetch("/api/paywithprepay", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ payWithPrePayUrl: response.Links.PayWithPrePay }),
-    });
-    const data = await res.json();
-
-    let label4x6 = null;
-    if (data.data && Array.isArray(data.data.Links)) {
-      const found = data.data.Links.find((l: any) => l.Name === "labels-4x6");
-      if (found) label4x6 = found.Link;
+  const handlePrePay = async () => {
+    if (!response?.Links?.PayWithPrePay) {
+      setError("No PayWithPrePay URL available.");
+      return;
     }
+    setLoading(true);
+    setError(null);
 
-    if (label4x6) {
-      setLabel4x6Url(label4x6); // store for later
-    } else {
-      setError(
-        "No 4x6 label found in the response. Raw response: " +
-          JSON.stringify(data, null, 2)
-      );
+    try {
+      const res = await fetch("/api/paywithprepay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ payWithPrePayUrl: response.Links.PayWithPrePay }),
+      });
+      const data = await res.json();
+
+      let label4x6 = null;
+      if (data.data && Array.isArray(data.data.Links)) {
+        const found = data.data.Links.find((l: any) => l.Name === "labels-4x6");
+        if (found) label4x6 = found.Link;
+      }
+
+      if (label4x6) {
+        setLabel4x6Url(label4x6);
+      } else {
+        setError(
+          "No 4x6 label found in the response. Raw response: " +
+            JSON.stringify(data, null, 2)
+        );
+      }
+    } catch (err: any) {
+      setError(err.message || "Unknown error");
+    } finally {
+      setLoading(false);
     }
-  } catch (err: any) {
-    setError(err.message || "Unknown error");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
+  const handleGetTracking = async () => {
+    if (!response?.OrderId) {
+      setError("No OrderId available for tracking.");
+      return;
+    }
+    setTrackingLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/get-tracking-number", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: response.OrderId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || res.statusText);
+
+      if (data.TrackingNumbers && data.TrackingNumbers.length > 0) {
+        setTrackingNumber(data.TrackingNumbers[0].TrackingNumber);
+      } else {
+        setError("No tracking number found in response.");
+      }
+    } catch (err: any) {
+      setError(err.message || "Unknown error");
+    } finally {
+      setTrackingLoading(false);
+    }
+  };
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!order) return <p>Loading payload…</p>;
@@ -115,7 +147,25 @@ const handlePrePay = async () => {
             Download 4x6 Label
           </button>
         )}
+        {/* Show tracking button after order is created */}
+        {response?.OrderId && (
+          <button
+            onClick={handleGetTracking}
+            disabled={trackingLoading}
+            className={styles.button}
+            type="button"
+            style={{ marginLeft: 12 }}
+          >
+            {trackingLoading ? "Getting Tracking…" : "Get Tracking Number"}
+          </button>
+        )}
       </div>
+      {/* Show tracking number if present */}
+      {trackingNumber && (
+        <div style={{ marginTop: 16, fontWeight: "bold", color: "#1976d2" }}>
+          Tracking Number: {trackingNumber}
+        </div>
+      )}
     </div>
   );
 }
