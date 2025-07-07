@@ -27,6 +27,8 @@ export default function BookOrderPreviewClient() {
     if (!order) return;
     setLoading(true);
     setError(null);
+    setLabel4x6Url(null);
+    setTrackingNumber(null);
 
     try {
       const res = await fetch("/api/create-order", {
@@ -37,7 +39,6 @@ export default function BookOrderPreviewClient() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || res.statusText);
       setResponse(data);
-      setTrackingNumber(null); // Reset tracking number on new order
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -68,7 +69,7 @@ export default function BookOrderPreviewClient() {
       }
 
       if (label4x6) {
-        setLabel4x6Url(label4x6);
+        setLabel4x6Url(label4x6); // store for later
       } else {
         setError(
           "No 4x6 label found in the response. Raw response: " +
@@ -82,13 +83,14 @@ export default function BookOrderPreviewClient() {
     }
   };
 
-  const handleGetTracking = async () => {
+  const handleGetTrackingNumber = async () => {
     if (!response?.OrderId) {
-      setError("No OrderId available for tracking.");
+      setError("No OrderId available.");
       return;
     }
     setTrackingLoading(true);
     setError(null);
+    setTrackingNumber(null);
 
     try {
       const res = await fetch("/api/get-tracking-number", {
@@ -102,7 +104,7 @@ export default function BookOrderPreviewClient() {
       if (data.TrackingNumbers && data.TrackingNumbers.length > 0) {
         setTrackingNumber(data.TrackingNumbers[0].TrackingNumber);
       } else {
-        setError("No tracking number found in response.");
+        setError("No tracking number returned.");
       }
     } catch (err: any) {
       setError(err.message || "Unknown error");
@@ -138,33 +140,38 @@ export default function BookOrderPreviewClient() {
           </button>
         )}
         {label4x6Url && (
-          <button
-            className={styles.button}
-            onClick={() => window.open(label4x6Url, "_blank")}
-            type="button"
-            style={{ marginLeft: 12 }}
-          >
-            Download 4x6 Label
-          </button>
-        )}
-        {/* Show tracking button after order is created */}
-        {response?.OrderId && (
-          <button
-            onClick={handleGetTracking}
-            disabled={trackingLoading}
-            className={styles.button}
-            type="button"
-            style={{ marginLeft: 12 }}
-          >
-            {trackingLoading ? "Getting Tracking…" : "Get Tracking Number"}
-          </button>
+          <>
+            <button
+              className={styles.button}
+              onClick={() => window.open(label4x6Url, "_blank")}
+              type="button"
+              style={{ marginLeft: 12 }}
+            >
+              Download 4x6 Label
+            </button>
+            <button
+              className={styles.button}
+              onClick={handleGetTrackingNumber}
+              disabled={trackingLoading}
+              style={{ marginLeft: 12 }}
+            >
+              {trackingLoading ? "Getting Tracking…" : "Get Tracking Number"}
+            </button>
+          </>
         )}
       </div>
-      {/* Show tracking number if present */}
       {trackingNumber && (
-        <div style={{ marginTop: 16, fontWeight: "bold", color: "#1976d2" }}>
-          Tracking Number: {trackingNumber}
+        <div style={{ marginTop: 16 }}>
+          <strong>Tracking Number:</strong> {trackingNumber}
         </div>
+      )}
+      {response && (
+        <section>
+          <h2>Response</h2>
+          <pre style={{ whiteSpace: "pre-wrap" }}>
+            {JSON.stringify(response, null, 2)}
+          </pre>
+        </section>
       )}
     </div>
   );
