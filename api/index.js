@@ -141,5 +141,35 @@ app.post('/paywithprepay', async (req, res) => {
   }
 });
 
+// Get tracking number by orderId
+app.post('/get-tracking-number', async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    if (!orderId) {
+      return res.status(400).json({ error: 'Missing orderId' });
+    }
+
+    const token = await getParcel2GoToken();
+
+    const trackingUrl = `https://www.parcel2go.com/api/orders/${orderId}/parcelnumbers`;
+    const response = await axios.post(
+      trackingUrl,
+      {}, // No body required
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      }
+    );
+
+    return res.json(response.data);
+  } catch (error) {
+    console.error('Failed to get tracking number:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to get tracking number', details: error.response?.data || error.message });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
