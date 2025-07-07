@@ -199,16 +199,14 @@ export default function BookOrderPreviewClient() {
         </div>
       )}
       
-      {/*
-        response && (
+      {response && (
         <section>
           <h2>Response</h2>
           <pre style={{ whiteSpace: "pre-wrap" }}>
             {JSON.stringify(response, null, 2)}
           </pre>
         </section>
-      )
-      */}
+      )}
     </div>
   );
 }
