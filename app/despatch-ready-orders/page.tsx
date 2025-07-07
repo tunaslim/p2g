@@ -5,6 +5,23 @@ import styles from "../page.module.css";
 import axios from "axios";
 import { useToken } from "../context/TokenContext";
 
+// --- Auto-fixer helper: Ensures parcel contents' sum matches parcel value ---
+function fixParcelContentsValue<T extends { EstimatedValue: number }>(
+  contents: T[],
+  desiredParcelValue: number
+): T[] {
+  if (!contents.length) return [];
+  const sumExceptLast = contents
+    .slice(0, -1)
+    .reduce((sum, item) => sum + Number(item.EstimatedValue), 0);
+  let lastValue = Number((desiredParcelValue - sumExceptLast).toFixed(2));
+  if (lastValue < 0) lastValue = 0.01;
+  return [
+    ...contents.slice(0, -1),
+    { ...contents[contents.length - 1], EstimatedValue: lastValue },
+  ];
+}
+
 interface Address {
   ContactName: string;
   Organisation: string;
@@ -369,72 +386,77 @@ function generateGuid() {
   });
 }
 
-const buildOrderPayload = (
-  order: Order,
-  quote: Quote,
-  info: { weight: string; length: string; width: string; height: string },
-  parcelValue: number,
-  country3: string,
-  protectionType: 'none' | 'extended' | 'cover'
-) => {
-    // --- IOSSCode/EoriNumber logic ---
-  let IOSSCode = "";
-  let EoriNumber = "";
-  if ([2, 3, 4, 5, 6, 25, 27].includes(order.channel_id)) {
-    IOSSCode = "IM4420001201";
-  } else if (order.channel_id === 11) {
-    IOSSCode = "IM3720000224";
-  } else if ([15, 24].includes(order.channel_id)) {
-    IOSSCode = "IM2760000742";
-  } else if ([7, 8].includes(order.channel_id)) {
-    EoriNumber = "GB122703551000";
-    // IOSSCode intentionally left blank
-  }
-  const extCover = quote.AvailableExtras.find(e => e.Type === 'ExtendedBaseCover');
-  const totalWithExtended = quote.TotalPrice + (extCover?.Total || 0);
-  let iosscode = "";
-  if ([2, 3, 4, 5, 6, 25, 27].includes(order.channel_id)) iosscode = "IM4420001201";
-  else if (order.channel_id === 11) iosscode = "IM3720000224";
-  else if ([15, 24].includes(order.channel_id)) iosscode = "IM2760000742";
-  const coverExtra = quote.AvailableExtras.find(e => e.Type === 'Cover');
-  const totalWithCover = quote.TotalPrice + (coverExtra?.Total || 0);
-  
-  const totalQuantity = order.inventory.reduce((sum, item) => sum + Number(item.quantity), 0);
+  // --- Main Order Payload Builder with Contents Auto-Fix ---
+  const buildOrderPayload = (
+    order: Order,
+    quote: Quote,
+    info: { weight: string; length: string; width: string; height: string },
+    parcelValue: number,
+    country3: string,
+    protectionType: 'none' | 'extended' | 'cover'
+  ) => {
+    let IOSSCode = "";
+    let EoriNumber = "";
+    if ([2, 3, 4, 5, 6, 25, 27].includes(order.channel_id)) {
+      IOSSCode = "IM4420001201";
+    } else if (order.channel_id === 11) {
+      IOSSCode = "IM3720000224";
+    } else if ([15, 24].includes(order.channel_id)) {
+      IOSSCode = "IM2760000742";
+    } else if ([7, 8].includes(order.channel_id)) {
+      EoriNumber = "GB122703551000";
+    }
+    const extCover = quote.AvailableExtras.find(e => e.Type === 'ExtendedBaseCover');
+    const totalWithExtended = quote.TotalPrice + (extCover?.Total || 0);
+    const coverExtra = quote.AvailableExtras.find(e => e.Type === 'Cover');
+    const totalWithCover = quote.TotalPrice + (coverExtra?.Total || 0);
 
-  // Build the upsell array depending on which protection was selected
-  let upsells = undefined;
-  if (protectionType === 'extended' && extCover) {
-    upsells = [{ Type: 'ExtendedBaseCover', Values: { Total: (totalWithExtended - quote.TotalPrice).toFixed(2) } }];
-  } else if (protectionType === 'cover' && coverExtra) {
-    upsells = [{ Type: 'Cover', Values: { Total: (totalWithCover - quote.TotalPrice).toFixed(2) } }];
-  }
+    // --- Auto-fix the content values ---
+    const rawContents = order.inventory.map(item => {
+      const details = inventoryDetailsMap[item.inventory_id] || {};
+      return {
+        Description: details.customs_description || item.name,
+        Quantity: item.quantity,
+        EstimatedValue: Number((parcelValue / order.inventory.length).toFixed(2)),
+        TariffCode: details.hs_code || "00000000",
+        OriginCountry: "United Kingdom",
+      };
+    });
+    const fixedContents = fixParcelContentsValue(rawContents, parcelValue);
 
-  return {
-    Items: [
-      {
-        Id: generateGuid(),
-        CollectionDate: new Date().toISOString(),
-        OriginCountry: 'GBR',
-        ExportReason: 'Sale',
-        VatStatus: 'Individual',
-        RecipientVatStatus: 'Individual',
-        ...(IOSSCode && { IOSSCode }),
-        ...(EoriNumber && { EoriNumber }),
-        ...(upsells && { Upsells: upsells }),
-        Service: quote.Service.Slug,
-        Reference: order.channel_order_id,
-        CollectionAddress: {
-          ContactName: 'Jeremy Dredge',
-          Organisation: 'Good Life Innovations Ltd',
-          Email: 'sales@sfxc.co.uk',
-          Phone: '02071183123',
-          Property: 'Unit 45B Basepoint',
-          Street: 'Denton Island',
-          Town: 'Newhaven',
-          County: 'East Sussex',
-          Postcode: 'BN9 9BA',
-          CountryIsoCode: 'GBR',
-        },
+    let upsells = undefined;
+    if (protectionType === 'extended' && extCover) {
+      upsells = [{ Type: 'ExtendedBaseCover', Values: { Total: (totalWithExtended - quote.TotalPrice).toFixed(2) } }];
+    } else if (protectionType === 'cover' && coverExtra) {
+      upsells = [{ Type: 'Cover', Values: { Total: (totalWithCover - quote.TotalPrice).toFixed(2) } }];
+    }
+
+    return {
+      Items: [
+        {
+          Id: generateGuid(),
+          CollectionDate: new Date().toISOString(),
+          OriginCountry: 'GBR',
+          ExportReason: 'Sale',
+          VatStatus: 'Individual',
+          RecipientVatStatus: 'Individual',
+          ...(IOSSCode && { IOSSCode }),
+          ...(EoriNumber && { EoriNumber }),
+          ...(upsells && { Upsells: upsells }),
+          Service: quote.Service.Slug,
+          Reference: order.channel_order_id,
+          CollectionAddress: {
+            ContactName: 'Jeremy Dredge',
+            Organisation: 'Good Life Innovations Ltd',
+            Email: 'sales@sfxc.co.uk',
+            Phone: '02071183123',
+            Property: 'Unit 45B Basepoint',
+            Street: 'Denton Island',
+            Town: 'Newhaven',
+            County: 'East Sussex',
+            Postcode: 'BN9 9BA',
+            CountryIsoCode: 'GBR',
+          },
           Parcels: [
             {
               Id: generateGuid(),
@@ -455,31 +477,22 @@ const buildOrderPayload = (
                 Postcode: order.shipping_address_postcode,
                 CountryIsoCode: country3,
               },
-              Contents: order.inventory.map(item => {
-                const details = inventoryDetailsMap[item.inventory_id] || {};
-                return {
-                  Description: details.customs_description || item.name,
-                  Quantity: item.quantity,
-                  EstimatedValue: Number((parcelValue / order.inventory.length).toFixed(2)),
-                  TariffCode: details.hs_code || "00000000",
-                  OriginCountry: "United Kingdom",
-                };
-              }),
+              Contents: fixedContents,
               ContentsSummary:
                 order.inventory
                   .map(item => `${item.quantity}x ${inventoryDetailsMap[item.inventory_id]?.customs_description || item.name}`)
                   .join(", ") || "Sale of goods",
             }
           ],
+        }
+      ],
+      CustomerDetails: {
+        Email: 'sales@sfxc.co.uk',
+        Forename: 'Oliver',
+        Surname: 'Dredge',
       }
-    ],
-    CustomerDetails: {
-      Email: 'sales@sfxc.co.uk',
-      Forename: 'Oliver',
-      Surname: 'Dredge',
-    }
+    };
   };
-};
 
   return (
     <div className={styles.main}>
