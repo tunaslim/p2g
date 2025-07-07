@@ -334,6 +334,12 @@ useEffect(() => {
     });
   }
 
+const getNormalizedCourierName = (name: string) => {
+  if (!name) return "";
+  if (name.toLowerCase().startsWith("evri")) return "Evri";
+  return name;
+};
+
 const handlePreview = (
   order: Order,
   quote: Quote,
@@ -343,13 +349,12 @@ const handlePreview = (
   protectionType: 'none' | 'extended' | 'cover'
 ) => {
   const payload = buildOrderPayload(order, quote, info, parcelValue, country3, protectionType);
-    // Add courier/service info:
-  const courierInfo = {
-    courierName: quote.Service.CourierName,
-    serviceName: quote.Service.Name,
-  };
-  // Merge into payload
-  const mergedPayload = { ...payload, ...courierInfo };
+
+  // Add courierName and serviceName to the payload
+  const courierName = getNormalizedCourierName(quote.Service.CourierName);
+  const serviceName = quote.Service.Name;
+  const mergedPayload = { ...payload, courierName, serviceName };
+
   const encoded = encodeURIComponent(JSON.stringify(mergedPayload));
   window.open(`/book-order?order=${encoded}`, '_blank');
 };
