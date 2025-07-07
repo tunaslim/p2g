@@ -141,7 +141,6 @@ app.post('/paywithprepay', async (req, res) => {
   }
 });
 
-// Get tracking number by orderId
 app.post('/get-tracking-number', async (req, res) => {
   try {
     const { orderId } = req.body;
@@ -151,9 +150,10 @@ app.post('/get-tracking-number', async (req, res) => {
 
     const token = await getParcel2GoToken();
 
-    const trackingUrl = `https://www.parcel2go.com/api/orders/${orderId}/parcelnumbers`;
+    const url = `https://www.parcel2go.com/api/orders/${orderId}/parcelnumbers`;
+
     const response = await axios.post(
-      trackingUrl,
+      url,
       {}, // No body required
       {
         headers: {
@@ -164,10 +164,23 @@ app.post('/get-tracking-number', async (req, res) => {
       }
     );
 
-    return res.json(response.data);
+    // Just forward the response data
+    res.json(response.data);
   } catch (error) {
-    console.error('Failed to get tracking number:', error.response?.data || error.message);
-    res.status(500).json({ error: 'Failed to get tracking number', details: error.response?.data || error.message });
+    if (error.response) {
+      console.error('Failed to get tracking number:', {
+        status: error.response.status,
+        headers: error.response.headers,
+        data: error.response.data,
+      });
+      res.status(error.response.status || 500).json({
+        error: error.response.data?.error || 'Failed to get tracking number',
+        details: error.response.data,
+      });
+    } else {
+      console.error('Failed to get tracking number:', error.message);
+      res.status(500).json({ error: error.message });
+    }
   }
 });
 
