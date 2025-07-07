@@ -343,7 +343,14 @@ const handlePreview = (
   protectionType: 'none' | 'extended' | 'cover'
 ) => {
   const payload = buildOrderPayload(order, quote, info, parcelValue, country3, protectionType);
-  const encoded = encodeURIComponent(JSON.stringify(payload));
+    // Add courier/service info:
+  const courierInfo = {
+    courierName: quote.Service.CourierName,
+    serviceName: quote.Service.Name,
+  };
+  // Merge into payload
+  const mergedPayload = { ...payload, ...courierInfo };
+  const encoded = encodeURIComponent(JSON.stringify(mergedPayload));
   window.open(`/book-order?order=${encoded}`, '_blank');
 };
 
