@@ -192,12 +192,13 @@ export default function BookOrderPreviewClient() {
           </button>
         )}
       </div>
-      {trackingNumber && (
-        <section style={{ marginTop: 12 }}>
-          <strong>Tracking Number: </strong>
-          <span style={{ fontSize: "1.15em" }}>{trackingNumber}</span>
-        </section>
+
+      {order?.courierName && order?.serviceName && trackingNumber && (
+        <div style={{ marginTop: 16 }}>
+          <strong>{order.courierName}</strong>, {order.serviceName}, <span>{trackingNumber}</span>
+        </div>
       )}
+      
       {response && (
         <section>
           <h2>Response</h2>
