@@ -13,7 +13,8 @@ export default function BookOrderPreviewClient() {
   const [error, setError] = useState<string | null>(null);
   const [label4x6Url, setLabel4x6Url] = useState<string | null>(null);
   const [trackingNumber, setTrackingNumber] = useState<string | null>(null);
-  const [trackingLoading, setTrackingLoading] = useState(false);
+  const [orderCreated, setOrderCreated] = useState(false);
+  const [prepayDone, setPrepayDone] = useState(false);
 
   useEffect(() => {
     try {
@@ -29,6 +30,8 @@ export default function BookOrderPreviewClient() {
     setError(null);
     setLabel4x6Url(null);
     setTrackingNumber(null);
+    setPrepayDone(false);
+    setOrderCreated(false);
 
     try {
       const res = await fetch("/api/create-order", {
@@ -39,8 +42,10 @@ export default function BookOrderPreviewClient() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || res.statusText);
       setResponse(data);
+      setOrderCreated(true); // Disable the button
     } catch (err: any) {
       setError(err.message);
+      setOrderCreated(false);
     } finally {
       setLoading(false);
     }
@@ -53,6 +58,7 @@ export default function BookOrderPreviewClient() {
     }
     setLoading(true);
     setError(null);
+    setLabel4x6Url(null);
 
     try {
       const res = await fetch("/api/paywithprepay", {
@@ -70,27 +76,29 @@ export default function BookOrderPreviewClient() {
 
       if (label4x6) {
         setLabel4x6Url(label4x6); // store for later
+        setPrepayDone(true);
       } else {
         setError(
           "No 4x6 label found in the response. Raw response: " +
             JSON.stringify(data, null, 2)
         );
+        setPrepayDone(false);
       }
     } catch (err: any) {
       setError(err.message || "Unknown error");
+      setPrepayDone(false);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGetTrackingNumber = async () => {
+  const handleGetTracking = async () => {
     if (!response?.OrderId) {
       setError("No OrderId available.");
       return;
     }
-    setTrackingLoading(true);
+    setLoading(true);
     setError(null);
-    setTrackingNumber(null);
 
     try {
       const res = await fetch("/api/get-tracking-number", {
@@ -101,15 +109,22 @@ export default function BookOrderPreviewClient() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || res.statusText);
 
-      if (data.TrackingNumbers && data.TrackingNumbers.length > 0) {
+      if (
+        data.TrackingNumbers &&
+        Array.isArray(data.TrackingNumbers) &&
+        data.TrackingNumbers[0]?.TrackingNumber
+      ) {
         setTrackingNumber(data.TrackingNumbers[0].TrackingNumber);
       } else {
-        setError("No tracking number returned.");
+        setError(
+          "No tracking number found. Raw response: " +
+            JSON.stringify(data, null, 2)
+        );
       }
     } catch (err: any) {
       setError(err.message || "Unknown error");
     } finally {
-      setTrackingLoading(false);
+      setLoading(false);
     }
   };
 
@@ -126,44 +141,62 @@ export default function BookOrderPreviewClient() {
         </pre>
       </section>
       <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-        <button onClick={handleCreate} disabled={loading} className={styles.button}>
-          {loading ? "Creating…" : "Create Order on P2G"}
+        <button
+          onClick={handleCreate}
+          disabled={loading || orderCreated}
+          className={styles.button}
+        >
+          {loading
+            ? "Creating…"
+            : orderCreated
+            ? "Order Created"
+            : "Create Order on P2G"}
         </button>
         {response?.Links?.PayWithPrePay && (
           <button
             onClick={handlePrePay}
-            disabled={loading}
+            disabled={loading || prepayDone}
             className={styles.button}
             type="button"
           >
-            {loading ? "Processing…" : "Pay Shipment with PrePay"}
+            {loading
+              ? "Processing…"
+              : prepayDone
+              ? "Paid"
+              : "Pay Shipment with PrePay"}
           </button>
         )}
         {label4x6Url && (
-          <>
-            <button
-              className={styles.button}
-              onClick={() => window.open(label4x6Url, "_blank")}
-              type="button"
-              style={{ marginLeft: 12 }}
-            >
-              Download 4x6 Label
-            </button>
-            <button
-              className={styles.button}
-              onClick={handleGetTrackingNumber}
-              disabled={trackingLoading}
-              style={{ marginLeft: 12 }}
-            >
-              {trackingLoading ? "Getting Tracking…" : "Get Tracking Number"}
-            </button>
-          </>
+          <button
+            className={styles.button}
+            onClick={() => window.open(label4x6Url, "_blank")}
+            type="button"
+            style={{ marginLeft: 12 }}
+          >
+            Download 4x6 Label
+          </button>
+        )}
+        {response?.OrderId && prepayDone && (
+          <button
+            className={styles.button}
+            onClick={handleGetTracking}
+            disabled={loading || !!trackingNumber}
+            type="button"
+            style={{ marginLeft: 12 }}
+          >
+            {loading
+              ? "Getting Tracking…"
+              : trackingNumber
+              ? "Tracking Acquired"
+              : "Get Tracking Number"}
+          </button>
         )}
       </div>
       {trackingNumber && (
-        <div style={{ marginTop: 16 }}>
-          <strong>Tracking Number:</strong> {trackingNumber}
-        </div>
+        <section style={{ marginTop: 12 }}>
+          <strong>Tracking Number: </strong>
+          <span style={{ fontSize: "1.15em" }}>{trackingNumber}</span>
+        </section>
       )}
       {response && (
         <section>
