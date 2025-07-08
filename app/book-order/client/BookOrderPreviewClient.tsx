@@ -136,7 +136,12 @@ export default function BookOrderPreviewClient() {
         return 183;
       case "Evri ParcelShop":
         return 182;
-      // You can add more mappings here if needed
+      case "Royal Mail International Tracked":
+        return 184;
+      case "Evri Europe Standard Parcelshop":
+        return 185;
+      case "Evri Standard Parcelshop":
+        return 186;
       default:
         return null; // or some default/fallback ID
     }
