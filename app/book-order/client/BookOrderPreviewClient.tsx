@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import styles from "../page.module.css";
+import { useToken } from "../../context/TokenContext";
 
 export default function BookOrderPreviewClient() {
   const params = useSearchParams();
@@ -165,6 +166,7 @@ export default function BookOrderPreviewClient() {
     const shippingTrackingUrl = trackingNumber
   ? `https://www.parcel2go.com/tracking/${trackingNumber}`
   : "https://www.parcel2go.com/tracking/";
+    const { token } = useToken();
 
     const helmPayload = {
       order_id: helmOrderId,
@@ -188,7 +190,7 @@ export default function BookOrderPreviewClient() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${yourToken}`,
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
         body: JSON.stringify(helmPayload),
       });
