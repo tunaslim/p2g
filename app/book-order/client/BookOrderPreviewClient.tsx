@@ -128,6 +128,53 @@ export default function BookOrderPreviewClient() {
     }
   };
 
+    // ------- NEW: DESPATCH ON HELM HANDLER --------
+  const handleDespatchOnHelm = async () => {
+    setLoading(true);
+    setError(null);
+
+    // TODO: Replace with real payload, e.g.:
+    // { order_id: ..., shipment: {...} }
+    const helmPayload = {
+      order_id: 123, // placeholder, should be from your order context
+      shipment: {
+        courier_service_id: 91,
+        tracking_codes: trackingNumber || "SAMPLE",
+        shipping_tracking_urls: "https://dc35dev8.myhelm.app/orders/index",
+        shipping_label: label4x6Url,
+        shipping_label_type: "pdf_url",
+        parcel_dimensions: {
+          width: 21,
+          height: 22,
+          length: 23,
+          weight: 99,
+        },
+      },
+    };
+
+    try {
+      const res = await fetch("/api/helm-despatch", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // "Authorization": `Bearer ${yourToken}`, // If needed
+        },
+        body: JSON.stringify(helmPayload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || res.statusText);
+
+      setDespatchDone(true);
+      // You can add a toast, alert, etc.
+    } catch (err: any) {
+      setError(err.message || "Unknown error");
+      setDespatchDone(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+  // ----------------------------------------------
+
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!order) return <p>Loading payload…</p>;
 
@@ -189,6 +236,21 @@ export default function BookOrderPreviewClient() {
               : trackingNumber
               ? "Tracking Acquired"
               : "Get Tracking Number"}
+          </button>
+        )}
+        {trackingNumber && label4x6Url && (
+          <button
+            className={styles.button}
+            onClick={handleDespatchOnHelm}
+            disabled={loading || despatchDone}
+            type="button"
+            style={{ marginLeft: 12, backgroundColor: "#006f4f" }}
+          >
+            {loading
+              ? "Processing…"
+              : despatchDone
+              ? "Despatched"
+              : "Despatch on Helm"}
           </button>
         )}
       </div>
