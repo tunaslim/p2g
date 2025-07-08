@@ -146,6 +146,8 @@ export default function BookOrderPreviewClient() {
         return 186;
       case "Royal Mail 24 Tracked Large Letter":
         return 194;
+      case "Royal Mail 48 Tracked Large Letter":
+        return 188;
       default:
         return null; // or some default/fallback ID
     }
