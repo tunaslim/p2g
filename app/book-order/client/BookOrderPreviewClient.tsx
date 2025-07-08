@@ -6,6 +6,7 @@ import styles from "../page.module.css";
 export default function BookOrderPreviewClient() {
   const params = useSearchParams();
   const raw = params.get("order") || "";
+  const helmOrderId = params.get("helmOrderId") || null;
 
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -165,7 +166,7 @@ export default function BookOrderPreviewClient() {
     // TODO: Replace with real payload, e.g.:
     // { order_id: ..., shipment: {...} }
     const helmPayload = {
-      order_id: 123, // placeholder, should be from your order context
+      order_id: helmOrderId,
       shipment: {
         courier_service_id: courierServiceId,
         tracking_codes: trackingNumber || "SAMPLE",
