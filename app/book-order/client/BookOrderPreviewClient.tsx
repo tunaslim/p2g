@@ -270,7 +270,7 @@ export default function BookOrderPreviewClient() {
               : "Get Tracking Number"}
           </button>
         )}
-        {trackingNumber && label4x6Url && (
+        {prepayDone && label4x6Url && (
           <button
             className={styles.button}
             onClick={handleDespatchOnHelm}
