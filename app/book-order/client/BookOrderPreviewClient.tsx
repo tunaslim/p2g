@@ -129,26 +129,47 @@ export default function BookOrderPreviewClient() {
     }
   };
 
+  // Mapping of serviceName to courier_service_id
+  const getCourierServiceId = (serviceName: string) => {
+    switch (serviceName) {
+      case "Evri ParcelShop Postable":
+        return 183;
+      case "Evri ParcelShop":
+        return 182;
+      // You can add more mappings here if needed
+      default:
+        return null; // or some default/fallback ID
+    }
+  };
+
     // ------- NEW: DESPATCH ON HELM HANDLER --------
   const handleDespatchOnHelm = async () => {
     setLoading(true);
     setError(null);
+
+    // Extract dimensions from the order
+    const parcel = order?.Items?.[0]?.Parcels?.[0];
+    const width = parcel?.Width ?? null;
+    const height = parcel?.Height ?? null;
+    const length = parcel?.Length ?? null;
+    const weight = parcel?.Weight ?? null;
+    const courierServiceId = getCourierServiceId(order?.serviceName);
 
     // TODO: Replace with real payload, e.g.:
     // { order_id: ..., shipment: {...} }
     const helmPayload = {
       order_id: 123, // placeholder, should be from your order context
       shipment: {
-        courier_service_id: 91,
+        courier_service_id: courierServiceId,
         tracking_codes: trackingNumber || "SAMPLE",
         shipping_tracking_urls: "https://dc35dev8.myhelm.app/orders/index",
         shipping_label: label4x6Url,
         shipping_label_type: "pdf_url",
         parcel_dimensions: {
-          width: 21,
-          height: 22,
-          length: 23,
-          weight: 99,
+          width,
+          height,
+          length,
+          weight,
         },
       },
     };
