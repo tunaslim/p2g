@@ -15,6 +15,7 @@ export default function BookOrderPreviewClient() {
   const [trackingNumber, setTrackingNumber] = useState<string | null>(null);
   const [orderCreated, setOrderCreated] = useState(false);
   const [prepayDone, setPrepayDone] = useState(false);
+  const [despatchDone, setDespatchDone] = useState(false);
 
   useEffect(() => {
     try {
