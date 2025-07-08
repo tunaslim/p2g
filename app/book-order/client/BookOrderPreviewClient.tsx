@@ -162,15 +162,16 @@ export default function BookOrderPreviewClient() {
     const length = parcel?.Length ?? null;
     const weight = parcel?.Weight ?? null;
     const courierServiceId = getCourierServiceId(order?.serviceName);
+    const shippingTrackingUrl = trackingNumber
+  ? `https://www.parcel2go.com/tracking/${trackingNumber}`
+  : "https://www.parcel2go.com/tracking/";
 
-    // TODO: Replace with real payload, e.g.:
-    // { order_id: ..., shipment: {...} }
     const helmPayload = {
       order_id: helmOrderId,
       shipment: {
         courier_service_id: courierServiceId,
         tracking_codes: trackingNumber || "SAMPLE",
-        shipping_tracking_urls: "https://dc35dev8.myhelm.app/orders/index",
+        shipping_tracking_urls: shippingTrackingUrl,
         shipping_label: label4x6Url,
         shipping_label_type: "pdf_url",
         parcel_dimensions: {
