@@ -187,7 +187,7 @@ export default function BookOrderPreviewClient() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // "Authorization": `Bearer ${yourToken}`, // If needed
+          "Authorization": `Bearer ${yourToken}`,
         },
         body: JSON.stringify(helmPayload),
       });
