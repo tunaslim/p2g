@@ -374,7 +374,7 @@ const handlePreview = (
   const mergedPayload = { ...payload, courierName, serviceName };
 
   const encoded = encodeURIComponent(JSON.stringify(mergedPayload));
-  window.open(`/book-order?order=${encoded}`, '_blank');
+  window.open(`/book-order?order=${encoded}&helmOrderId=${order.id}`, '_blank');
 };
 
 // Helper for guid
