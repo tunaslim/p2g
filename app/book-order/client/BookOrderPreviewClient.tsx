@@ -8,7 +8,7 @@ export default function BookOrderPreviewClient() {
   const params = useSearchParams();
   const raw = params.get("order") || "";
   const helmOrderId = params.get("helmOrderId") || null;
-
+  const { token } = useToken();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<any>(null);
@@ -166,7 +166,6 @@ export default function BookOrderPreviewClient() {
     const shippingTrackingUrl = trackingNumber
   ? `https://www.parcel2go.com/tracking/${trackingNumber}`
   : "https://www.parcel2go.com/tracking/";
-    const { token } = useToken();
 
     const helmPayload = {
       order_id: helmOrderId,
