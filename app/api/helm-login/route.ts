@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
       'Accept': 'application/json',
     },
     // withCredentials: false, // Not needed for this endpoint, but can be toggled to test
-    // maxRedirects: 0, // Optional: to catch a redirect instead of getting HTML
+    maxRedirects: 0,
   }
 );
     console.log(response.data);
