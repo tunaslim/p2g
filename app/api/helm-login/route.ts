@@ -10,6 +10,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
+  console.log('Sending to Helm:', JSON.stringify(body, null, 2));
+
   try {
     // POST to Helm login API
     const response = await axios.post(
