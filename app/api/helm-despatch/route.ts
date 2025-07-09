@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   // 3. POST to Helm API with Bearer token
   try {
     const resp = await axios.post(
-      "https://goodlife.myhelm.app/orders/despatch_with_tracking_code",
+      "https://goodlife.myhelm.app/public-api/orders/despatch_with_tracking_code",
       payload,
       {
         headers: {
