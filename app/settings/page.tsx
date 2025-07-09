@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import styles from '../page.module.css';
-import axios from 'axios';
 import { useToken } from '../context/TokenContext';
 import { useRouter } from 'next/navigation';
 
@@ -24,16 +23,26 @@ export default function SettingsPage() {
     setToken('');
 
     try {
-      const response = await axios.post('/api/helm-login', {
-        email,
-        password,
+      const res = await fetch('/api/helm-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          // 2fa_code: null, // Uncomment if required by backend
+        }),
       });
 
-      console.log(response.data);
+      const data = await res.json();
 
-      setToken(response.data.token);
+      if (!res.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      console.log(data); // Debug: see what comes back from backend
+      setToken(data.token);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed');
+      setError(err.message || 'Login failed');
     }
   };
 
@@ -63,7 +72,9 @@ export default function SettingsPage() {
           />
         </label>
 
-        <button type="submit" className={styles.primaryButton}>Login to Helm</button>
+        <button type="submit" className={styles.primaryButton}>
+          Login to Helm
+        </button>
       </form>
 
       {error && <p className={styles.error}>{error}</p>}
