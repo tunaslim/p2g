@@ -29,6 +29,8 @@ export default function SettingsPage() {
         password,
       });
 
+      console.log(response.data);
+
       setToken(response.data.token);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Login failed');
