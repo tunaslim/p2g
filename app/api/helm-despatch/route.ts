@@ -24,8 +24,8 @@ export async function POST(req: NextRequest) {
       payload,
       {
         headers: {
-          Authorization: token,
-          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
         },
       }
     );
