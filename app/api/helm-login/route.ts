@@ -6,8 +6,18 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
 
   try {
-    const response = await axios.post('https://goodlife.myhelm.app/auth/login', body);
-    // Log the actual response for debugging
+    const response = await axios.post(
+  'https://goodlife.myhelm.app/auth/login',
+  body,
+  {
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    // withCredentials: false, // Not needed for this endpoint, but can be toggled to test
+    // maxRedirects: 0, // Optional: to catch a redirect instead of getting HTML
+  }
+);
     console.log(response.data);
 
     return NextResponse.json({ token: response.data.token });
