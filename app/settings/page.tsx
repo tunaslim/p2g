@@ -24,7 +24,7 @@ export default function SettingsPage() {
     setToken('');
 
     try {
-      const response = await axios.post('app/api/helm-login', {
+      const response = await axios.post('/api/helm-login', {
         email,
         password,
       });
