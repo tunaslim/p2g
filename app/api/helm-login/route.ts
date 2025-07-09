@@ -1,40 +1,38 @@
+// app/api/helm-login/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
 
 export async function POST(req: NextRequest) {
-  // Get JSON from request body
-  let body: any;
+  let body: { email: string; password: string; "2fa_code"?: string } = { email: '', password: '' };
+
   try {
     body = await req.json();
-  } catch (err) {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  console.log('Sending to Helm:', JSON.stringify(body, null, 2));
-
   try {
-    // POST to Helm login API
-    const response = await axios.post(
-      'https://goodlife.myhelm.app/auth/login',
-      body,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      }
-    );
-    // Log response for debugging
-    console.log('Helm login response:', response.data);
+    const res = await fetch('https://goodlife.myhelm.app/public-api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
 
-    // Return token to frontend
-    return NextResponse.json({ token: response.data.token });
+    // Attempt to parse the response as JSON
+    const data = await res.json();
+
+    if (!res.ok || !data.token) {
+      return NextResponse.json(
+        { error: data.error || data.message || 'Login failed' },
+        { status: res.status }
+      );
+    }
+
+    // Success: return only the token
+    return NextResponse.json({ token: data.token });
   } catch (error: any) {
-    // Print more error details
-    console.error('Helm login error:', error.response?.status, error.response?.data);
     return NextResponse.json(
-      { error: error.response?.data?.message || 'Login failed' },
-      { status: error.response?.status || 500 }
+      { error: error.message || 'Unexpected error occurred' },
+      { status: 500 }
     );
   }
 }
