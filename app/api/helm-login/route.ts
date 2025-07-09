@@ -7,7 +7,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const response = await axios.post('https://goodlife.myhelm.app/auth/login', body);
-    console.log('Helm API response:', response.data);
+    // Log the actual response for debugging
+    console.log(response.data);
+
     return NextResponse.json({ token: response.data.token });
   } catch (error: any) {
     return NextResponse.json(
