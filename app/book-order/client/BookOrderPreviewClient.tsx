@@ -156,6 +156,8 @@ export default function BookOrderPreviewClient() {
         return 190;
       case "Royal Mail 48 Tracked Small":
         return 193;
+      case "Evri Ireland Standard Parcelshop":
+        return 195;
       default:
         return null; // or some default/fallback ID
     }
