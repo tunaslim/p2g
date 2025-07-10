@@ -215,12 +215,14 @@ export default function BookOrderPreviewClient() {
   return (
     <div className={styles.preview}>
       <h1>Preview Order</h1>
+      {/*
       <section>
         <h2>Full JSON Payload</h2>
         <pre style={{ whiteSpace: "pre-wrap", maxHeight: "300px", overflow: "auto" }}>
           {JSON.stringify(order, null, 2)}
         </pre>
       </section>
+      */}
       <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
         <button
           onClick={handleCreate}
@@ -294,7 +296,7 @@ export default function BookOrderPreviewClient() {
           <strong>{order.courierName}</strong>, {order.serviceName}, <span>{trackingNumber}</span>
         </div>
       )}
-      
+      {/*
       {response && (
         <section>
           <h2>Response</h2>
@@ -303,6 +305,7 @@ export default function BookOrderPreviewClient() {
           </pre>
         </section>
       )}
+      */}
     </div>
   );
 }
