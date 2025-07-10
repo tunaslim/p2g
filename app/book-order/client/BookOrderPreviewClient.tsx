@@ -148,6 +148,14 @@ export default function BookOrderPreviewClient() {
         return 194;
       case "Royal Mail 48 Tracked Large Letter":
         return 188;
+      case "Royal Mail International Tracked & Signed":
+        return 187;
+      case "Evri Postable Next Day":
+        return 189;
+      case "Evri ParcelShop Next Day":
+        return 190;
+      case "Royal Mail 48 Tracked Small":
+        return 193;
       default:
         return null; // or some default/fallback ID
     }
