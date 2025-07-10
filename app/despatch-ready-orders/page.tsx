@@ -628,7 +628,7 @@ function generateGuid() {
                               {order.inventory.map((item, i) => {
                                 const details = inventoryDetailsMap[item.inventory_id] || {};
                                 const hsCode = details.hs_code || "";
-                                // New: HS code is invalid if length < 8 or > 10, or equals 00000000
+                                const hideHSCode = country3 === "GBR";
                                 const isInvalidHS =
                                   hsCode.length < 8 || hsCode.length > 10 || hsCode === "00000000";
                                 return (
