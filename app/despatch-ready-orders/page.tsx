@@ -626,12 +626,20 @@ function generateGuid() {
                             <div className={styles.orderCell}>
                               {order.inventory.map((item, i) => {
                                 const details = inventoryDetailsMap[item.inventory_id] || {};
+                                const hsCode = details.hs_code || "";
                                 return (
                                   <div key={i}>
                                     <strong>{item.name || details.customs_description}</strong>
                                     {" (x" + item.quantity + ")"}
-                                    {details.hs_code && (
-                                      <span> | HS: {details.hs_code}</span>
+                                    {hsCode && (
+                                      <>
+                                        <span> | HS: {hsCode}</span>
+                                        {hsCode.length < 8 && (
+                                          <span style={{ color: "red", fontWeight: "bold", marginLeft: 8 }}>
+                                            Please fix the HS code and reload this page.
+                                          </span>
+                                        )}
+                                      </>
                                     )}
                                     {" | Price: £" + Number(item.price).toFixed(2)}
                                   </div>
