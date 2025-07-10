@@ -249,29 +249,18 @@ export default function BookOrderPreviewClient() {
               : "Pay Shipment with PrePay"}
           </button>
         )}
-        {label4x6Url && (
+        {label4x6Url && response?.OrderId && prepayDone && (
           <button
             className={styles.button}
-            onClick={() => window.open(label4x6Url, "_blank")}
+            onClick={async () => {
+              window.open(label4x6Url, "_blank");
+              await handleGetTracking();
+            }}
+            disabled={loading}
             type="button"
             style={{ marginLeft: 12 }}
           >
             Download 4x6 Label
-          </button>
-        )}
-        {response?.OrderId && prepayDone && (
-          <button
-            className={styles.button}
-            onClick={handleGetTracking}
-            disabled={loading || !!trackingNumber}
-            type="button"
-            style={{ marginLeft: 12 }}
-          >
-            {loading
-              ? "Getting Tracking…"
-              : trackingNumber
-              ? "Tracking Acquired"
-              : "Get Tracking Number"}
           </button>
         )}
         {prepayDone && label4x6Url && (
