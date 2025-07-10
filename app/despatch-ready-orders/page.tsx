@@ -634,7 +634,7 @@ function generateGuid() {
                                 return (
                                   <div key={i}>
                                     {item.sku && (
-                                      <span style={{ color: "#555", marginLeft: 8 }}>
+                                      <span style={{ color: "#555" }}>
                                         {item.sku} |
                                       </span>
                                     )}
