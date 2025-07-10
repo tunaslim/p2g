@@ -218,6 +218,7 @@ export default function DespatchReadyOrders() {
     const baseValue = totalPaid - shippingCost;
     const country3 =
       iso2to3[order.shipping_address_iso] || order.shipping_address_iso;
+    const hideHSCode = country3 === "GBR";
     const parcelValue = country3 === "GBR" ? baseValue / 1.2 : baseValue;
 
     const info = packageInfo[order.id] || {
@@ -627,8 +628,9 @@ function generateGuid() {
                               {order.inventory.map((item, i) => {
                                 const details = inventoryDetailsMap[item.inventory_id] || {};
                                 const hsCode = details.hs_code || "";
+                                // New: HS code is invalid if length < 8 or > 10, or equals 00000000
                                 const isInvalidHS =
-                                  hsCode.length < 8 || hsCode.length > 10;
+                                  hsCode.length < 8 || hsCode.length > 10 || hsCode === "00000000";
                                 return (
                                   <div key={i}>
                                     <strong>{item.name || details.customs_description}</strong>
@@ -638,7 +640,8 @@ function generateGuid() {
                                       </span>
                                     )}
                                     {" (x" + item.quantity + ")"}
-                                    {hsCode && (
+                                    {/* Only show HS code and validation for non-GBR shipments */}
+                                    {!hideHSCode && hsCode && (
                                       <>
                                         <span> | HS: {hsCode}</span>
                                         {isInvalidHS && (
