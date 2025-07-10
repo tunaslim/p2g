@@ -633,12 +633,12 @@ function generateGuid() {
                                   hsCode.length < 8 || hsCode.length > 10 || hsCode === "00000000";
                                 return (
                                   <div key={i}>
-                                    <strong>{item.name || details.customs_description}</strong>
                                     {item.sku && (
                                       <span style={{ color: "#555", marginLeft: 8 }}>
-                                        (SKU: {item.sku})
+                                        {item.sku} |
                                       </span>
                                     )}
+                                    <strong> {item.name || details.customs_description}</strong>
                                     {" (x" + item.quantity + ")"}
                                     {/* Only show HS code and validation for non-GBR shipments */}
                                     {!hideHSCode && hsCode && (
