@@ -627,6 +627,8 @@ function generateGuid() {
                               {order.inventory.map((item, i) => {
                                 const details = inventoryDetailsMap[item.inventory_id] || {};
                                 const hsCode = details.hs_code || "";
+                                const isInvalidHS =
+                                  hsCode.length < 8 || hsCode === "00000000";
                                 return (
                                   <div key={i}>
                                     <strong>{item.name || details.customs_description}</strong>
@@ -634,9 +636,9 @@ function generateGuid() {
                                     {hsCode && (
                                       <>
                                         <span> | HS: {hsCode}</span>
-                                        {hsCode.length < 8 && (
+                                        {isInvalidHS && (
                                           <span style={{ color: "red", fontWeight: "bold", marginLeft: 8 }}>
-                                            Please fix the HS code and reload this page.
+                                            Please fix the HS code and reload this page
                                           </span>
                                         )}
                                       </>
