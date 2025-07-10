@@ -173,6 +173,8 @@ export default function DespatchReadyOrders() {
     MU: "MUS",
     KR: "KOR",
     LU: "LUX",
+    IE: "IRL",
+
   };
 
   const getChannelLogo = (id: number) => {
