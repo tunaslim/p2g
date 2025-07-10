@@ -628,10 +628,15 @@ function generateGuid() {
                                 const details = inventoryDetailsMap[item.inventory_id] || {};
                                 const hsCode = details.hs_code || "";
                                 const isInvalidHS =
-                                  hsCode.length < 8 || hsCode === "00000000";
+                                  hsCode.length < 8 || hsCode.length > 10;
                                 return (
                                   <div key={i}>
                                     <strong>{item.name || details.customs_description}</strong>
+                                    {item.sku && (
+                                      <span style={{ color: "#555", marginLeft: 8 }}>
+                                        (SKU: {item.sku})
+                                      </span>
+                                    )}
                                     {" (x" + item.quantity + ")"}
                                     {hsCode && (
                                       <>
