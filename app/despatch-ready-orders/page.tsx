@@ -401,8 +401,14 @@ function generateGuid() {
   ) => {
     let IOSSCode = "";
     let EoriNumber = "";
-    if ([2, 3, 4, 5, 6, 25, 27].includes(order.channel_id)) {
+    if ([4, 5, 6, 25].includes(order.channel_id)) {
       IOSSCode = "IM4420001201";
+    } else if (order.channel_id === 2) {
+      IOSSCode = "IM4420001405";
+    } else if (order.channel_id === 3) {
+      IOSSCode = "IM4420001405";
+    } else if (order.channel_id === 27) {
+      IOSSCode = "IM4420001405";
     } else if (order.channel_id === 11) {
       IOSSCode = "IM3720000224";
     } else if ([15, 24].includes(order.channel_id)) {
