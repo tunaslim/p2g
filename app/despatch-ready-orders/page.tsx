@@ -401,20 +401,26 @@ function generateGuid() {
   ) => {
     let IOSSCode = "";
     let EoriNumber = "";
-    if ([4, 5, 6, 25].includes(order.channel_id)) {
-      IOSSCode = "IM4420001201";
-    } else if (order.channel_id === 2) {
-      IOSSCode = "IM4420001405";
-    } else if (order.channel_id === 3) {
-      IOSSCode = "IM4420001405";
-    } else if (order.channel_id === 27) {
-      IOSSCode = "IM4420001405";
-    } else if (order.channel_id === 11) {
-      IOSSCode = "IM3720000224";
-    } else if ([15, 24].includes(order.channel_id)) {
-      IOSSCode = "IM2760000742";
-    } else if ([7, 8].includes(order.channel_id)) {
-      EoriNumber = "GB122703551000";
+    let VatNumber = "";
+    
+    if (order.id === 11 && country3 === "CHE") {
+      VatNumber = "CHE-373.086.513";
+    } else {
+      if ([4, 5, 6, 25].includes(order.channel_id)) {
+        IOSSCode = "IM4420001201";
+      } else if (order.channel_id === 2) {
+        IOSSCode = "IM4420001405";
+      } else if (order.channel_id === 3) {
+        IOSSCode = "IM4420001405";
+      } else if (order.channel_id === 27) {
+        IOSSCode = "IM4420001405";
+      } else if (order.channel_id === 11) {
+        IOSSCode = "IM3720000224";
+      } else if ([15, 24].includes(order.channel_id)) {
+        IOSSCode = "IM2760000742";
+      } else if ([7, 8].includes(order.channel_id)) {
+        EoriNumber = "GB122703551000";
+      }
     }
     const extCover = quote.AvailableExtras.find(e => e.Type === 'ExtendedBaseCover');
     const totalWithExtended = quote.TotalPrice + (extCover?.Total || 0);
@@ -451,6 +457,7 @@ function generateGuid() {
           VatStatus: 'Individual',
           RecipientVatStatus: 'Individual',
           ...(IOSSCode && { IOSSCode }),
+          ...(VatNumber && { VatNumber }),
           ...(EoriNumber && { EoriNumber }),
           ...(upsells && { Upsells: upsells }),
           Service: quote.Service.Slug,
